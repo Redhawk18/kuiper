@@ -2,8 +2,8 @@ use iced::{Application, Settings};
 
 mod gui;
 
-pub use gui::ApplicationState;
+pub use gui::State;
 
 fn main() -> iced::Result {
-    ApplicationState::run(Settings::default())
+    State::run(Settings::default())
 }
