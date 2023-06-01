@@ -1,7 +1,7 @@
 use iced::widget::TextInput;
 use iced::{theme, Application, Command, Element, Subscription};
 use iced::widget::column;
-use iced_aw::menu::{MenuBar, MenuTree};
+use iced_aw::menu::MenuBar;
 
 mod menu_bar;
 
@@ -57,4 +57,3 @@ impl Application for State {
         Subscription::none()
     }
 }
-
