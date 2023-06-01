@@ -2,7 +2,9 @@ use iced::widget::button;
 use iced_aw::menu::MenuTree;
 
 pub fn file<'a>(_app: &super::State) -> MenuTree<'a, super::Message, iced::Renderer> {
-    let open_file = MenuTree::new(button("Open File",)); 
+    let new_file = MenuTree::new(button("New File",)); 
+
+    let open_file = MenuTree::new(button("Open File",));
 
     let open_folder = MenuTree::new(button("Open Folder",));
 
@@ -11,6 +13,7 @@ pub fn file<'a>(_app: &super::State) -> MenuTree<'a, super::Message, iced::Rende
     let save_as = MenuTree::new(button("Open File",));
 
     let root = MenuTree::with_children(button("File"), vec![
+        new_file,
         open_file,
         open_folder,
         save,
