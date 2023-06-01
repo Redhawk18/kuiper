@@ -4,7 +4,7 @@ use iced_aw::menu::MenuTree;
 pub fn file<'a>(_app: &super::State) -> MenuTree<'a, super::Message, iced::Renderer> {
     let new_file = MenuTree::new(button("New File",)); 
 
-    let open_file = MenuTree::new(button("Open File",));
+    let open_file = MenuTree::new(button("Open File",).on_press(super::Message::OpenFile((true))));
 
     let open_folder = MenuTree::new(button("Open Folder",));
 

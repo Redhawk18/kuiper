@@ -2,6 +2,7 @@ use iced::widget::TextInput;
 use iced::{theme, Application, Command, Element, Subscription};
 use iced::widget::column;
 use iced_aw::menu::MenuBar;
+use open;
 
 mod menu_bar;
 
@@ -9,7 +10,8 @@ pub use menu_bar::file;
 
 #[derive(Debug, Clone)]
 pub enum Message {
-    Update(String),
+    TextUpdate(String),
+    OpenFile(bool),
 }
 
 pub struct State {
@@ -37,8 +39,12 @@ impl Application for State {
 
     fn update(&mut self, message: Message) -> Command<Message> {
         match message {
-            Message::Update(text) => {
+            Message::TextUpdate(text) => {
                 self.text = text;
+            }
+
+            Message::OpenFile(toggle) => {
+                open::that_in_background("/home/redhawk");
             }
         }
 
@@ -48,7 +54,7 @@ impl Application for State {
     fn view(&self) -> Element<Message> {
         let menu_bar = MenuBar::new(vec![file(self),]);
 
-        let text_input = TextInput::new("code...", &self.text).on_input(Message::Update);
+        let text_input = TextInput::new("code...", &self.text).on_input(Message::TextUpdate);
 
         column![menu_bar, text_input].into()
     }
