@@ -1,8 +1,11 @@
 use iced::widget::TextInput;
 use iced::{theme, Application, Command, Element, Subscription};
-use iced::widget::button;
 use iced::widget::column;
-use iced_aw::menu::{CloseCondition, ItemHeight, ItemWidth, MenuBar, MenuTree, PathHighlight};
+use iced_aw::menu::{MenuBar, MenuTree};
+
+mod menu_bar;
+
+pub use menu_bar::file;
 
 #[derive(Debug, Clone)]
 pub enum Message {
@@ -47,9 +50,7 @@ impl Application for State {
 
         let text_input = TextInput::new("code...", &self.text).on_input(Message::Update);
 
-        let c = column!(menu_bar, text_input);
-
-        c.into()
+        column![menu_bar, text_input].into()
     }
 
     fn subscription(&self) -> Subscription<Message> {
@@ -57,8 +58,3 @@ impl Application for State {
     }
 }
 
-fn file<'a>(app: &State) -> MenuTree<'a, Message, iced::Renderer> {
-    let root = MenuTree::new(button("File",));
-
-    root
-}
