@@ -34,8 +34,8 @@ impl Application for State {
 
     fn update(&mut self, message: Message) -> Command<Message> {
         match message {
-            Message::Update(new_text) => {
-                self.text = new_text;
+            Message::Update(text) => {
+                self.text = text;
             }
         }
 
@@ -45,7 +45,7 @@ impl Application for State {
     fn view(&self) -> Element<Message> {
         let menu_bar = MenuBar::new(vec![file(self),]);
 
-        let text_input = Element::new(TextInput::new("", &self.text).on_input(Message::Update));
+        let text_input = TextInput::new("code...", &self.text).on_input(Message::Update);
 
         let c = column!(menu_bar, text_input);
 
