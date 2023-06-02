@@ -8,4 +8,4 @@ edition = "2021"
 [dependencies]
 iced = "0.9.0"
 iced_aw = { version = "0.5", default-features = false, features = ["menu", "split", "tab_bar", "tabs"] }
-open = "4.1.0"
+native-dialog = "0.6.3"

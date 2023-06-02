@@ -2,7 +2,7 @@ use iced::widget::TextInput;
 use iced::{theme, Application, Command, Element, Subscription};
 use iced::widget::column;
 use iced_aw::menu::MenuBar;
-use open;
+use native_dialog::FileDialog;
 
 mod menu_bar;
 
@@ -11,7 +11,7 @@ pub use menu_bar::file;
 #[derive(Debug, Clone)]
 pub enum Message {
     TextUpdate(String),
-    OpenFile(bool),
+    OpenFile(),
 }
 
 pub struct State {
@@ -43,8 +43,13 @@ impl Application for State {
                 self.text = text;
             }
 
-            Message::OpenFile(toggle) => {
-                open::that_in_background("/home/redhawk");
+            Message::OpenFile() => {
+                let path = FileDialog::new()
+                .set_location("~/")
+                .show_open_single_file()
+                .unwrap();
+
+                println!("{:?}", path);
             }
         }
 
