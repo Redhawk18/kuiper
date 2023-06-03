@@ -11,7 +11,13 @@ pub use menu_bar::file;
 #[derive(Debug, Clone)]
 pub enum Message {
     TextUpdate(String),
+
+    //menu bar
+    NewFile(),
     OpenFile(),
+    OpenFolder(),
+    Save(),
+    SaveAs(),    
 }
 
 pub struct State {
@@ -43,6 +49,8 @@ impl Application for State {
                 self.text = text;
             }
 
+            Message::NewFile() => todo!(),
+
             Message::OpenFile() => {
                 let path = FileDialog::new()
                 .set_location("~/")
@@ -51,6 +59,13 @@ impl Application for State {
 
                 println!("{:?}", path);
             }
+            
+            Message::OpenFolder() => todo!(),
+
+            Message::Save() => todo!(),
+
+            Message::SaveAs() => todo!(),
+
         }
 
         Command::none()
