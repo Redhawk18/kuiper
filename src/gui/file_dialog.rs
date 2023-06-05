@@ -2,7 +2,6 @@ use rfd::FileDialog;
 
 pub fn open_file() {
     let path_opt = FileDialog::new()
-        .set_directory("~/")
         .pick_file();
 
     let Some(path) = path_opt
@@ -15,7 +14,6 @@ pub fn open_file() {
 
 pub fn open_folder() {
     let path_opt = FileDialog::new()
-        .set_directory("~/")
         .pick_folder();
 
     let Some(path) = path_opt
