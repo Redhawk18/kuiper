@@ -2,8 +2,8 @@ use iced::widget::TextInput;
 use iced::{theme, Application, Command, Element, Subscription};
 use iced::widget::column;
 use iced_aw::menu::MenuBar;
-use rfd::FileDialog;
 
+mod file_dialog;
 mod menu_bar;
 
 pub use menu_bar::file;
@@ -49,22 +49,25 @@ impl Application for State {
                 self.text = text;
             }
 
-            Message::NewFile() => todo!(),
+            Message::NewFile() => {
+                todo!();
+            }
 
             Message::OpenFile() => {
-                let files = FileDialog::new()
-                    .set_directory("~/")
-                    .pick_file();
-
-                println!("{:?}", files);
+                file_dialog::open_file();
             }
             
-            Message::OpenFolder() => todo!(),
+            Message::OpenFolder() =>  {
+                file_dialog::open_folder();
+            }
 
-            Message::Save() => todo!(),
+            Message::Save() =>  {
+                todo!();
+            }
 
-            Message::SaveAs() => todo!(),
-
+            Message::SaveAs() =>  {
+                todo!();
+            }
         }
 
         Command::none()
