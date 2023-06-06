@@ -54,7 +54,9 @@ impl Application for State {
             }
 
             Message::OpenFile() => {
-                file_dialog::open_file();
+                let file_contents = file_dialog::open_file();
+
+                Message::TextUpdate(file_contents);
             }
 
             Message::OpenFolder() => {
