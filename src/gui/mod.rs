@@ -1,6 +1,6 @@
+use iced::widget::column;
 use iced::widget::TextInput;
 use iced::{theme, Application, Command, Element, Subscription};
-use iced::widget::column;
 use iced_aw::menu::MenuBar;
 
 mod file_dialog;
@@ -17,7 +17,7 @@ pub enum Message {
     OpenFile(),
     OpenFolder(),
     Save(),
-    SaveAs(),    
+    SaveAs(),
 }
 
 pub struct State {
@@ -56,16 +56,16 @@ impl Application for State {
             Message::OpenFile() => {
                 file_dialog::open_file();
             }
-            
-            Message::OpenFolder() =>  {
+
+            Message::OpenFolder() => {
                 file_dialog::open_folder();
             }
 
-            Message::Save() =>  {
+            Message::Save() => {
                 todo!();
             }
 
-            Message::SaveAs() =>  {
+            Message::SaveAs() => {
                 todo!();
             }
         }
@@ -74,7 +74,7 @@ impl Application for State {
     }
 
     fn view(&self) -> Element<Message> {
-        let menu_bar = MenuBar::new(vec![file(self),]);
+        let menu_bar = MenuBar::new(vec![file(self)]);
 
         let text_input = TextInput::new("code...", &self.text).on_input(Message::TextUpdate);
 
