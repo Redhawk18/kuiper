@@ -1,5 +1,6 @@
 use iced::{Application, Settings};
 
+mod core;
 mod gui;
 
 pub use gui::State;

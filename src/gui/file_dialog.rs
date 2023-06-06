@@ -1,5 +1,7 @@
 use rfd::FileDialog;
 
+use crate::core::read_file;
+
 pub fn open_file() {
     let path_opt = FileDialog::new()
         .pick_file();
@@ -9,7 +11,9 @@ pub fn open_file() {
 
     println!("{:?}", path);
 
-    todo!(); //update gui
+    // todo!(); //update gui
+    read_file(path);
+
 }
 
 pub fn open_folder() {
