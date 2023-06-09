@@ -75,7 +75,8 @@ impl Application for State {
                     Ok(_v) => {
                         return Command::none();
                     }
-                    Err(_e) => {
+                    Err(e) => {
+                        log::warn!("{}", e);
                         return Command::none();
                     }
                 }
