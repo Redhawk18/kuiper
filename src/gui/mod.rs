@@ -63,7 +63,6 @@ impl Application for State {
                         return Command::none();
                     }
                 }
-                
             }
 
             Message::OpenFolder() => {

@@ -1,5 +1,5 @@
-use std::io::Result;
 use std::fs;
+use std::io::Result;
 use std::path::PathBuf;
 use std::string::String;
 
