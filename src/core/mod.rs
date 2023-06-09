@@ -1,14 +1,16 @@
+use std::io::Result;
 use std::fs;
 use std::path::PathBuf;
 use std::string::String;
 
-/// Returns the contents of the file given a valid PathBuf, errors are not handled.
-pub fn read_file(path: PathBuf) -> String {
-    println!("In file {:?}", path);
+use log;
 
-    let contents: String = fs::read_to_string(path).expect("Should have been able to read the file");
+/// Returns the contents of the file given a valid PathBuf.
+pub fn read_file(path: PathBuf) -> Result<String> {
+    log::info!("reading file at: {:?}", path);
 
-    println!("With text:\n{contents}");
+    let contents =
+        fs::read_to_string(path);
 
     contents
 }

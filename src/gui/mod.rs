@@ -55,8 +55,15 @@ impl Application for State {
 
             Message::OpenFile() => {
                 let file_contents = file_dialog::open_file();
-
-                return self.update(Message::TextUpdate(file_contents));
+                match file_contents {
+                    Ok(v) => {
+                        return self.update(Message::TextUpdate(v));
+                    }
+                    Err(_e) => {
+                        return Command::none();
+                    }
+                }
+                
             }
 
             Message::OpenFolder() => {
@@ -78,7 +85,8 @@ impl Application for State {
     fn view(&self) -> Element<Message> {
         let menu_bar = MenuBar::new(vec![file(self)]);
 
-        let text_input = TextInput::new("code...", &self.text).on_input(Message::TextUpdate);
+        let placeholder = "Deleted code is debugged code.";
+        let text_input = TextInput::new(placeholder, &self.text).on_input(Message::TextUpdate);
 
         column![menu_bar, text_input].into()
     }
