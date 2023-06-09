@@ -13,3 +13,10 @@ pub fn read_file(path: PathBuf) -> Result<String> {
 
     contents
 }
+
+pub fn save_file(path: PathBuf, contents: &str) -> Result<()> {
+    log::info!("saving file at: {:?}", path);
+    let result = fs::write(path, contents);
+    
+    result
+}

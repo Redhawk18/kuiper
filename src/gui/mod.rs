@@ -70,7 +70,15 @@ impl Application for State {
             }
 
             Message::Save() => {
-                todo!();
+                let result = file_dialog::pick_file_to_save(self.text.as_str());
+                match result {
+                    Ok(_v) => {
+                        return Command::none();
+                    }
+                    Err(_e) => {
+                        return Command::none();
+                    }
+                }
             }
 
             Message::SaveAs() => {
