@@ -9,8 +9,7 @@ use log;
 pub fn read_file(path: PathBuf) -> Result<String> {
     log::info!("reading file at: {:?}", path);
 
-    let contents =
-        fs::read_to_string(path);
+    let contents = fs::read_to_string(path);
 
     contents
 }

@@ -6,7 +6,8 @@ use rfd::FileDialog;
 
 use crate::core::read_file;
 
-pub fn open_file() -> Result<String> {
+/// Displays the user's os native file dialog to pick a file to open.
+pub fn pick_file() -> Result<String> {
     let path_opt = FileDialog::new().pick_file();
 
     let Some(path) = path_opt
@@ -20,7 +21,8 @@ pub fn open_file() -> Result<String> {
     read_file(path)
 }
 
-pub fn open_folder() {
+/// Displays the user's os native file dialog to pick a folder to open.
+pub fn pick_folder() {
     let path_opt = FileDialog::new().pick_folder();
 
     let Some(path) = path_opt

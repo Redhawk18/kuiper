@@ -54,7 +54,7 @@ impl Application for State {
             }
 
             Message::OpenFile() => {
-                let file_contents = file_dialog::open_file();
+                let file_contents = file_dialog::pick_file();
                 match file_contents {
                     Ok(v) => {
                         return self.update(Message::TextUpdate(v));
@@ -67,7 +67,7 @@ impl Application for State {
             }
 
             Message::OpenFolder() => {
-                file_dialog::open_folder();
+                file_dialog::pick_folder();
             }
 
             Message::Save() => {
