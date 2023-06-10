@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use iced::widget::column;
 use iced::widget::TextInput;
 use iced::{theme, Application, Command, Element, Subscription};
@@ -22,6 +24,7 @@ pub enum Message {
 
 pub struct State {
     text: String,
+    path: PathBuf,
 }
 
 impl Application for State {
@@ -34,7 +37,9 @@ impl Application for State {
         (
             State {
                 text: String::from(""),
+                path: PathBuf::default(),
             },
+
             Command::none(),
         )
     }
@@ -54,7 +59,9 @@ impl Application for State {
             }
 
             Message::OpenFile() => {
-                let file_contents = file_dialog::pick_file();
+                let (file_contents, path) = file_dialog::pick_file();
+
+                self.path = path;
                 match file_contents {
                     Ok(v) => {
                         return self.update(Message::TextUpdate(v));
@@ -70,7 +77,7 @@ impl Application for State {
             }
 
             Message::Save() => {
-                let result = file_dialog::pick_file_to_save(self.text.as_str());
+                let result = file_dialog::pick_file_to_save(self.text.as_str(), &self.path);
                 match result {
                     Ok(_v) => {
                         return Command::none();
@@ -91,6 +98,7 @@ impl Application for State {
     }
 
     fn view(&self) -> Element<Message> {
+        println!("{:?}",self.path);
         let menu_bar = MenuBar::new(vec![file(self)]);
 
         let placeholder = "Deleted code is debugged code.";
