@@ -77,20 +77,11 @@ impl Application for State {
             }
 
             Message::Save() => {
-                let result = file_dialog::pick_file_to_save(self.text.as_str(), &self.path);
-                match result {
-                    Ok(_v) => {
-                        return Command::none();
-                    }
-                    Err(e) => {
-                        log::warn!("{}", e);
-                        return Command::none();
-                    }
-                }
+                file_dialog::save_file(self.text.as_str(), &self.path).unwrap();
             }
 
             Message::SaveAs() => {
-                todo!();
+                file_dialog::save_as(self.text.as_str(), &self.path).unwrap();
             }
         }
 
@@ -98,7 +89,6 @@ impl Application for State {
     }
 
     fn view(&self) -> Element<Message> {
-        println!("{:?}",self.path);
         let menu_bar = MenuBar::new(vec![file(self)]);
 
         let placeholder = "Deleted code is debugged code.";
