@@ -15,9 +15,9 @@ A hybrid gui and tui editor with planned LSP, themes and other awesome features.
     - [x] read from files
     - [x] write to files
 - [x] GUI Editor
-    - [] new file
+    - [ ] new file
     - [x] open file
-    - [] open folder
+    - [ ] open folder
     - [x] save
     - [x] save as
 - [ ] Terminal Editor
