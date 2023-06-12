@@ -15,11 +15,11 @@ pub enum Message {
     TextUpdate(String),
 
     //menu bar
-    NewFile(),
-    OpenFile(),
-    OpenFolder(),
-    Save(),
-    SaveAs(),
+    NewFile,
+    OpenFile,
+    OpenFolder,
+    Save,
+    SaveAs,
 }
 
 pub struct State {
@@ -54,11 +54,11 @@ impl Application for State {
                 self.text = text;
             }
 
-            Message::NewFile() => {
+            Message::NewFile => {
                 todo!();
             }
 
-            Message::OpenFile() => {
+            Message::OpenFile => {
                 let (file_contents, path) = file_dialog::pick_file();
 
                 self.path = path;
@@ -72,15 +72,15 @@ impl Application for State {
                 }
             }
 
-            Message::OpenFolder() => {
+            Message::OpenFolder => {
                 file_dialog::pick_folder();
             }
 
-            Message::Save() => {
+            Message::Save => {
                 file_dialog::save_file(self.text.as_str(), &self.path).unwrap();
             }
 
-            Message::SaveAs() => {
+            Message::SaveAs => {
                 file_dialog::save_as(self.text.as_str(), &self.path).unwrap();
             }
         }
