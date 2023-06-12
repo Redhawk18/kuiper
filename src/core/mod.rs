@@ -12,7 +12,7 @@ pub fn read_file(path: &Path) -> Result<String> {
 }
 
 /// Saves the contents to the file and returns the results.
-pub fn save_file(path: &Path, contents: &str,) -> Result<()> {
+pub fn save_file(path: &Path, contents: &str) -> Result<()> {
     log::info!("saving file at: {:?}", path);
     return fs::write(path, contents);
 }

@@ -1,15 +1,12 @@
 use std::path::PathBuf;
 
-use iced::{
-    widget::{Button, Column, Row, Text, TextInput},
-    Alignment, Length, Sandbox, Settings,
-};
+use iced::{widget::Column, Length, Sandbox};
 
 //use iced::widget::column;
 //use iced::widget::TextInput;
 use iced::{theme, Application, Command, Element, Subscription};
-use iced_aw::{TabBar, TabLabel};
 use iced_aw::menu::MenuBar;
+use iced_aw::{TabBar, TabLabel};
 
 mod file_dialog;
 mod menu_bar;
@@ -57,13 +54,12 @@ impl Application for State {
             State {
                 text: String::from(""),
                 path: PathBuf::default(),
-                
+
                 active_tab: 0,
                 new_tab_label: String::new(),
                 new_tab_content: String::new(),
                 tabs: Vec::new(),
             },
-
             Command::none(),
         )
     }
@@ -78,9 +74,7 @@ impl Application for State {
                 self.text = text;
             }
 
-            Message::NewFile => {
-                return self.update(Message::NewTab)
-            }
+            Message::NewFile => return self.update(Message::NewTab),
 
             Message::OpenFile => {
                 let (file_contents, path) = file_dialog::pick_file();
@@ -123,13 +117,9 @@ impl Application for State {
             Message::NewTab => {
                 println!("New");
                 // if !self.new_tab_label.is_empty() && !self.new_tab_content.is_empty() {
-                    println!("Create");
-                    self.tabs.push((
-                        "name of tab".to_string(),
-                        "contents of tab".to_string(),
-                    ));
-
-                
+                println!("Create");
+                self.tabs
+                    .push(("name of tab".to_string(), "contents of tab".to_string()));
             }
         }
 
@@ -144,25 +134,23 @@ impl Application for State {
 
         // column![menu_bar, text_input].into()
         Column::new()
-        .push(
-            menu_bar
-        )
-        .push(
-            self.tabs
-                .iter()
-                .fold(
-                    TabBar::new(self.active_tab, Message::TabSelected),
-                    |tab_bar, (tab_label, _)| {
-                        tab_bar.push(TabLabel::Text(tab_label.to_owned()))
-                    },
-                )
-                .on_close(Message::TabClosed)
-                .tab_width(Length::Shrink)
-                .spacing(5.0)
-                .padding(5.0)
-                .text_size(32.0),
-        )
-        .into()
+            .push(menu_bar)
+            .push(
+                self.tabs
+                    .iter()
+                    .fold(
+                        TabBar::new(self.active_tab, Message::TabSelected),
+                        |tab_bar, (tab_label, _)| {
+                            tab_bar.push(TabLabel::Text(tab_label.to_owned()))
+                        },
+                    )
+                    .on_close(Message::TabClosed)
+                    .tab_width(Length::Shrink)
+                    .spacing(5.0)
+                    .padding(5.0)
+                    .text_size(32.0),
+            )
+            .into()
     }
 
     fn subscription(&self) -> Subscription<Message> {

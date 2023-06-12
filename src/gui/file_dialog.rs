@@ -37,7 +37,7 @@ pub fn pick_folder() {
 /// Opens the file dialog if the path given is blank,
 /// Otherwise it simpley saves the file.
 pub fn save_file(contents: &str, path: &Path) -> Result<()> {
-    // incase we know where the current file is, 
+    // incase we know where the current file is,
     // just save instead of opening the dialog.
     if path != PathBuf::default() {
         return core::save_file(&path, contents);
@@ -56,7 +56,9 @@ pub fn save_file(contents: &str, path: &Path) -> Result<()> {
 }
 
 pub fn save_as(contents: &str, path: &Path) -> Result<()> {
-    let path_opt = FileDialog::new().set_file_name(path.to_str().unwrap()).save_file();
+    let path_opt = FileDialog::new()
+        .set_file_name(path.to_str().unwrap())
+        .save_file();
 
     let Some(path) = path_opt
         else {
