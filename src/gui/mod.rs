@@ -1,8 +1,14 @@
 use std::path::PathBuf;
 
-use iced::widget::column;
-use iced::widget::TextInput;
+use iced::{
+    widget::{Button, Column, Row, Text, TextInput},
+    Alignment, Length, Sandbox, Settings,
+};
+
+//use iced::widget::column;
+//use iced::widget::TextInput;
 use iced::{theme, Application, Command, Element, Subscription};
+use iced_aw::{TabBar, TabLabel};
 use iced_aw::menu::MenuBar;
 
 mod file_dialog;
@@ -20,11 +26,24 @@ pub enum Message {
     OpenFolder,
     Save,
     SaveAs,
+
+    //tabs
+    NewTab,
+    TabSelected(usize),
+    TabClosed(usize),
+    TabLabelInputChanged(String),
+    TabContentInputChanged(String),
 }
 
 pub struct State {
     text: String,
     path: PathBuf,
+
+    //tab
+    active_tab: usize,
+    new_tab_label: String,
+    new_tab_content: String,
+    tabs: Vec<(String, String)>,
 }
 
 impl Application for State {
@@ -38,6 +57,11 @@ impl Application for State {
             State {
                 text: String::from(""),
                 path: PathBuf::default(),
+                
+                active_tab: 0,
+                new_tab_label: String::new(),
+                new_tab_content: String::new(),
+                tabs: Vec::new(),
             },
 
             Command::none(),
@@ -55,7 +79,7 @@ impl Application for State {
             }
 
             Message::NewFile => {
-                todo!();
+                return self.update(Message::NewTab)
             }
 
             Message::OpenFile => {
@@ -83,6 +107,30 @@ impl Application for State {
             Message::SaveAs => {
                 file_dialog::save_as(self.text.as_str(), &self.path).unwrap();
             }
+            Message::TabSelected(index) => self.active_tab = index,
+            Message::TabClosed(index) => {
+                self.tabs.remove(index);
+                println!("active tab before: {}", self.active_tab);
+                self.active_tab = if self.tabs.is_empty() {
+                    0
+                } else {
+                    usize::max(0, usize::min(self.active_tab, self.tabs.len() - 1))
+                };
+                println!("active tab after: {}", self.active_tab);
+            }
+            Message::TabLabelInputChanged(value) => self.new_tab_label = value,
+            Message::TabContentInputChanged(value) => self.new_tab_content = value,
+            Message::NewTab => {
+                println!("New");
+                // if !self.new_tab_label.is_empty() && !self.new_tab_content.is_empty() {
+                    println!("Create");
+                    self.tabs.push((
+                        "name of tab".to_string(),
+                        "contents of tab".to_string(),
+                    ));
+
+                
+            }
         }
 
         Command::none()
@@ -91,10 +139,30 @@ impl Application for State {
     fn view(&self) -> Element<Message> {
         let menu_bar = MenuBar::new(vec![file(self)]);
 
-        let placeholder = "Deleted code is debugged code.";
-        let text_input = TextInput::new(placeholder, &self.text).on_input(Message::TextUpdate);
+        // let placeholder = "Deleted code is debugged code.";
+        // let text_input = TextInput::new(placeholder, &self.text).on_input(Message::TextUpdate);
 
-        column![menu_bar, text_input].into()
+        // column![menu_bar, text_input].into()
+        Column::new()
+        .push(
+            menu_bar
+        )
+        .push(
+            self.tabs
+                .iter()
+                .fold(
+                    TabBar::new(self.active_tab, Message::TabSelected),
+                    |tab_bar, (tab_label, _)| {
+                        tab_bar.push(TabLabel::Text(tab_label.to_owned()))
+                    },
+                )
+                .on_close(Message::TabClosed)
+                .tab_width(Length::Shrink)
+                .spacing(5.0)
+                .padding(5.0)
+                .text_size(32.0),
+        )
+        .into()
     }
 
     fn subscription(&self) -> Subscription<Message> {
