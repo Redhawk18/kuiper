@@ -1,15 +1,18 @@
 use std::path::PathBuf;
 
-use iced::{widget::Column, Length, Sandbox};
+use iced::widget::{text_input};
+use iced::{widget::Column};
 
 //use iced::widget::column;
 //use iced::widget::TextInput;
 use iced::{theme, Application, Command, Element, Subscription};
 use iced_aw::menu::MenuBar;
-use iced_aw::{TabBar, TabLabel};
+
+use log;
 
 mod file_dialog;
 mod menu_bar;
+mod tabs;
 
 pub use menu_bar::file;
 
@@ -32,15 +35,16 @@ pub enum Message {
     TabContentInputChanged(String),
 }
 
-pub struct State {
+pub struct FileTab {
     text: String,
     path: PathBuf,
+}
 
-    //tab
-    active_tab: usize,
+pub struct State {
+    active_tab: usize, //TODO make a option for a no tab case
     new_tab_label: String,
     new_tab_content: String,
-    tabs: Vec<(String, String)>,
+    tabs: Vec<FileTab>,
 }
 
 impl Application for State {
@@ -52,9 +56,6 @@ impl Application for State {
     fn new(_flags: Self::Flags) -> (Self, Command<Self::Message>) {
         (
             State {
-                text: String::from(""),
-                path: PathBuf::default(),
-
                 active_tab: 0,
                 new_tab_label: String::new(),
                 new_tab_content: String::new(),
@@ -71,37 +72,40 @@ impl Application for State {
     fn update(&mut self, message: Message) -> Command<Message> {
         match message {
             Message::TextUpdate(text) => {
-                self.text = text;
+                self.tabs.get_mut(self.active_tab).unwrap().text = text;
             }
 
             Message::NewFile => return self.update(Message::NewTab),
 
             Message::OpenFile => {
-                let (file_contents, path) = file_dialog::pick_file();
+                // let (file_contents, path) = file_dialog::pick_file();
 
-                self.path = path;
-                match file_contents {
-                    Ok(v) => {
-                        return self.update(Message::TextUpdate(v));
-                    }
-                    Err(_e) => {
-                        return Command::none();
-                    }
-                }
+                // self.path = path;
+                // match file_contents {
+                //     Ok(v) => {
+                //         return self.update(Message::TextUpdate(v));
+                //     }
+                //     Err(_e) => {
+                //         return Command::none();
+                //     }
+                // }
             }
 
             Message::OpenFolder => {
-                file_dialog::pick_folder();
+                // file_dialog::pick_folder();
             }
 
             Message::Save => {
-                file_dialog::save_file(self.text.as_str(), &self.path).unwrap();
+                // file_dialog::save_file(self.text.as_str(), &self.path).unwrap();
             }
 
             Message::SaveAs => {
-                file_dialog::save_as(self.text.as_str(), &self.path).unwrap();
+                // file_dialog::save_as(self.text.as_str(), &self.path).unwrap();
             }
-            Message::TabSelected(index) => self.active_tab = index,
+            Message::TabSelected(index) => {
+                log::info!("{}", index);
+                self.active_tab = index;
+            }
             Message::TabClosed(index) => {
                 self.tabs.remove(index);
                 println!("active tab before: {}", self.active_tab);
@@ -116,10 +120,13 @@ impl Application for State {
             Message::TabContentInputChanged(value) => self.new_tab_content = value,
             Message::NewTab => {
                 println!("New");
-                // if !self.new_tab_label.is_empty() && !self.new_tab_content.is_empty() {
+
                 println!("Create");
                 self.tabs
-                    .push(("name of tab".to_string(), "contents of tab".to_string()));
+                    .push(FileTab{
+                        text: String::default(),
+                        path: PathBuf::default(),
+                    });
             }
         }
 
@@ -129,27 +136,15 @@ impl Application for State {
     fn view(&self) -> Element<Message> {
         let menu_bar = MenuBar::new(vec![file(self)]);
 
-        // let placeholder = "Deleted code is debugged code.";
-        // let text_input = TextInput::new(placeholder, &self.text).on_input(Message::TextUpdate);
-
-        // column![menu_bar, text_input].into()
         Column::new()
             .push(menu_bar)
-            .push(
-                self.tabs
-                    .iter()
-                    .fold(
-                        TabBar::new(self.active_tab, Message::TabSelected),
-                        |tab_bar, (tab_label, _)| {
-                            tab_bar.push(TabLabel::Text(tab_label.to_owned()))
-                        },
-                    )
-                    .on_close(Message::TabClosed)
-                    .tab_width(Length::Shrink)
-                    .spacing(5.0)
-                    .padding(5.0)
-                    .text_size(32.0),
-            )
+            .push(tabs::tab_header(&self.tabs))
+            //problem is that at the start we dont have any active tabs
+            .push(text_input(self.tabs.len().to_string().as_str(), self.tabs.get(self.active_tab).unwrap_or(
+                &FileTab { text: String::default(), path: PathBuf::default() }
+            ).text.as_str()
+            
+                ).on_input(Message::TextUpdate))
             .into()
     }
 
