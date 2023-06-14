@@ -124,7 +124,7 @@ impl Application for State {
                 println!("Create");
                 self.tabs
                     .push(FileTab{
-                        text: String::default(),
+                        text: self.tabs.len().to_string(),
                         path: PathBuf::default(),
                     });
             }
