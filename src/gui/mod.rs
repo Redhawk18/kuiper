@@ -23,6 +23,7 @@ pub enum Message {
     OpenFolder,
     Save,
     SaveAs,
+    Quit,
 
     //tabs
     NewTab,
@@ -101,6 +102,9 @@ impl Application for State {
             Message::SaveAs => {
                 file_dialog::save_as(self.text.as_str(), &self.path).unwrap();
             }
+
+            Message::Quit => std::process::exit(0),
+
             Message::TabSelected(index) => self.active_tab = index,
             Message::TabClosed(index) => {
                 self.tabs.remove(index);
@@ -121,6 +125,7 @@ impl Application for State {
                 self.tabs
                     .push(("name of tab".to_string(), "contents of tab".to_string()));
             }
+            
         }
 
         Command::none()
