@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use iced::widget::{text_input};
+use iced::widget::{text_input, row};
 use iced::{widget::Column};
 
 //use iced::widget::column;
@@ -35,12 +35,14 @@ pub enum Message {
     TabContentInputChanged(String),
 }
 
+#[derive(Clone)]
 pub struct FileTab {
     text: String,
     path: PathBuf,
 }
 
 pub struct State {
+    test_string: String,
     active_tab: usize, //TODO make a option for a no tab case
     new_tab_label: String,
     new_tab_content: String,
@@ -56,6 +58,7 @@ impl Application for State {
     fn new(_flags: Self::Flags) -> (Self, Command<Self::Message>) {
         (
             State {
+                test_string: String::new(),
                 active_tab: 0,
                 new_tab_label: String::new(),
                 new_tab_content: String::new(),
@@ -123,10 +126,11 @@ impl Application for State {
 
                 println!("Create");
                 self.tabs
-                    .push(FileTab{
+                    .push(FileTab {
                         text: self.tabs.len().to_string(),
                         path: PathBuf::default(),
                     });
+                // tab_body(&self.tabs);
             }
         }
 
@@ -136,19 +140,23 @@ impl Application for State {
     fn view(&self) -> Element<Message> {
         let menu_bar = MenuBar::new(vec![file(self)]);
 
-        Column::new()
+        let mut c = Column::new()
             .push(menu_bar)
-            .push(tabs::tab_header(&self.tabs))
-            //problem is that at the start we dont have any active tabs
-            .push(text_input(self.tabs.len().to_string().as_str(), self.tabs.get(self.active_tab).unwrap_or(
-                &FileTab { text: String::default(), path: PathBuf::default() }
-            ).text.as_str()
-            
-                ).on_input(Message::TextUpdate))
-            .into()
+            .push(tabs::tab_header(&self.tabs));
+
+        if self.tabs.len() != 0 {
+            c = c.push(text_input("placeholder", self.tabs.get(self.active_tab).unwrap().text.as_str()).on_input(Message::TextUpdate));
+        } 
+       
+        c.into()
     }
 
     fn subscription(&self) -> Subscription<Message> {
         Subscription::none()
     }
 }
+
+// pub fn tab_body(tabs: &Vec<FileTab>) -> Element<Message> {
+//     let t = text_input("placeholder", &"");
+//     row!(t).into()
+// }
