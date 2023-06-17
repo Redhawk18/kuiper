@@ -142,7 +142,7 @@ impl Application for State {
 
         let mut c = Column::new()
             .push(menu_bar)
-            .push(tabs::tab_header(&self.tabs));
+            .push(tabs::tab_header(&self.tabs, self.active_tab));
 
         if self.tabs.len() != 0 {
             c = c.push(text_input("placeholder", self.tabs.get(self.active_tab).unwrap().text.as_str()).on_input(Message::TextUpdate));
