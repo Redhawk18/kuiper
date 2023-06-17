@@ -1,14 +1,11 @@
 use std::path::PathBuf;
 
-use iced::widget::{text_input, row};
-use iced::{widget::Column};
-
-//use iced::widget::column;
-//use iced::widget::TextInput;
+use iced::widget::text_input;
+use iced::widget::Column;
 use iced::{theme, Application, Command, Element, Subscription};
 use iced_aw::menu::MenuBar;
 
-use log;
+
 
 mod file_dialog;
 mod menu_bar;
@@ -42,7 +39,6 @@ pub struct FileTab {
 }
 
 pub struct State {
-    test_string: String,
     active_tab: usize, //TODO make a option for a no tab case
     new_tab_label: String,
     new_tab_content: String,
@@ -58,7 +54,6 @@ impl Application for State {
     fn new(_flags: Self::Flags) -> (Self, Command<Self::Message>) {
         (
             State {
-                test_string: String::new(),
                 active_tab: 0,
                 new_tab_label: String::new(),
                 new_tab_content: String::new(),
@@ -81,34 +76,36 @@ impl Application for State {
             Message::NewFile => return self.update(Message::NewTab),
 
             Message::OpenFile => {
-                // let (file_contents, path) = file_dialog::pick_file();
+                let (file_contents, path) = file_dialog::pick_file();
 
-                // self.path = path;
-                // match file_contents {
-                //     Ok(v) => {
-                //         return self.update(Message::TextUpdate(v));
-                //     }
-                //     Err(_e) => {
-                //         return Command::none();
-                //     }
-                // }
+                self.tabs.get_mut(self.active_tab).unwrap().path = path;
+                match file_contents {
+                    Ok(v) => {
+                        return self.update(Message::TextUpdate(v));
+                    }
+                    Err(_e) => {
+                        return Command::none();
+                    }
+                }
             }
 
-            Message::OpenFolder => {
-                // file_dialog::pick_folder();
-            }
+            Message::OpenFolder => file_dialog::pick_folder(),
 
             Message::Save => {
-                // file_dialog::save_file(self.text.as_str(), &self.path).unwrap();
+                let filetab = self.tabs.get(self.active_tab).unwrap();
+                file_dialog::save_file(filetab.text.as_str(), filetab.path.as_path()).unwrap()
             }
 
             Message::SaveAs => {
-                // file_dialog::save_as(self.text.as_str(), &self.path).unwrap();
+                let filetab = self.tabs.get(self.active_tab).unwrap();
+                file_dialog::save_as(filetab.text.as_str(), filetab.path.as_path()).unwrap()
             }
+
             Message::TabSelected(index) => {
                 log::info!("{}", index);
                 self.active_tab = index;
             }
+
             Message::TabClosed(index) => {
                 self.tabs.remove(index);
                 println!("active tab before: {}", self.active_tab);
@@ -125,12 +122,10 @@ impl Application for State {
                 println!("New");
 
                 println!("Create");
-                self.tabs
-                    .push(FileTab {
-                        text: self.tabs.len().to_string(),
-                        path: PathBuf::default(),
-                    });
-                // tab_body(&self.tabs);
+                self.tabs.push(FileTab {
+                    text: self.tabs.len().to_string(),
+                    path: PathBuf::default(),
+                });
             }
         }
 
@@ -144,10 +139,16 @@ impl Application for State {
             .push(menu_bar)
             .push(tabs::tab_header(&self.tabs));
 
-        if self.tabs.len() != 0 {
-            c = c.push(text_input("placeholder", self.tabs.get(self.active_tab).unwrap().text.as_str()).on_input(Message::TextUpdate));
-        } 
-       
+        if !self.tabs.is_empty() {
+            c = c.push(
+                text_input(
+                    "placeholder",
+                    self.tabs.get(self.active_tab).unwrap().text.as_str(),
+                )
+                .on_input(Message::TextUpdate),
+            );
+        }
+
         c.into()
     }
 
@@ -155,8 +156,3 @@ impl Application for State {
         Subscription::none()
     }
 }
-
-// pub fn tab_body(tabs: &Vec<FileTab>) -> Element<Message> {
-//     let t = text_input("placeholder", &"");
-//     row!(t).into()
-// }

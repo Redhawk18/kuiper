@@ -3,7 +3,7 @@ use std::io::Result;
 use std::path::Path;
 use std::string::String;
 
-use log;
+
 
 /// Reads the contents of the file at the path given and returns it
 pub fn read_file(path: &Path) -> Result<String> {
@@ -14,5 +14,5 @@ pub fn read_file(path: &Path) -> Result<String> {
 /// Saves the contents to the file and returns the results.
 pub fn save_file(path: &Path, contents: &str) -> Result<()> {
     log::info!("saving file at: {:?}", path);
-    return fs::write(path, contents);
+    fs::write(path, contents)
 }
