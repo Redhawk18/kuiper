@@ -1,11 +1,12 @@
 use std::path::PathBuf;
 
-use iced::widget::text_input;
 use iced::widget::Column;
+use iced::widget::{text_input};
+
+//use iced::widget::column;
+//use iced::widget::TextInput;
 use iced::{theme, Application, Command, Element, Subscription};
 use iced_aw::menu::MenuBar;
-
-
 
 mod file_dialog;
 mod menu_bar;
@@ -126,6 +127,7 @@ impl Application for State {
                     text: self.tabs.len().to_string(),
                     path: PathBuf::default(),
                 });
+                // tab_body(&self.tabs);
             }
         }
 
@@ -137,9 +139,9 @@ impl Application for State {
 
         let mut c = Column::new()
             .push(menu_bar)
-            .push(tabs::tab_header(&self.tabs));
+            .push(tabs::tab_header(&self.tabs, self.active_tab));
 
-        if !self.tabs.is_empty() {
+        if self.tabs.len() != 0 {
             c = c.push(
                 text_input(
                     "placeholder",

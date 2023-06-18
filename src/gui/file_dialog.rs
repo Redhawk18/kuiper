@@ -2,7 +2,6 @@ use std::io::Result;
 use std::path::{Path, PathBuf};
 use std::string::String;
 
-
 use rfd::FileDialog;
 
 use crate::core;
