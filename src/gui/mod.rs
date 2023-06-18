@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 
-use iced::widget::{text_input, row};
-use iced::{widget::Column};
+use iced::widget::Column;
+use iced::widget::{row, text_input};
 
 //use iced::widget::column;
 //use iced::widget::TextInput;
@@ -125,11 +125,10 @@ impl Application for State {
                 println!("New");
 
                 println!("Create");
-                self.tabs
-                    .push(FileTab {
-                        text: self.tabs.len().to_string(),
-                        path: PathBuf::default(),
-                    });
+                self.tabs.push(FileTab {
+                    text: self.tabs.len().to_string(),
+                    path: PathBuf::default(),
+                });
                 // tab_body(&self.tabs);
             }
         }
@@ -145,9 +144,15 @@ impl Application for State {
             .push(tabs::tab_header(&self.tabs, self.active_tab));
 
         if self.tabs.len() != 0 {
-            c = c.push(text_input("placeholder", self.tabs.get(self.active_tab).unwrap().text.as_str()).on_input(Message::TextUpdate));
-        } 
-       
+            c = c.push(
+                text_input(
+                    "placeholder",
+                    self.tabs.get(self.active_tab).unwrap().text.as_str(),
+                )
+                .on_input(Message::TextUpdate),
+            );
+        }
+
         c.into()
     }
 

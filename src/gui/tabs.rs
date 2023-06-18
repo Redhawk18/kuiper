@@ -1,15 +1,15 @@
-use iced::widget::{button, column, row, text, text_input};
 use iced::Element;
+use iced::widget::row;
 use iced_aw::{TabBar, TabLabel};
 
 pub fn tab_header(tabs: &Vec<super::FileTab>, active_tab: usize) -> Element<super::Message> {
-    let mut tab_labels: Vec<Element<super::Message>> = Vec::new();
+    let mut tab_bar =
+        TabBar::new(active_tab, super::Message::TabSelected).on_close(super::Message::TabClosed);
 
-    for (index, _tab) in tabs.iter().enumerate() {
-        //let button = button(text("NAME OF TAB")).on_press(super::Message::TabSelected(index));
-        //tab_labels.push(button.into());
-        let tab_head: TabBar<super::Message> = TabBar::new(active_tab, super::Message::TabSelected);
+    for tab in tabs.iter() {
+        //TODO if let some tab.path is "" else name it new tab
+        tab_bar = tab_bar.push(TabLabel::Text(String::from("tab name!")));
     }
 
-    column!(row(tab_labels)).into()
+    row!(tab_bar).into()
 }
