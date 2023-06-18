@@ -93,13 +93,13 @@ impl Application for State {
             Message::OpenFolder => file_dialog::pick_folder(),
 
             Message::Save => {
-                let filetab = self.tabs.get(self.active_tab).unwrap();
-                file_dialog::save_file(filetab.text.as_str(), filetab.path.as_path()).unwrap()
+                let file_tab = self.tabs.get(self.active_tab).unwrap();
+                file_dialog::save_file(file_tab.text.as_str(), file_tab.path.as_path()).unwrap()
             }
 
             Message::SaveAs => {
-                let filetab = self.tabs.get(self.active_tab).unwrap();
-                file_dialog::save_as(filetab.text.as_str(), filetab.path.as_path()).unwrap()
+                let file_tab = self.tabs.get(self.active_tab).unwrap();
+                file_dialog::save_as(file_tab.text.as_str(), file_tab.path.as_path()).unwrap()
             }
 
             Message::TabSelected(index) => {
@@ -120,14 +120,10 @@ impl Application for State {
             Message::TabLabelInputChanged(value) => self.new_tab_label = value,
             Message::TabContentInputChanged(value) => self.new_tab_content = value,
             Message::NewTab => {
-                println!("New");
-
-                println!("Create");
                 self.tabs.push(FileTab {
                     text: self.tabs.len().to_string(),
                     path: PathBuf::default(),
                 });
-                // tab_body(&self.tabs);
             }
         }
 
@@ -141,7 +137,7 @@ impl Application for State {
             .push(menu_bar)
             .push(tabs::tab_header(&self.tabs, self.active_tab));
 
-        if self.tabs.len() != 0 {
+        if !self.tabs.is_empty() {
             c = c.push(
                 text_input(
                     "placeholder",
