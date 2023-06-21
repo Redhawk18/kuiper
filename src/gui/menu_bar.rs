@@ -16,7 +16,7 @@ pub fn file<'a>(_app: &super::State) -> MenuTree<'a, super::Message, iced::Rende
 
     let root = MenuTree::with_children(
         button("File"),
-        vec![new_file, open_file, open_folder, save, save_as],
+        vec![new_file, open_file, open_folder, save, save_as, quit],
     );
 
     root
