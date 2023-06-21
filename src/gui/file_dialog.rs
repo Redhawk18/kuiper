@@ -13,7 +13,7 @@ pub fn pick_file() -> (Result<String>, PathBuf) {
 
     let Some(path) = path_opt
         else {
-            log::warn!("File not picked"); 
+            log::warn!("File not picked");
             return (Err(std::io::ErrorKind::NotFound.into()), PathBuf::default());
         };
 

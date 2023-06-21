@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 
+use iced::widget::text_input;
 use iced::widget::Column;
-use iced::widget::{text_input};
 
 //use iced::widget::column;
 //use iced::widget::TextInput;
@@ -26,14 +26,14 @@ pub enum Message {
     SaveAs,
 
     //tabs
-    NewTab,
+    NewTab(FileTab),
     TabSelected(usize),
     TabClosed(usize),
     TabLabelInputChanged(String),
     TabContentInputChanged(String),
 }
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct FileTab {
     text: String,
     path: PathBuf,
@@ -74,7 +74,12 @@ impl Application for State {
                 self.tabs.get_mut(self.active_tab).unwrap().text = text;
             }
 
-            Message::NewFile => return self.update(Message::NewTab),
+            Message::NewFile => {
+                return self.update(Message::NewTab(FileTab {
+                    text: "newfile".to_string(),
+                    path: PathBuf::default(),
+                }))
+            }
 
             Message::OpenFile => {
                 let (file_contents, path) = file_dialog::pick_file();
@@ -119,11 +124,8 @@ impl Application for State {
             }
             Message::TabLabelInputChanged(value) => self.new_tab_label = value,
             Message::TabContentInputChanged(value) => self.new_tab_content = value,
-            Message::NewTab => {
-                self.tabs.push(FileTab {
-                    text: self.tabs.len().to_string(),
-                    path: PathBuf::default(),
-                });
+            Message::NewTab(tab) => {
+                self.tabs.push(tab);
             }
         }
 
