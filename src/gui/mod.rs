@@ -148,7 +148,7 @@ impl Application for State {
             Message::TabContentInputChanged(value) => self.new_tab_content = value,
             Message::NewTab(tab) => {
                 self.tabs.push(tab);
-                self.active_tab = self.tabs.len();
+                self.active_tab = self.tabs.len() -1;
             }
         }
 
