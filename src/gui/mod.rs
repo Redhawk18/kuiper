@@ -98,13 +98,21 @@ impl Application for State {
             Message::OpenFolder => file_dialog::pick_folder(),
 
             Message::Save => {
-                let file_tab = self.tabs.get(self.active_tab).unwrap();
-                file_dialog::save_file(file_tab.text.as_str(), file_tab.path.as_path()).unwrap()
+                match self.tabs.get(self.active_tab) {
+                    Some(tab) => {
+                        file_dialog::save_file(tab.text.as_str(), tab.path.as_path()).unwrap()        
+                    }
+                    None => return Command::none()
+                }
             }
 
             Message::SaveAs => {
-                let file_tab = self.tabs.get(self.active_tab).unwrap();
-                file_dialog::save_as(file_tab.text.as_str(), file_tab.path.as_path()).unwrap()
+                match self.tabs.get(self.active_tab) {
+                    Some(tab) => {
+                        file_dialog::save_as(tab.text.as_str(), tab.path.as_path()).unwrap()        
+                    }
+                    None => return Command::none()
+                }                
             }
 
             Message::TabSelected(index) => {
