@@ -71,7 +71,15 @@ impl Application for State {
     fn update(&mut self, message: Message) -> Command<Message> {
         match message {
             Message::TextUpdate(text) => {
-                self.tabs.get_mut(self.active_tab).unwrap().text = text;
+                match self.tabs.get_mut(self.active_tab) {
+                    Some(filetab) => {
+                        filetab.text = text;
+                    }
+                    None => return self.update(Message::NewTab(FileTab {
+                        text: "newfile".to_string(),
+                        path: PathBuf::default(),
+                    }))
+                }
             }
 
             Message::NewFile => {
@@ -140,6 +148,7 @@ impl Application for State {
             Message::TabContentInputChanged(value) => self.new_tab_content = value,
             Message::NewTab(tab) => {
                 self.tabs.push(tab);
+                self.active_tab = self.tabs.len();
             }
         }
 
