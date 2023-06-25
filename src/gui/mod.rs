@@ -85,9 +85,15 @@ impl Application for State {
                 let (file_contents, path) = file_dialog::pick_file();
 
                 match file_contents {
-                    Ok(v) => {
-                        self.tabs.get_mut(self.active_tab).unwrap().path = path;
-                        return self.update(Message::TextUpdate(v));
+                    Ok(text) => {
+                        match self.tabs.get_mut(self.active_tab) {
+                            Some(tab) => {
+                                tab.path = path;
+                                return self.update(Message::TextUpdate(text));
+                            }
+                            None => return Command::none()
+                        }
+                        
                     }
                     Err(_e) => {
                         return Command::none();
