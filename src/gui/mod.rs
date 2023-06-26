@@ -80,7 +80,7 @@ impl Application for State {
                         path: PathBuf::default(),
                     }))
                 }
-            },
+            }
 
             Message::NewFile => {
                 return self.update(Message::NewTab(FileTab {
@@ -115,7 +115,7 @@ impl Application for State {
                     file_dialog::save_file(tab.text.as_str(), tab.path.as_path()).unwrap();
                 }
                 None => return Command::none(),
-            },
+            }
 
             Message::SaveAs => match self.active_tab {
                 Some(index) => {
@@ -123,7 +123,9 @@ impl Application for State {
                     file_dialog::save_as(tab.text.as_str(), tab.path.as_path()).unwrap();
                 }
                 None => return Command::none(),
-            },
+            }
+
+            Message::Quit => std::process::exit(0),
 
             Message::TabSelected(index) => {
                 log::info!("{}", index);
