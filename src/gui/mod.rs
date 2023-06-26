@@ -40,7 +40,7 @@ pub struct FileTab {
 }
 
 pub struct State {
-    active_tab: usize, //TODO make a option for a no tab case
+    active_tab: Option<usize>,
     new_tab_label: String,
     new_tab_content: String,
     tabs: Vec<FileTab>,
@@ -55,7 +55,7 @@ impl Application for State {
     fn new(_flags: Self::Flags) -> (Self, Command<Self::Message>) {
         (
             State {
-                active_tab: 0,
+                active_tab: None,
                 new_tab_label: String::new(),
                 new_tab_content: String::new(),
                 tabs: Vec::new(),
@@ -94,14 +94,14 @@ impl Application for State {
 
                 match file_contents {
                     Ok(text) => {
-                        match self.tabs.get_mut(self.active_tab) {
-                            Some(tab) => {
+                        match self.active_tab {
+                            Some(index) => {
+                                let tab = self.tabs.get_mut(index).unwrap();
                                 tab.path = path;
-                                return self.update(Message::TextUpdate(text));
+                                return self.update(Message::TextUpdate(text))
                             }
                             None => return Command::none()
                         }
-                        
                     }
                     Err(_e) => {
                         return Command::none();
