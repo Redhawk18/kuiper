@@ -1,5 +1,4 @@
 use iced::{Application, Settings};
-use pretty_env_logger;
 
 mod core;
 mod gui;

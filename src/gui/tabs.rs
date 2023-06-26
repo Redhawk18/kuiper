@@ -2,7 +2,7 @@ use iced::Element;
 use iced::widget::row;
 use iced_aw::{TabBar, TabLabel};
 
-pub fn tab_header(tabs: &Vec<super::FileTab>, active_tab: usize) -> Element<super::Message> {
+pub fn tab_header(tabs: &[super::FileTab], active_tab: usize) -> Element<super::Message> {
     let mut tab_bar =
         TabBar::new(active_tab, super::Message::TabSelected).on_close(super::Message::TabClosed);
 
