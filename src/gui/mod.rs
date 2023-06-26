@@ -3,8 +3,6 @@ use std::path::PathBuf;
 use iced::widget::text_input;
 use iced::widget::Column;
 
-//use iced::widget::column;
-//use iced::widget::TextInput;
 use iced::{theme, Application, Command, Element, Subscription};
 use iced_aw::menu::MenuBar;
 
@@ -70,20 +68,18 @@ impl Application for State {
 
     fn update(&mut self, message: Message) -> Command<Message> {
         match message {
-            Message::TextUpdate(text) => {
-                match self.active_tab {
-                    Some(index) => {
-                        let tab = self.tabs.get_mut(index).unwrap();
-                        tab.text = text;
-                    }
-                    None => {
-                        return self.update(Message::NewTab(FileTab {
-                                    text: "newfile".to_string(),
-                                    path: PathBuf::default(),
-                                }))
-                    }
+            Message::TextUpdate(text) => match self.active_tab {
+                Some(index) => {
+                    let tab = self.tabs.get_mut(index).unwrap();
+                    tab.text = text;
                 }
-            }
+                None => {
+                    return self.update(Message::NewTab(FileTab {
+                        text: "newfile".to_string(),
+                        path: PathBuf::default(),
+                    }))
+                }
+            },
 
             Message::NewFile => {
                 return self.update(Message::NewTab(FileTab {
@@ -96,16 +92,14 @@ impl Application for State {
                 let (file_contents, path) = file_dialog::pick_file();
 
                 match file_contents {
-                    Ok(text) => {
-                        match self.active_tab {
-                            Some(index) => {
-                                let tab = self.tabs.get_mut(index).unwrap();
-                                tab.path = path;
-                                return self.update(Message::TextUpdate(text))
-                            }
-                            None => return Command::none()
+                    Ok(text) => match self.active_tab {
+                        Some(index) => {
+                            let tab = self.tabs.get_mut(index).unwrap();
+                            tab.path = path;
+                            return self.update(Message::TextUpdate(text));
                         }
-                    }
+                        None => return Command::none(),
+                    },
                     Err(_e) => {
                         return Command::none();
                     }
@@ -114,46 +108,44 @@ impl Application for State {
 
             Message::OpenFolder => file_dialog::pick_folder(),
 
-            Message::Save => {
-                match self.active_tab {
-                    Some(index) => {
-                        let tab = self.tabs.get(index).unwrap();
-                        file_dialog::save_file(tab.text.as_str(), tab.path.as_path()).unwrap();
-                    }
-                    None => return Command::none()
+            Message::Save => match self.active_tab {
+                Some(index) => {
+                    let tab = self.tabs.get(index).unwrap();
+                    file_dialog::save_file(tab.text.as_str(), tab.path.as_path()).unwrap();
                 }
-            }
+                None => return Command::none(),
+            },
 
-            Message::SaveAs => {
-                match self.active_tab {
-                    Some(index) => {
-                        let tab = self.tabs.get(index).unwrap();
-                        file_dialog::save_as(tab.text.as_str(), tab.path.as_path()).unwrap();
-                    }
-                    None => return Command::none()
-                }             
-            }
+            Message::SaveAs => match self.active_tab {
+                Some(index) => {
+                    let tab = self.tabs.get(index).unwrap();
+                    file_dialog::save_as(tab.text.as_str(), tab.path.as_path()).unwrap();
+                }
+                None => return Command::none(),
+            },
 
             Message::TabSelected(index) => {
-                // log::info!("{}", index);
-                // self.active_tab = index;
+                log::info!("{}", index);
+                self.active_tab = Some(index);
             }
 
             Message::TabClosed(index) => {
-                // self.tabs.remove(index);
-                // //println!("active tab before: {}", self.active_tab);
-                // self.active_tab = if self.tabs.is_empty() {
-                //     0
-                // } else {
-                //     usize::max(0, usize::min(self.active_tab, self.tabs.len() - 1))
-                // };
-                // println!("active tab after: {}", self.active_tab);
+                self.tabs.remove(index);
+                //println!("active tab before: {}", self.active_tab);
+                self.active_tab = if self.tabs.is_empty() {
+                    Some(0)
+                } else {
+                    Some(usize::max(
+                        0,
+                        usize::min(self.active_tab.unwrap(), self.tabs.len() - 1),
+                    ))
+                };
             }
             Message::TabLabelInputChanged(value) => self.new_tab_label = value,
             Message::TabContentInputChanged(value) => self.new_tab_content = value,
             Message::NewTab(tab) => {
-                // self.tabs.push(tab);
-                // self.active_tab = self.tabs.len() -1;
+                self.tabs.push(tab);
+                self.active_tab = Some(self.tabs.len() - 1);
             }
         }
 
@@ -163,16 +155,18 @@ impl Application for State {
     fn view(&self) -> Element<Message> {
         let menu_bar = MenuBar::new(vec![file(self)]);
 
-        let mut c = Column::new()
-            .push(menu_bar);
-            
+        let mut c = Column::new().push(menu_bar);
 
         if !self.tabs.is_empty() {
             c = c.push(tabs::tab_header(&self.tabs, self.active_tab.unwrap()));
             c = c.push(
                 text_input(
                     "placeholder",
-                    self.tabs.get(self.active_tab.unwrap()).unwrap().text.as_str(),
+                    self.tabs
+                        .get(self.active_tab.unwrap())
+                        .unwrap()
+                        .text
+                        .as_str(),
                 )
                 .on_input(Message::TextUpdate),
             );
