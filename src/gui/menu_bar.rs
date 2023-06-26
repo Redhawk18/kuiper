@@ -2,7 +2,12 @@ use iced::widget::button;
 use iced_aw::menu::MenuTree;
 
 pub fn file<'a>(_app: &super::State) -> MenuTree<'a, super::Message, iced::Renderer> {
-    let new_file = MenuTree::new(button("New File").on_press(super::Message::NewTab));
+    let new_file = MenuTree::new(button("New File").on_press(super::Message::NewTab(
+        super::FileTab {
+            text: "New Tab".to_string(),
+            path: std::path::PathBuf::default(),
+        },
+    )));
 
     let open_file = MenuTree::new(button("Open File").on_press(super::Message::OpenFile));
 
