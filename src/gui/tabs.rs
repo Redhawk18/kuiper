@@ -1,7 +1,5 @@
-use std::path::PathBuf;
-
 use iced::Element;
-use iced::{widget::row, Application};
+use iced::widget::row;
 use iced_aw::{TabBar, TabLabel};
 
 pub fn tab_header(tabs: &Vec<super::FileTab>, active_tab: usize) -> Element<super::Message> {
@@ -15,24 +13,3 @@ pub fn tab_header(tabs: &Vec<super::FileTab>, active_tab: usize) -> Element<supe
 
     row!(tab_bar).into()
 }
-
-// Abstracts the logic of getting the current
-// pub fn get_active_tab(
-//     tabs: &Vec<super::FileTab>,
-//     active_tab: &usize,
-//     state: super::State,
-// ) -> &super::FileTab {
-//     let option = tabs.get(active_tab);
-
-//     match option {
-//         Some(v) => return v,
-//         None => {
-//             let tab = super::FileTab {
-//                 text: "get_active_tab".to_string(),
-//                 path: PathBuf::default(),
-//             };
-//             state.update(super::Message::NewTab(tab));
-//             tabs.get(active_tab).unwrap()
-//         }
-//     }
-// }
