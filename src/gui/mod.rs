@@ -153,7 +153,7 @@ impl Application for State {
             c = c.push(elements::tab_header(&self.tabs, self.active_tab.unwrap()));
             c = c.push(
                 text_input(
-                    "placeholder",
+                    "",
                     self.tabs
                         .get(self.active_tab.unwrap())
                         .unwrap()
