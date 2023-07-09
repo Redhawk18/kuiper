@@ -1,8 +1,10 @@
-use iced::widget::button;
+use iced::widget::{button, row};
+use iced::Element;
 use iced_aw::menu::MenuTree;
+use iced_aw::{TabBar, TabLabel};
 
 pub fn file<'a>(_app: &super::State) -> MenuTree<'a, super::Message, iced::Renderer> {
-    let new_file = MenuTree::new(button("New File").on_press(super::Message::NewTab(
+    let new_file = MenuTree::new(button("New File").on_press(super::Message::TabNew(
         super::FileTab {
             text: std::string::String::default(),
             path: std::path::PathBuf::default(),
@@ -25,4 +27,21 @@ pub fn file<'a>(_app: &super::State) -> MenuTree<'a, super::Message, iced::Rende
     );
 
     root
+}
+
+pub fn tab_header(tabs: &[super::FileTab], active_tab: usize) -> Element<super::Message> {
+    let mut tab_bar =
+        TabBar::new(active_tab, super::Message::TabSelected).on_close(super::Message::TabClosed);
+
+    for tab in tabs.iter() {
+        let filename = tab
+            .path
+            .file_name() // this already checks the "empty" case
+            .and_then(|filename| filename.to_str())
+            .unwrap_or("New Tab");
+
+        tab_bar = tab_bar.push(TabLabel::Text(String::from(filename)));
+    }
+
+    row!(tab_bar).into()
 }
