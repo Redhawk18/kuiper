@@ -1,9 +1,13 @@
 use iced::widget::{button, row};
 use iced::Element;
-use iced_aw::menu::MenuTree;
+use iced_aw::menu::{MenuBar, MenuTree};
 use iced_aw::{TabBar, TabLabel};
 
-pub fn file<'a>(_app: &super::State) -> MenuTree<'a, super::Message, iced::Renderer> {
+pub fn menu_bar<'a>() -> MenuBar<'a, super::Message, iced::Renderer> {
+    MenuBar::new(vec![file()])
+}
+
+fn file<'a>() -> MenuTree<'a, super::Message, iced::Renderer> {
     let new_file = MenuTree::new(button("New File").on_press(super::Message::TabNew(
         super::FileTab {
             text: std::string::String::default(),

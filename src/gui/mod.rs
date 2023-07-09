@@ -3,12 +3,11 @@ use std::path::PathBuf;
 use iced::widget::text_input;
 use iced::widget::Column;
 use iced::{theme, Application, Command, Element, Subscription};
-use iced_aw::menu::MenuBar;
 
 mod elements;
 mod file_dialog;
 
-pub use elements::file;
+pub use elements::menu_bar;
 
 #[derive(Debug, Clone)]
 pub enum Message {
@@ -148,9 +147,7 @@ impl Application for State {
     }
 
     fn view(&self) -> Element<Message> {
-        let menu_bar = MenuBar::new(vec![file(self)]);
-
-        let mut c = Column::new().push(menu_bar);
+        let mut c = Column::new().push(menu_bar());
 
         if !self.tabs.is_empty() {
             c = c.push(elements::tab_header(&self.tabs, self.active_tab.unwrap()));
