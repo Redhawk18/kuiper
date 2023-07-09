@@ -2,15 +2,13 @@ use std::path::PathBuf;
 
 use iced::widget::text_input;
 use iced::widget::Column;
-
 use iced::{theme, Application, Command, Element, Subscription};
 use iced_aw::menu::MenuBar;
 
+mod elements;
 mod file_dialog;
-mod menu_bar;
-mod tabs;
 
-pub use menu_bar::file;
+pub use elements::file;
 
 #[derive(Debug, Clone)]
 pub enum Message {
@@ -25,11 +23,9 @@ pub enum Message {
     Quit,
 
     //tabs
-    NewTab(FileTab),
+    TabNew(FileTab),
     TabSelected(usize),
     TabClosed(usize),
-    TabLabelInputChanged(String),
-    TabContentInputChanged(String),
 }
 
 #[derive(Debug, Clone)]
@@ -40,8 +36,6 @@ pub struct FileTab {
 
 pub struct State {
     active_tab: Option<usize>,
-    new_tab_label: String,
-    new_tab_content: String,
     tabs: Vec<FileTab>,
 }
 
@@ -55,8 +49,6 @@ impl Application for State {
         (
             State {
                 active_tab: None,
-                new_tab_label: String::new(),
-                new_tab_content: String::new(),
                 tabs: Vec::new(),
             },
             Command::none(),
@@ -75,7 +67,7 @@ impl Application for State {
                     tab.text = text;
                 }
                 None => {
-                    return self.update(Message::NewTab(FileTab {
+                    return self.update(Message::TabNew(FileTab {
                         text: "newfile".to_string(),
                         path: PathBuf::default(),
                     }))
@@ -83,7 +75,7 @@ impl Application for State {
             },
 
             Message::NewFile => {
-                return self.update(Message::NewTab(FileTab {
+                return self.update(Message::TabNew(FileTab {
                     text: "newfile".to_string(),
                     path: PathBuf::default(),
                 }))
@@ -99,12 +91,7 @@ impl Application for State {
                             tab.path = path;
                             return self.update(Message::TextUpdate(text));
                         }
-                        None => {
-                            return self.update(Message::NewTab(FileTab {
-                                text: text,
-                                path: path,
-                            }))
-                        }
+                        None => return self.update(Message::TabNew(FileTab { text, path })),
                     },
                     Err(_e) => {
                         return Command::none();
@@ -132,8 +119,14 @@ impl Application for State {
 
             Message::Quit => std::process::exit(0),
 
+            Message::TabNew(tab) => {
+                log::info!("new tab");
+                self.tabs.push(tab);
+                self.active_tab = Some(self.tabs.len() - 1);
+            }
+
             Message::TabSelected(index) => {
-                log::info!("{}", index);
+                log::info!("Selected tab {}", index);
                 self.active_tab = Some(index);
             }
 
@@ -149,12 +142,6 @@ impl Application for State {
                     ))
                 };
             }
-            Message::TabLabelInputChanged(value) => self.new_tab_label = value,
-            Message::TabContentInputChanged(value) => self.new_tab_content = value,
-            Message::NewTab(tab) => {
-                self.tabs.push(tab);
-                self.active_tab = Some(self.tabs.len() - 1);
-            }
         }
 
         Command::none()
@@ -166,7 +153,7 @@ impl Application for State {
         let mut c = Column::new().push(menu_bar);
 
         if !self.tabs.is_empty() {
-            c = c.push(tabs::tab_header(&self.tabs, self.active_tab.unwrap()));
+            c = c.push(elements::tab_header(&self.tabs, self.active_tab.unwrap()));
             c = c.push(
                 text_input(
                     "placeholder",
