@@ -13,19 +13,19 @@ jobs:
           - release_for: Linux-x86_64
             os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
-            bin: code-editor
+            bin: blaze
             command: build
 
           - release_for: macOS-x86_64
             os: macOS-latest
             target: x86_64-apple-darwin
-            bin: code-editor
+            bin: blaze
             command: both
 
           - release_for: Windows-x86_64
             os: windows-latest
             target: x86_64-pc-windows-msvc
-            bin: code-editor.exe
+            bin: blaze.exe
             command: both
 
             # more release targets here ...
@@ -56,5 +56,5 @@ jobs:
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: code-editor-${{ matrix.platform.target }}
+          name: blaze-${{ matrix.platform.target }}
           path: ./target/${{ matrix.platform.target }}/release/${{ matrix.platform.bin }}
