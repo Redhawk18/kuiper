@@ -3,12 +3,12 @@ use std::path::PathBuf;
 use iced::widget::text_input;
 use iced::widget::Column;
 use iced::{Application, Command, Element, Subscription};
-
+mod theme;
 mod elements;
 mod file_dialog;
-pub use theme::Theme;
 
 pub use elements::menu_bar;
+use theme::Theme;
 
 #[derive(Debug, Clone)]
 pub enum Message {
@@ -37,12 +37,13 @@ pub struct FileTab {
 pub struct State {
     active_tab: Option<usize>,
     tabs: Vec<FileTab>,
+    theme: Theme 
 }
 
 impl Application for State {
     type Executor = iced::executor::Default;
     type Message = Message;
-    type Theme = theme::Theme;
+    type Theme = Theme;
     type Flags = ();
 
     fn new(_flags: Self::Flags) -> (Self, Command<Self::Message>) {
@@ -50,6 +51,7 @@ impl Application for State {
             State {
                 active_tab: None,
                 tabs: Vec::new(),
+                theme: Theme::Dark
             },
             Command::none(),
         )
@@ -166,6 +168,10 @@ impl Application for State {
         }
 
         c.into()
+    }
+
+    fn theme(&self) -> Theme {
+        self.theme.clone()
     }
 
     fn subscription(&self) -> Subscription<Message> {

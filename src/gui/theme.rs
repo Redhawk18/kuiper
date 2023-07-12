@@ -1,15 +1,19 @@
-use iced::widget::button;
-use iced::{application, Color, color, Theme};
+use iced::{application, color};
+
+#[derive(Debug, Clone, Copy, Default)]
+pub enum Theme {
+  #[default]
+  Dark,
+  Light,
+}
 
 impl application::StyleSheet for Theme {
-    type Style = Button;
+    type Style = Theme; // ModernTheme in this case is an enum
 
-    fn active(&self, style: &Self::Style) -> Appearance {
-        match style {
-            Button::Primary => button::Appearance {
-                background: color!(0x28, 0x28, 0x28).into(),
-                ..Default::default()
-            }
+    fn appearance(&self, _style: &Self::Style) -> application::Appearance {
+        application::Appearance {
+            background_color: color!(0, 0, 0),
+            text_color: color!(150, 150, 150),
         }
     }
 }
