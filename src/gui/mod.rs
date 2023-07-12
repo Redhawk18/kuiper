@@ -67,15 +67,15 @@ impl Application for State {
                 }
                 None => {
                     return self.update(Message::TabNew(FileTab {
-                        text: "newfile".to_string(),
+                        text: String::default(),
                         path: PathBuf::default(),
                     }))
                 }
-            },
+            }
 
             Message::NewFile => {
                 return self.update(Message::TabNew(FileTab {
-                    text: "newfile".to_string(),
+                    text: String::default(),
                     path: PathBuf::default(),
                 }))
             }
@@ -106,7 +106,7 @@ impl Application for State {
                     file_dialog::save_file(tab.text.as_str(), tab.path.as_path()).unwrap();
                 }
                 None => return Command::none(),
-            },
+            }
 
             Message::SaveAs => match self.active_tab {
                 Some(index) => {
@@ -114,12 +114,12 @@ impl Application for State {
                     file_dialog::save_as(tab.text.as_str(), tab.path.as_path()).unwrap();
                 }
                 None => return Command::none(),
-            },
+            }
 
             Message::Quit => std::process::exit(0),
 
             Message::TabNew(tab) => {
-                log::info!("new tab");
+                log::info!("New tab");
                 self.tabs.push(tab);
                 self.active_tab = Some(self.tabs.len() - 1);
             }
@@ -130,8 +130,8 @@ impl Application for State {
             }
 
             Message::TabClosed(index) => {
+                log::info!("Closed tab {}", index);
                 self.tabs.remove(index);
-                //println!("active tab before: {}", self.active_tab);
                 self.active_tab = if self.tabs.is_empty() {
                     Some(0)
                 } else {
