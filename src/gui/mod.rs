@@ -2,10 +2,11 @@ use std::path::PathBuf;
 
 use iced::widget::text_input;
 use iced::widget::Column;
-use iced::{theme, Application, Command, Element, Subscription};
+use iced::{Application, Command, Element, Subscription};
 
 mod elements;
 mod file_dialog;
+pub use theme::Theme;
 
 pub use elements::menu_bar;
 
