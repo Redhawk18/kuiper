@@ -3,11 +3,13 @@ use iced::Element;
 use iced_aw::menu::{MenuBar, MenuTree};
 use iced_aw::{TabBar, TabLabel};
 
-pub fn menu_bar<'a>() -> MenuBar<'a, super::Message, iced::Renderer> {
+use crate::gui::theme::Renderer;
+
+pub fn menu_bar<'a>() -> MenuBar<'a, super::Message, Renderer> {
     MenuBar::new(vec![file()])
 }
 
-fn file<'a>() -> MenuTree<'a, super::Message, iced::Renderer> {
+fn file<'a>() -> MenuTree<'a, super::Message, Renderer> {
     let new_file = MenuTree::new(button("New File").on_press(super::Message::TabNew(
         super::FileTab {
             text: std::string::String::default(),
