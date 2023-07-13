@@ -1,13 +1,14 @@
 use std::path::PathBuf;
 
-use iced::widget::text_input;
-use iced::widget::Column;
-use iced::{Application, Command, Element, Subscription};
+//use iced::widget::text_input;
+//use iced::widget::Column;
+use iced::{Application, Command, Subscription};
 mod theme;
 mod elements;
 mod file_dialog;
 
 pub use elements::menu_bar;
+use theme::mywidget::{Element, Column, Button};
 use theme::Theme;
 
 #[derive(Debug, Clone)]
@@ -150,22 +151,24 @@ impl Application for State {
     }
 
     fn view(&self) -> Element<Message> {
-        let mut c = Column::new().push(menu_bar());
+        //let open_file = Button::new("Open File").on_press(Message::OpenFile);
+        let c = Column::new();
+        // let mut c = Column::new().push(menu_bar());
 
-        if !self.tabs.is_empty() {
-            c = c.push(elements::tab_header(&self.tabs, self.active_tab.unwrap()));
-            c = c.push(
-                text_input(
-                    "",
-                    self.tabs
-                        .get(self.active_tab.unwrap())
-                        .unwrap()
-                        .text
-                        .as_str(),
-                )
-                .on_input(Message::TextUpdate),
-            );
-        }
+        // if !self.tabs.is_empty() {
+        //     c = c.push(elements::tab_header(&self.tabs, self.active_tab.unwrap()));
+        //     c = c.push(
+        //         text_input(
+        //             "",
+        //             self.tabs
+        //                 .get(self.active_tab.unwrap())
+        //                 .unwrap()
+        //                 .text
+        //                 .as_str(),
+        //         )
+        //         .on_input(Message::TextUpdate),
+        //     );
+        // }
 
         c.into()
     }
