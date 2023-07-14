@@ -116,7 +116,7 @@ impl Application for State {
                 None => return Command::none(),
             }
 
-            Message::Quit => std::process::exit(0),
+            Message::Quit => return iced::window::close(),
 
             Message::TabNew(tab) => {
                 log::info!("New tab");
