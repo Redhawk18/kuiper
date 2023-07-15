@@ -1,7 +1,7 @@
 use iced::widget::{button, text, text_input};
 use iced::{application, color, Color, Background};
 use iced_aw::menu;
-use iced_aw::style::tab_bar; //lib bug
+use iced_aw::style::tab_bar; //FIXME https://github.com/iced-rs/iced_aw/issues/151
 
 
 pub type Renderer = iced::Renderer<Theme>;
@@ -19,7 +19,7 @@ impl application::StyleSheet for Theme {
 
     fn appearance(&self, _style: &Self::Style) -> application::Appearance {
         application::Appearance {
-            background_color: color!(0, 0, 0),
+            background_color: color!(255, 255, 255),
             text_color: color!(150, 150, 150),
         }
     }

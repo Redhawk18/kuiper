@@ -1,6 +1,5 @@
 use std::path::PathBuf;
 
-use iced::widget::button;
 use iced::widget::text_input;
 use iced::widget::Column;
 use iced::{Application, Command, Subscription};
