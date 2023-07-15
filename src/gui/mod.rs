@@ -1,15 +1,15 @@
 use std::path::PathBuf;
 
-//use iced::widget::text_input;
-//use iced::widget::Column;
+use iced::widget::button;
+use iced::widget::text_input;
+use iced::widget::Column;
 use iced::{Application, Command, Subscription};
-mod theme;
 mod elements;
 mod file_dialog;
+mod theme;
 
 pub use elements::menu_bar;
-use theme::mywidget::{Element, Column, Button};
-use theme::Theme;
+use theme::{Theme, Element};
 
 #[derive(Debug, Clone)]
 pub enum Message {
@@ -38,7 +38,7 @@ pub struct FileTab {
 pub struct State {
     active_tab: Option<usize>,
     tabs: Vec<FileTab>,
-    theme: Theme 
+    theme: Theme,
 }
 
 impl Application for State {
@@ -52,7 +52,7 @@ impl Application for State {
             State {
                 active_tab: None,
                 tabs: Vec::new(),
-                theme: Theme::Dark
+                theme: Theme::Dark,
             },
             Command::none(),
         )
@@ -75,7 +75,7 @@ impl Application for State {
                         path: PathBuf::default(),
                     }))
                 }
-            }
+            },
 
             Message::NewFile => {
                 return self.update(Message::TabNew(FileTab {
@@ -110,7 +110,7 @@ impl Application for State {
                     file_dialog::save_file(tab.text.as_str(), tab.path.as_path()).unwrap();
                 }
                 None => return Command::none(),
-            }
+            },
 
             Message::SaveAs => match self.active_tab {
                 Some(index) => {
@@ -118,7 +118,7 @@ impl Application for State {
                     file_dialog::save_as(tab.text.as_str(), tab.path.as_path()).unwrap();
                 }
                 None => return Command::none(),
-            }
+            },
 
             Message::Quit => std::process::exit(0),
 
@@ -151,24 +151,22 @@ impl Application for State {
     }
 
     fn view(&self) -> Element<Message> {
-        //let open_file = Button::new("Open File").on_press(Message::OpenFile);
-        let c = Column::new();
-        // let mut c = Column::new().push(menu_bar());
+        let mut c = Column::new().push(menu_bar());
 
-        // if !self.tabs.is_empty() {
-        //     c = c.push(elements::tab_header(&self.tabs, self.active_tab.unwrap()));
-        //     c = c.push(
-        //         text_input(
-        //             "",
-        //             self.tabs
-        //                 .get(self.active_tab.unwrap())
-        //                 .unwrap()
-        //                 .text
-        //                 .as_str(),
-        //         )
-        //         .on_input(Message::TextUpdate),
-        //     );
-        // }
+        if !self.tabs.is_empty() {
+            c = c.push(elements::tab_header(&self.tabs, self.active_tab.unwrap()));
+            c = c.push(
+                text_input(
+                    "",
+                    self.tabs
+                        .get(self.active_tab.unwrap())
+                        .unwrap()
+                        .text
+                        .as_str(),
+                )
+                .on_input(Message::TextUpdate),
+            );
+        }
 
         c.into()
     }

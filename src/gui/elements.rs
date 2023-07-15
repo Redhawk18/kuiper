@@ -1,9 +1,8 @@
 use iced::widget::{button, row};
-use iced::Element;
 use iced_aw::menu::{MenuBar, MenuTree};
 use iced_aw::{TabBar, TabLabel};
 
-use crate::gui::theme::Renderer;
+use crate::gui::theme::{Element, Renderer};
 
 pub fn menu_bar<'a>() -> MenuBar<'a, super::Message, Renderer> {
     MenuBar::new(vec![file()])
