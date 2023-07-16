@@ -1,5 +1,7 @@
 use std::path::PathBuf;
 
+use iced::theme::Text;
+use iced::widget::text;
 use iced::widget::text_input;
 use iced::widget::Column;
 use iced::{Application, Command, Subscription};
@@ -166,6 +168,7 @@ impl Application for State {
                 .on_input(Message::TextUpdate),
             );
         }
+        c = c.push(text("TEXTBOX")); //temp
 
         c.into()
     }

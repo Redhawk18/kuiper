@@ -20,7 +20,7 @@ impl application::StyleSheet for Theme {
     fn appearance(&self, _style: &Self::Style) -> application::Appearance {
         application::Appearance {
             background_color: color!(255, 255, 255),
-            text_color: color!(150, 150, 150),
+            text_color: color!(0, 0, 0),
         }
     }
 }
@@ -69,7 +69,7 @@ impl text_input::StyleSheet for Theme {
 
     fn active(&self, style: &Self::Style) -> text_input::Appearance {
         text_input::Appearance {
-            background: Background::Color(color!(0, 0, 0)),
+            background: Background::Color(color!(255, 255, 255)),
             border_radius: 4.0.into(),
             border_width: 0.0,
             border_color: Color::TRANSPARENT,
