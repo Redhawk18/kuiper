@@ -27,7 +27,7 @@ impl application::StyleSheet for Theme {
 
 impl button::StyleSheet for Theme {
     type Style = Theme;
-
+    #[allow(unused_variables)]
     fn active(&self, style: &Self::Style) -> button::Appearance {
         button::Appearance {
             ..Default::default()
@@ -37,7 +37,7 @@ impl button::StyleSheet for Theme {
 
 impl menu::StyleSheet for Theme {
     type Style = Theme;
-
+    #[allow(unused_variables)]
     fn appearance(&self, style: &Self::Style) -> menu::Appearance {
         Default::default()
     }
@@ -45,11 +45,11 @@ impl menu::StyleSheet for Theme {
 
 impl tab_bar::StyleSheet for Theme {
     type Style = Theme;
-
+    #[allow(unused_variables)]
     fn active(&self, style: Self::Style, is_active: bool) -> tab_bar::Appearance {
         Default::default()
     }
-
+    #[allow(unused_variables)]
     fn hovered(&self, style: Self::Style, is_active: bool) -> tab_bar::Appearance {
         Default::default()
     }
@@ -58,7 +58,7 @@ impl tab_bar::StyleSheet for Theme {
 
 impl text::StyleSheet for Theme {
     type Style = Theme;
-
+    #[allow(unused_variables)]
     fn appearance(&self, style: Self::Style) -> text::Appearance {
         Default::default()
     }
@@ -66,7 +66,7 @@ impl text::StyleSheet for Theme {
 
 impl text_input::StyleSheet for Theme {
     type Style = Theme;
-
+    #[allow(unused_variables)]
     fn active(&self, style: &Self::Style) -> text_input::Appearance {
         text_input::Appearance {
             background: Background::Color(color!(255, 255, 255)),
@@ -81,19 +81,19 @@ impl text_input::StyleSheet for Theme {
     fn focused(&self, style: &Self::Style) -> text_input::Appearance {
         self.active(style)
     }
-
+    #[allow(unused_variables)]
     fn placeholder_color(&self, style: &Self::Style) -> Color {
         Default::default()
     }
-
+    #[allow(unused_variables)]
     fn value_color(&self, style: &Self::Style) -> Color {
         Default::default()
     }
-
+    #[allow(unused_variables)]
     fn disabled_color(&self, style: &Self::Style) -> Color {
         Default::default()
     }
-
+    #[allow(unused_variables)]
     fn selection_color(&self, style: &Self::Style) -> Color {
         Default::default()
     }
