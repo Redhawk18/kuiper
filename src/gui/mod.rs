@@ -1,6 +1,5 @@
 use std::path::PathBuf;
 
-use iced::theme::Text;
 use iced::widget::text;
 use iced::widget::text_input;
 use iced::widget::Column;
@@ -10,7 +9,7 @@ mod file_dialog;
 mod theme;
 
 pub use elements::menu_bar;
-use theme::{Theme, Element};
+use theme::{Element, Theme};
 
 #[derive(Debug, Clone)]
 pub enum Message {

@@ -1,8 +1,7 @@
 use iced::widget::{button, text, text_input};
-use iced::{application, color, Color, Background};
+use iced::{application, color, Background, Color};
 use iced_aw::menu;
 use iced_aw::style::tab_bar; //FIXME https://github.com/iced-rs/iced_aw/issues/151
-
 
 pub type Renderer = iced::Renderer<Theme>;
 pub type Element<'msg, Message> = iced::Element<'msg, Message, Renderer>;
@@ -53,7 +52,6 @@ impl tab_bar::StyleSheet for Theme {
     fn hovered(&self, style: Self::Style, is_active: bool) -> tab_bar::Appearance {
         Default::default()
     }
-
 }
 
 impl text::StyleSheet for Theme {
