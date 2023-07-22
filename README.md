@@ -40,6 +40,13 @@ Building the application. Current known dependencies are `gtk3` for Linux. In ad
 3. Compiling
 `cargo build --release`
 
+### Known System Dependencies
+OpenSuse
+
+```bash
+sudo zypper install atkmm-devel gdk-pixbuf-devel gdk-pixbuf-xlib-devel glib2-devel gtk3-devel harfbuzz-devel pkg-config
+```
+
 ## Roadmap
 [refer here](ROADMAP.md)
 
