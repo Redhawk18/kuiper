@@ -19,26 +19,16 @@ Currently to install
 
 1. Clone the repository
 
-`git clone git@github.com:Redhawk18/blaze.git`
+```git clone git@github.com:Redhawk18/blaze.git```
 
 2. Compile and install the program
 
-`cargo install --path blaze`
+```cargo install --path blaze```
 
 3. Add given path to your `$PATH`
 
 ## Building
-Building the application. Current known dependencies are `gtk3` for Linux. In addition Blaze is hardware accelerated, so have the proper drivers installed. 
-
-1. Clone the repository
-
-`git clone git@github.com:Redhawk18/blaze.git`
-
-2. Go into the repository
-`cd blaze`
-
-3. Compiling
-`cargo build --release`
+Blaze is hardware accelerated, so have the proper drivers installed. 
 
 ### Known System Dependencies
 OpenSuse
@@ -46,6 +36,18 @@ OpenSuse
 ```bash
 sudo zypper install atkmm-devel gdk-pixbuf-devel gdk-pixbuf-xlib-devel glib2-devel gtk3-devel harfbuzz-devel pkg-config
 ```
+
+1. Clone the repository
+
+```git clone git@github.com:Redhawk18/blaze.git```
+
+2. Go into the repository
+
+`cd blaze`
+
+3. Compiling
+
+`cargo build --release`
 
 ## Roadmap
 [refer here](ROADMAP.md)
