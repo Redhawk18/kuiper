@@ -10,15 +10,19 @@ use colors::Colors;
 pub type Renderer = iced::Renderer<Theme>;
 pub type Element<'msg, Message> = iced::Element<'msg, Message, Renderer>;
 
-#[derive(Debug, Clone, Copy, Default)]
-pub enum Theme {
-    #[default]
-    Dark,
-    Light,
+#[derive(Clone)]
+pub struct Theme {
+    pub colors: Colors,
+}
+
+impl Default for Theme {
+    fn default() -> Self {
+        Theme { colors: Colors::default() }
+    }
 }
 
 impl application::StyleSheet for Theme {
-    type Style = Theme;
+    type Style = ();
 
     fn appearance(&self, _style: &Self::Style) -> application::Appearance {
         application::Appearance {
@@ -27,9 +31,14 @@ impl application::StyleSheet for Theme {
         }
     }
 }
+#[derive(Default)]
+pub enum Button {
+    #[default]
+    Primary,
+}
 
 impl button::StyleSheet for Theme {
-    type Style = Theme;
+    type Style = Button;
     #[allow(unused_variables)]
     fn active(&self, style: &Self::Style) -> button::Appearance {
         button::Appearance {
@@ -38,16 +47,27 @@ impl button::StyleSheet for Theme {
     }
 }
 
+#[derive(Default)]
+pub enum Menu {
+    #[default]
+    Primary,
+}
 impl menu::StyleSheet for Theme {
-    type Style = Theme;
+    type Style = Menu;
     #[allow(unused_variables)]
     fn appearance(&self, style: &Self::Style) -> menu::Appearance {
         Default::default()
     }
 }
 
+#[derive(Clone, Copy, Default)]
+pub enum TabBar {
+    #[default]
+    Primary,
+}
+
 impl tab_bar::StyleSheet for Theme {
-    type Style = Theme;
+    type Style = TabBar;
     #[allow(unused_variables)]
     fn active(&self, style: Self::Style, is_active: bool) -> tab_bar::Appearance {
         Default::default()
@@ -58,16 +78,28 @@ impl tab_bar::StyleSheet for Theme {
     }
 }
 
+#[derive(Clone, Copy, Default)]
+pub enum Text {
+    #[default]
+    Primary,
+}
+
 impl text::StyleSheet for Theme {
-    type Style = Theme;
+    type Style = Text;
     #[allow(unused_variables)]
     fn appearance(&self, style: Self::Style) -> text::Appearance {
         Default::default()
     }
 }
 
+#[derive(Default)]
+pub enum TextInput {
+    #[default]
+    Primary,
+}
+
 impl text_input::StyleSheet for Theme {
-    type Style = Theme;
+    type Style = TextInput;
     #[allow(unused_variables)]
     fn active(&self, style: &Self::Style) -> text_input::Appearance {
         text_input::Appearance {
@@ -76,7 +108,7 @@ impl text_input::StyleSheet for Theme {
             border_width: 0.0,
             border_color: iced::Color::TRANSPARENT,
             // XXX Not currently displayed in application.
-            icon_color: color!(0, 0, 0),
+            icon_color: self.colors.accent,
         }
     }
 

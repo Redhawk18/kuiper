@@ -11,12 +11,13 @@ use iced::Color;
 //     text: Shade,
 // }
 
+#[derive(Clone)]
 pub struct Colors {
-    accent: Color,
-    background: Color,
-    primary: Color,
-    secondary: Color,
-    text: Color,
+    pub accent: Color,
+    pub background: Color,
+    pub primary: Color,
+    pub secondary: Color,
+    pub text: Color,
 }
 
 //TODO review this after get it working in theme.rs

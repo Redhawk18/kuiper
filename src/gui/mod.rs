@@ -52,7 +52,7 @@ impl Application for State {
             State {
                 active_tab: None,
                 tabs: Vec::new(),
-                theme: Theme::Dark,
+                theme: Theme::default(),
             },
             Command::none(),
         )
