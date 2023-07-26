@@ -24,11 +24,11 @@ pub struct Colors {
 impl Default for Colors {
     fn default() -> Colors {
         Colors {
-            accent: hex_to_color("#000000").unwrap(),
-            background: hex_to_color("#ffffff").unwrap(),
-            primary: hex_to_color("#4685ff").unwrap(),
-            secondary: hex_to_color("#f2f2f2").unwrap(),
-            text: hex_to_color("#ffb084").unwrap(),
+            accent: hex_to_color("#f8073b").unwrap(),
+            background: hex_to_color("#fafafa").unwrap(),
+            primary: hex_to_color("#f9682f").unwrap(),
+            secondary: hex_to_color("#fef2cd").unwrap(),
+            text: hex_to_color("#050505").unwrap(),
         }
     }
 }

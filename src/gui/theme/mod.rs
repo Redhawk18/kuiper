@@ -17,7 +17,9 @@ pub struct Theme {
 
 impl Default for Theme {
     fn default() -> Self {
-        Theme { colors: Colors::default() }
+        Theme {
+            colors: Colors::default(),
+        }
     }
 }
 
@@ -70,7 +72,18 @@ impl tab_bar::StyleSheet for Theme {
     type Style = TabBar;
     #[allow(unused_variables)]
     fn active(&self, style: Self::Style, is_active: bool) -> tab_bar::Appearance {
-        Default::default()
+        match style {
+            TabBar::Primary => tab_bar::Appearance {
+                background: Some(Background::Color(self.colors.background)),
+                border_color: Some(self.colors.accent),
+                border_width: 4.0,
+                icon_color: self.colors.accent,
+                tab_label_background: Background::Color(self.colors.accent),
+                tab_label_border_color: self.colors.accent,
+                tab_label_border_width: 1.0,
+                text_color: self.colors.accent
+            }
+        }
     }
     #[allow(unused_variables)]
     fn hovered(&self, style: Self::Style, is_active: bool) -> tab_bar::Appearance {
@@ -102,37 +115,45 @@ impl text_input::StyleSheet for Theme {
     type Style = TextInput;
     #[allow(unused_variables)]
     fn active(&self, style: &Self::Style) -> text_input::Appearance {
-        text_input::Appearance {
-            background: Background::Color(color!(255, 255, 255)),
-            border_radius: 4.0.into(),
-            border_width: 0.0,
-            border_color: iced::Color::TRANSPARENT,
-            // XXX Not currently displayed in application.
-            icon_color: self.colors.accent,
+        match style {
+            TextInput::Primary => text_input::Appearance {
+                background: Background::Color(self.colors.background),
+                border_radius: 4.0.into(),
+                border_width: 1.0,
+                border_color: self.colors.accent,
+                // XXX Not currently displayed in application.
+                icon_color: self.colors.accent,
+            },
         }
+    }
+
+    fn disabled(&self, style: &Self::Style) -> text_input::Appearance {
+        self.active(style)
+    }
+
+    #[allow(unused_variables)]
+    fn disabled_color(&self, style: &Self::Style) -> iced::Color {
+        Default::default()
     }
 
     fn focused(&self, style: &Self::Style) -> text_input::Appearance {
         self.active(style)
     }
+
     #[allow(unused_variables)]
     fn placeholder_color(&self, style: &Self::Style) -> iced::Color {
         Default::default()
     }
-    #[allow(unused_variables)]
-    fn value_color(&self, style: &Self::Style) -> iced::Color {
-        Default::default()
-    }
-    #[allow(unused_variables)]
-    fn disabled_color(&self, style: &Self::Style) -> iced::Color {
-        Default::default()
-    }
-    #[allow(unused_variables)]
+
     fn selection_color(&self, style: &Self::Style) -> iced::Color {
-        Default::default()
+        match style {
+            TextInput::Primary => self.colors.accent,
+        }
     }
 
-    fn disabled(&self, style: &Self::Style) -> text_input::Appearance {
-        self.active(style)
+    fn value_color(&self, style: &Self::Style) -> iced::Color {
+        match style {
+            TextInput::Primary => self.colors.text,
+        }
     }
 }
