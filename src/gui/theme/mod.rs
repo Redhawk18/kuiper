@@ -26,8 +26,8 @@ impl application::StyleSheet for Theme {
 
     fn appearance(&self, _style: &Self::Style) -> application::Appearance {
         application::Appearance {
-            background_color: color!(255, 255, 255),
-            text_color: color!(0, 0, 0),
+            background_color: self.colors.background,
+            text_color: self.colors.text,
         }
     }
 }
