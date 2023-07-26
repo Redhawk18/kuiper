@@ -1,7 +1,11 @@
 use iced::widget::{button, text, text_input};
-use iced::{application, color, Background, Color};
+use iced::{application, color, Background};
 use iced_aw::menu;
 use iced_aw::style::tab_bar; //FIXME https://github.com/iced-rs/iced_aw/issues/151
+
+mod colors;
+
+use colors::Colors;
 
 pub type Renderer = iced::Renderer<Theme>;
 pub type Element<'msg, Message> = iced::Element<'msg, Message, Renderer>;
@@ -70,7 +74,7 @@ impl text_input::StyleSheet for Theme {
             background: Background::Color(color!(255, 255, 255)),
             border_radius: 4.0.into(),
             border_width: 0.0,
-            border_color: Color::TRANSPARENT,
+            border_color: iced::Color::TRANSPARENT,
             // XXX Not currently displayed in application.
             icon_color: color!(0, 0, 0),
         }
@@ -80,19 +84,19 @@ impl text_input::StyleSheet for Theme {
         self.active(style)
     }
     #[allow(unused_variables)]
-    fn placeholder_color(&self, style: &Self::Style) -> Color {
+    fn placeholder_color(&self, style: &Self::Style) -> iced::Color {
         Default::default()
     }
     #[allow(unused_variables)]
-    fn value_color(&self, style: &Self::Style) -> Color {
+    fn value_color(&self, style: &Self::Style) -> iced::Color {
         Default::default()
     }
     #[allow(unused_variables)]
-    fn disabled_color(&self, style: &Self::Style) -> Color {
+    fn disabled_color(&self, style: &Self::Style) -> iced::Color {
         Default::default()
     }
     #[allow(unused_variables)]
-    fn selection_color(&self, style: &Self::Style) -> Color {
+    fn selection_color(&self, style: &Self::Style) -> iced::Color {
         Default::default()
     }
 
