@@ -91,9 +91,13 @@ pub enum Text {
 
 impl text::StyleSheet for Theme {
     type Style = Text;
-    #[allow(unused_variables)]
+
     fn appearance(&self, style: Self::Style) -> text::Appearance {
-        Default::default()
+        match style {
+            Text::Primary => text::Appearance {
+                color: Some(self.colors.text)
+            },
+        }
     }
 }
 
