@@ -25,6 +25,7 @@ impl application::StyleSheet for Theme {
         }
     }
 }
+
 #[derive(Default)]
 pub enum Button {
     #[default]
@@ -35,18 +36,45 @@ impl button::StyleSheet for Theme {
     type Style = Button;
 
     fn active(&self, style: &Self::Style) -> button::Appearance {
-        // match style {
-        //     Button::Primary => button::Appearance {
-        //         shadow_offset: iced::Vector::default(),
-        //         background: Some(Background::Color(self.colors.background)),
-        //         border_radius: 0.0,
-        //         border_width: 0.0,
-        //         border_color: self.colors.accent,
-        //         text_color: self.colors.text,
-        //     },
-        // }
-        button::Appearance::default()
+        match style {
+            Button::Primary => button::Appearance {
+                background: None,
+                border_color: self.colors.accent,
+                border_radius: 0.0,
+                border_width: 0.0,
+                shadow_offset: iced::Vector::default(),
+                text_color: self.colors.text
+            },
+        }
     }
+
+    fn hovered(&self, style: &Self::Style) -> button::Appearance {
+        match style {
+            Button::Primary => button::Appearance {
+                background: Some(Background::Color(self.colors.accent)),
+                border_color: self.colors.accent,
+                border_radius: 0.0,
+                border_width: 0.0,
+                shadow_offset: iced::Vector::default(),
+                text_color: self.colors.text
+            },
+        }
+    }
+
+    fn pressed(&self, style: &Self::Style) -> button::Appearance {
+        match style {
+            Button::Primary => button::Appearance {
+                background: Some(Background::Color(self.colors.accent)),
+                border_color: self.colors.accent,
+                border_radius: 0.0,
+                border_width: 0.0,
+                shadow_offset: iced::Vector::default(),
+                text_color: self.colors.text
+            },
+        }
+    }
+
+    //fn disabled(&self, style: &Self::Style) -> button::Appearance {} //todo
 }
 
 #[derive(Default)]
