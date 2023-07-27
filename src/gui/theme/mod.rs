@@ -33,11 +33,19 @@ pub enum Button {
 
 impl button::StyleSheet for Theme {
     type Style = Button;
-    #[allow(unused_variables)]
+
     fn active(&self, style: &Self::Style) -> button::Appearance {
-        button::Appearance {
-            ..Default::default()
-        }
+        // match style {
+        //     Button::Primary => button::Appearance {
+        //         shadow_offset: iced::Vector::default(),
+        //         background: Some(Background::Color(self.colors.background)),
+        //         border_radius: 0.0,
+        //         border_width: 0.0,
+        //         border_color: self.colors.accent,
+        //         text_color: self.colors.text,
+        //     },
+        // }
+        button::Appearance::default()
     }
 }
 
@@ -70,25 +78,41 @@ pub enum TabBar {
 }
 
 impl tab_bar::StyleSheet for Theme {
+    //TODO add is_active
     type Style = TabBar;
-    #[allow(unused_variables)]
+
     fn active(&self, style: Self::Style, is_active: bool) -> tab_bar::Appearance {
+        match style {
+            TabBar::Primary => tab_bar::Appearance {
+                background: Some(Background::Color(self.colors.background)),
+                border_color: Some(self.colors.primary),
+                border_width: 4.0,
+                icon_color: self.colors.accent,
+                tab_label_background: Background::Color(if is_active {
+                    self.colors.primary
+                } else {
+                    self.colors.secondary
+                }),
+                tab_label_border_color: self.colors.primary,
+                tab_label_border_width: 1.0,
+                text_color: self.colors.text,
+            },
+        }
+    }
+
+    fn hovered(&self, style: Self::Style, _is_active: bool) -> tab_bar::Appearance {
         match style {
             TabBar::Primary => tab_bar::Appearance {
                 background: Some(Background::Color(self.colors.background)),
                 border_color: Some(self.colors.accent),
                 border_width: 4.0,
                 icon_color: self.colors.accent,
-                tab_label_background: Background::Color(self.colors.accent),
-                tab_label_border_color: self.colors.secondary,
+                tab_label_background: Background::Color(self.colors.primary),
+                tab_label_border_color: self.colors.accent,
                 tab_label_border_width: 1.0,
                 text_color: self.colors.text,
             },
         }
-    }
-    #[allow(unused_variables)]
-    fn hovered(&self, style: Self::Style, is_active: bool) -> tab_bar::Appearance {
-        Default::default()
     }
 }
 
@@ -126,14 +150,13 @@ impl text_input::StyleSheet for Theme {
                 border_radius: 4.0,
                 border_width: 1.0,
                 border_color: self.colors.primary,
-                // XXX Not currently displayed in application.
                 icon_color: self.colors.primary,
             },
         }
     }
 
     fn disabled(&self, style: &Self::Style) -> text_input::Appearance {
-        self.active(style)
+        self.active(style) //TODO
     }
 
     #[allow(unused_variables)]
