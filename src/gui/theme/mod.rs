@@ -1,5 +1,5 @@
 use iced::widget::{button, text, text_input};
-use iced::{application, color, Background};
+use iced::{application, Background};
 use iced_aw::menu;
 use iced_aw::style::tab_bar; //FIXME https://github.com/iced-rs/iced_aw/issues/151
 
@@ -10,17 +10,9 @@ use colors::Colors;
 pub type Renderer = iced::Renderer<Theme>;
 pub type Element<'msg, Message> = iced::Element<'msg, Message, Renderer>;
 
-#[derive(Clone)]
+#[derive(Clone, Default)]
 pub struct Theme {
     pub colors: Colors,
-}
-
-impl Default for Theme {
-    fn default() -> Self {
-        Theme {
-            colors: Colors::default(),
-        }
-    }
 }
 
 impl application::StyleSheet for Theme {
@@ -81,8 +73,8 @@ impl tab_bar::StyleSheet for Theme {
                 tab_label_background: Background::Color(self.colors.accent),
                 tab_label_border_color: self.colors.accent,
                 tab_label_border_width: 1.0,
-                text_color: self.colors.accent
-            }
+                text_color: self.colors.accent,
+            },
         }
     }
     #[allow(unused_variables)]
@@ -113,16 +105,16 @@ pub enum TextInput {
 
 impl text_input::StyleSheet for Theme {
     type Style = TextInput;
-    #[allow(unused_variables)]
+
     fn active(&self, style: &Self::Style) -> text_input::Appearance {
         match style {
             TextInput::Primary => text_input::Appearance {
                 background: Background::Color(self.colors.background),
-                border_radius: 4.0.into(),
+                border_radius: 4.0,
                 border_width: 1.0,
-                border_color: self.colors.accent,
+                border_color: self.colors.primary,
                 // XXX Not currently displayed in application.
-                icon_color: self.colors.accent,
+                icon_color: self.colors.primary,
             },
         }
     }
@@ -137,12 +129,22 @@ impl text_input::StyleSheet for Theme {
     }
 
     fn focused(&self, style: &Self::Style) -> text_input::Appearance {
-        self.active(style)
+        match style {
+            TextInput::Primary => text_input::Appearance {
+                background: Background::Color(self.colors.background),
+                border_radius: 4.0,
+                border_width: 1.0,
+                border_color: self.colors.accent,
+                // XXX Not currently displayed in application.
+                icon_color: self.colors.accent,
+            },
+        }
     }
 
-    #[allow(unused_variables)]
     fn placeholder_color(&self, style: &Self::Style) -> iced::Color {
-        Default::default()
+        match style {
+            TextInput::Primary => self.colors.text, //TODO lightest
+        }
     }
 
     fn selection_color(&self, style: &Self::Style) -> iced::Color {
