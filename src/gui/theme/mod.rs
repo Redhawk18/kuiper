@@ -48,9 +48,18 @@ pub enum Menu {
 }
 impl menu::StyleSheet for Theme {
     type Style = Menu;
-    #[allow(unused_variables)]
+
     fn appearance(&self, style: &Self::Style) -> menu::Appearance {
-        Default::default()
+        match style {
+            Menu::Primary => menu::Appearance {
+                background: self.colors.background,
+                border_width: 2.0,
+                border_radius: [4.0; 4],
+                border_color: self.colors.primary,
+                background_expand: [0; 4],
+                path: self.colors.accent,
+            },
+        }
     }
 }
 
@@ -71,9 +80,9 @@ impl tab_bar::StyleSheet for Theme {
                 border_width: 4.0,
                 icon_color: self.colors.accent,
                 tab_label_background: Background::Color(self.colors.accent),
-                tab_label_border_color: self.colors.accent,
+                tab_label_border_color: self.colors.secondary,
                 tab_label_border_width: 1.0,
-                text_color: self.colors.accent,
+                text_color: self.colors.text,
             },
         }
     }
@@ -95,7 +104,7 @@ impl text::StyleSheet for Theme {
     fn appearance(&self, style: Self::Style) -> text::Appearance {
         match style {
             Text::Primary => text::Appearance {
-                color: Some(self.colors.text)
+                color: Some(self.colors.text),
             },
         }
     }
