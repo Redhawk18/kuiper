@@ -82,20 +82,13 @@ impl Application for State {
 
             Message::OpenFile => {
                 let (file_contents, path) = file_dialog::pick_file();
+                let Ok(text) = file_contents else { return Command::none() };
+                let Some(index) = self.active_tab else {
+                    return self.update(Message::TabNew(FileTab { text, path }))
+                };
 
-                match file_contents {
-                    Ok(text) => match self.active_tab {
-                        Some(index) => {
-                            let tab = self.tabs.get_mut(index).unwrap();
-                            tab.path = path;
-                            return self.update(Message::TextUpdate(text));
-                        }
-                        None => return self.update(Message::TabNew(FileTab { text, path })),
-                    },
-                    Err(_e) => {
-                        return Command::none();
-                    }
-                }
+                self.tabs[index].path = path;
+                return self.update(Message::TextUpdate(text))
             }
 
             Message::OpenFolder => file_dialog::pick_folder(),
