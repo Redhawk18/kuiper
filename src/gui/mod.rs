@@ -167,7 +167,6 @@ impl Application for State {
                 .on_input(Message::TextUpdate),
             );
         }
-        c = c.push(text("TEXTBOX")); //temp
 
         c.into()
     }
