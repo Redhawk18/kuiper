@@ -43,7 +43,7 @@ impl button::StyleSheet for Theme {
                 border_radius: 0.0,
                 border_width: 0.0,
                 shadow_offset: iced::Vector::default(),
-                text_color: self.colors.text
+                text_color: self.colors.text,
             },
         }
     }
@@ -56,7 +56,7 @@ impl button::StyleSheet for Theme {
                 border_radius: 0.0,
                 border_width: 0.0,
                 shadow_offset: iced::Vector::default(),
-                text_color: self.colors.text
+                text_color: self.colors.text,
             },
         }
     }
@@ -69,7 +69,7 @@ impl button::StyleSheet for Theme {
                 border_radius: 0.0,
                 border_width: 0.0,
                 shadow_offset: iced::Vector::default(),
-                text_color: self.colors.text
+                text_color: self.colors.text,
             },
         }
     }
