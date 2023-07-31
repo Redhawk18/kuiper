@@ -1,22 +1,23 @@
 use iced::Color;
 
 /// raw hex colors from the theme files
+#[derive(Clone, Copy)]
 pub struct Palette {
-    accent: Color,
-    background: Color, 
-    primary: Color,
-    secondary: Color,
-    text: Color,
+    pub accent: Color,
+    pub background: Color,
+    pub primary: Color,
+    pub secondary: Color,
+    pub text: Color,
 }
 
 impl Default for Palette {
     fn default() -> Palette {
         Palette {
-            accent: hex_to_color("#000000").unwrap(),
-            background: hex_to_color("#ffffff").unwrap(), 
-            primary: hex_to_color("#4685ff").unwrap(),
-            secondary: hex_to_color("#f2f2f2").unwrap(),
-            text: hex_to_color("#ffb084").unwrap(),
+            accent: hex_to_color("#928fd6").unwrap(),
+            background: hex_to_color("#050505").unwrap(),
+            primary: hex_to_color("#2a4b74").unwrap(),
+            secondary: hex_to_color("#0e0e25").unwrap(),
+            text: hex_to_color("#fafafa").unwrap(),
         }
     }
 }
