@@ -81,7 +81,7 @@ impl button::StyleSheet for Theme {
             Button::Primary => button::Appearance {
                 background: Some(Background::Color(self.colors.accent.base)),
                 border_color: self.colors.accent.base,
-                border_radius: 0.0,
+                border_radius: 8.0,
                 border_width: 0.0,
                 shadow_offset: iced::Vector::default(),
                 text_color: self.colors.text.base,
@@ -90,16 +90,7 @@ impl button::StyleSheet for Theme {
     }
 
     fn pressed(&self, style: &Self::Style) -> button::Appearance {
-        match style {
-            Button::Primary => button::Appearance {
-                background: Some(Background::Color(self.colors.accent.base)),
-                border_color: self.colors.accent.base,
-                border_radius: 0.0,
-                border_width: 0.0,
-                shadow_offset: iced::Vector::default(),
-                text_color: self.colors.text.base,
-            },
-        }
+        self.hovered(style)
     }
 
     //fn disabled(&self, style: &Self::Style) -> button::Appearance {} //todo
