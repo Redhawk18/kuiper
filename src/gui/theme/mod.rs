@@ -26,18 +26,20 @@ impl Default for Theme {
         Theme {
             colors: Colors {
                 accent: Shade {
-                    base: palette.accent,
+                    default: palette.accent,
                 },
                 background: Shade {
-                    base: palette.background,
+                    default: palette.background,
                 },
                 primary: Shade {
-                    base: palette.primary,
+                    default: palette.primary,
                 },
                 secondary: Shade {
-                    base: palette.secondary,
+                    default: palette.secondary,
                 },
-                text: Shade { base: palette.text },
+                text: Shade {
+                    default: palette.text,
+                },
             },
         }
     }
@@ -48,8 +50,8 @@ impl application::StyleSheet for Theme {
 
     fn appearance(&self, _style: &Self::Style) -> application::Appearance {
         application::Appearance {
-            background_color: self.colors.background.base,
-            text_color: self.colors.text.base,
+            background_color: self.colors.background.default,
+            text_color: self.colors.text.default,
         }
     }
 }
@@ -67,11 +69,11 @@ impl button::StyleSheet for Theme {
         match style {
             Button::Primary => button::Appearance {
                 background: None,
-                border_color: self.colors.accent.base,
+                border_color: self.colors.accent.default,
                 border_radius: 0.0,
                 border_width: 0.0,
                 shadow_offset: iced::Vector::default(),
-                text_color: self.colors.text.base,
+                text_color: self.colors.text.default,
             },
         }
     }
@@ -79,12 +81,12 @@ impl button::StyleSheet for Theme {
     fn hovered(&self, style: &Self::Style) -> button::Appearance {
         match style {
             Button::Primary => button::Appearance {
-                background: Some(Background::Color(self.colors.accent.base)),
-                border_color: self.colors.accent.base,
+                background: Some(Background::Color(self.colors.accent.default)),
+                border_color: self.colors.accent.default,
                 border_radius: 8.0,
                 border_width: 0.0,
                 shadow_offset: iced::Vector::default(),
-                text_color: self.colors.text.base,
+                text_color: self.colors.text.default,
             },
         }
     }
@@ -107,12 +109,12 @@ impl menu::StyleSheet for Theme {
     fn appearance(&self, style: &Self::Style) -> menu::Appearance {
         match style {
             Menu::Primary => menu::Appearance {
-                background: self.colors.background.base,
+                background: self.colors.background.default,
                 border_width: 2.0,
                 border_radius: [4.0; 4],
-                border_color: self.colors.primary.base,
+                border_color: self.colors.primary.default,
                 background_expand: [0; 4],
-                path: self.colors.accent.base,
+                path: self.colors.accent.default,
             },
         }
     }
@@ -131,18 +133,18 @@ impl tab_bar::StyleSheet for Theme {
     fn active(&self, style: Self::Style, is_active: bool) -> tab_bar::Appearance {
         match style {
             TabBar::Primary => tab_bar::Appearance {
-                background: Some(Background::Color(self.colors.background.base)),
-                border_color: Some(self.colors.primary.base),
+                background: Some(Background::Color(self.colors.background.default)),
+                border_color: Some(self.colors.primary.default),
                 border_width: 4.0,
-                icon_color: self.colors.accent.base,
+                icon_color: self.colors.accent.default,
                 tab_label_background: Background::Color(if is_active {
-                    self.colors.primary.base
+                    self.colors.primary.default
                 } else {
-                    self.colors.secondary.base
+                    self.colors.secondary.default
                 }),
-                tab_label_border_color: self.colors.primary.base,
+                tab_label_border_color: self.colors.primary.default,
                 tab_label_border_width: 1.0,
-                text_color: self.colors.text.base,
+                text_color: self.colors.text.default,
             },
         }
     }
@@ -150,14 +152,14 @@ impl tab_bar::StyleSheet for Theme {
     fn hovered(&self, style: Self::Style, _is_active: bool) -> tab_bar::Appearance {
         match style {
             TabBar::Primary => tab_bar::Appearance {
-                background: Some(Background::Color(self.colors.background.base)),
-                border_color: Some(self.colors.accent.base),
+                background: Some(Background::Color(self.colors.background.default)),
+                border_color: Some(self.colors.accent.default),
                 border_width: 4.0,
-                icon_color: self.colors.accent.base,
-                tab_label_background: Background::Color(self.colors.primary.base),
-                tab_label_border_color: self.colors.accent.base,
+                icon_color: self.colors.accent.default,
+                tab_label_background: Background::Color(self.colors.primary.default),
+                tab_label_border_color: self.colors.accent.default,
                 tab_label_border_width: 1.0,
-                text_color: self.colors.text.base,
+                text_color: self.colors.text.default,
             },
         }
     }
@@ -175,7 +177,7 @@ impl text::StyleSheet for Theme {
     fn appearance(&self, style: Self::Style) -> text::Appearance {
         match style {
             Text::Primary => text::Appearance {
-                color: Some(self.colors.text.base),
+                color: Some(self.colors.text.default),
             },
         }
     }
@@ -193,11 +195,11 @@ impl text_input::StyleSheet for Theme {
     fn active(&self, style: &Self::Style) -> text_input::Appearance {
         match style {
             TextInput::Primary => text_input::Appearance {
-                background: Background::Color(self.colors.background.base),
+                background: Background::Color(self.colors.background.default),
                 border_radius: 4.0,
                 border_width: 1.0,
-                border_color: self.colors.primary.base,
-                icon_color: self.colors.primary.base,
+                border_color: self.colors.primary.default,
+                icon_color: self.colors.primary.default,
             },
         }
     }
@@ -214,31 +216,31 @@ impl text_input::StyleSheet for Theme {
     fn focused(&self, style: &Self::Style) -> text_input::Appearance {
         match style {
             TextInput::Primary => text_input::Appearance {
-                background: Background::Color(self.colors.background.base),
+                background: Background::Color(self.colors.background.default),
                 border_radius: 4.0,
                 border_width: 1.0,
-                border_color: self.colors.accent.base,
+                border_color: self.colors.accent.default,
                 // XXX Not currently displayed in application.
-                icon_color: self.colors.accent.base,
+                icon_color: self.colors.accent.default,
             },
         }
     }
 
     fn placeholder_color(&self, style: &Self::Style) -> iced::Color {
         match style {
-            TextInput::Primary => self.colors.text.base, //TODO lightest
+            TextInput::Primary => self.colors.text.default, //TODO lightest
         }
     }
 
     fn selection_color(&self, style: &Self::Style) -> iced::Color {
         match style {
-            TextInput::Primary => self.colors.accent.base,
+            TextInput::Primary => self.colors.accent.default,
         }
     }
 
     fn value_color(&self, style: &Self::Style) -> iced::Color {
         match style {
-            TextInput::Primary => self.colors.text.base,
+            TextInput::Primary => self.colors.text.default,
         }
     }
 }
