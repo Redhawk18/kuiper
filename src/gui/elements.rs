@@ -8,12 +8,9 @@ pub fn menu_bar<'a>() -> MenuBar<'a, super::Message, iced::Renderer> {
 }
 
 fn file<'a>() -> MenuTree<'a, super::Message, iced::Renderer> {
-    let new_file = MenuTree::new(button("New File").on_press(super::Message::TabNew(
-        super::FileTab {
-            text: std::string::String::default(),
-            path: std::path::PathBuf::default(),
-        },
-    )));
+    let new_file = MenuTree::new(
+        button("New File").on_press(super::Message::TabNew(super::FileTab::default())),
+    );
 
     let open_file = MenuTree::new(button("Open File").on_press(super::Message::OpenFile));
 
@@ -33,9 +30,13 @@ fn file<'a>() -> MenuTree<'a, super::Message, iced::Renderer> {
     root
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TabId {
+    File,
+}
+
 pub fn tab_header(tabs: &[super::FileTab], active_tab: usize) -> Element<super::Message> {
-    let mut tab_bar =
-        TabBar::new(active_tab, super::Message::TabSelected).on_close(super::Message::TabClosed);
+    let mut tab_bar = TabBar::new(super::Message::TabSelected); //.on_close(super::Message::TabClosed);
 
     for tab in tabs.iter() {
         let filename = tab
@@ -44,7 +45,7 @@ pub fn tab_header(tabs: &[super::FileTab], active_tab: usize) -> Element<super::
             .and_then(|filename| filename.to_str())
             .unwrap_or("New Tab");
 
-        tab_bar = tab_bar.push(TabLabel::Text(String::from(filename)));
+        tab_bar = tab_bar.push(TabId::File, TabLabel::Text(String::from(filename)));
     }
 
     row!(tab_bar).into()

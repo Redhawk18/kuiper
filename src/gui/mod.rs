@@ -23,22 +23,50 @@ pub enum Message {
 
     //tabs
     TabNew(FileTab),
-    TabSelected(usize),
-    TabClosed(usize),
+    TabSelected(elements::TabId),
+    TabClosed(elements::TabId),
+}
+
+pub struct Blaze {
+    tabs: Tabs,
+}
+
+struct Tabs {
+    tab_bar: iced_aw::TabBar<Message, elements::TabId>,
+    data: Vec<Tab>,
+}
+
+impl Default for Tabs {
+    fn default() -> Self {
+        Self {
+            tab_bar: iced_aw::TabBar::new(Message::TabSelected),
+            data: Vec::new(),
+        }
+    }
+}
+
+pub enum Tab {
+    File(FileTab),
 }
 
 #[derive(Debug, Clone)]
 pub struct FileTab {
+    id: elements::TabId,
     text: String,
     path: PathBuf,
 }
 
-pub struct State {
-    active_tab: Option<usize>,
-    tabs: Vec<FileTab>,
+impl Default for FileTab {
+    fn default() -> Self {
+        Self {
+            id: elements::TabId::File,
+            text: String::default(),
+            path: PathBuf::default(),
+        }
+    }
 }
 
-impl Application for State {
+impl Application for Blaze {
     type Executor = iced::executor::Default;
     type Message = Message;
     type Theme = theme::Theme;
@@ -46,9 +74,8 @@ impl Application for State {
 
     fn new(_flags: Self::Flags) -> (Self, Command<Self::Message>) {
         (
-            State {
-                active_tab: None,
-                tabs: Vec::new(),
+            Blaze {
+                tabs: Tabs::default(),
             },
             Command::none(),
         )
@@ -65,30 +92,20 @@ impl Application for State {
                     let tab = self.tabs.get_mut(index).unwrap();
                     tab.text = text;
                 }
-                None => {
-                    return self.update(Message::TabNew(FileTab {
-                        text: String::default(),
-                        path: PathBuf::default(),
-                    }))
-                }
-            }
+                None => return self.update(Message::TabNew(FileTab::default())),
+            },
 
-            Message::NewFile => {
-                return self.update(Message::TabNew(FileTab {
-                    text: String::default(),
-                    path: PathBuf::default(),
-                }))
-            }
+            Message::NewFile => return self.update(Message::TabNew(FileTab::default())),
 
             Message::OpenFile => {
                 let (file_contents, path) = file_dialog::pick_file();
                 let Ok(text) = file_contents else { return Command::none() };
                 let Some(index) = self.active_tab else {
-                    return self.update(Message::TabNew(FileTab { text, path }))
+                    return self.update(Message::TabNew(FileTab::default()))
                 };
 
                 self.tabs[index].path = path;
-                return self.update(Message::TextUpdate(text))
+                return self.update(Message::TextUpdate(text));
             }
 
             Message::OpenFolder => file_dialog::pick_folder(),
@@ -99,7 +116,7 @@ impl Application for State {
                     file_dialog::save_file(tab.text.as_str(), tab.path.as_path()).unwrap();
                 }
                 None => return Command::none(),
-            }
+            },
 
             Message::SaveAs => match self.active_tab {
                 Some(index) => {
@@ -107,7 +124,7 @@ impl Application for State {
                     file_dialog::save_as(tab.text.as_str(), tab.path.as_path()).unwrap();
                 }
                 None => return Command::none(),
-            }
+            },
 
             Message::Quit => return iced::window::close(),
 
@@ -117,22 +134,13 @@ impl Application for State {
                 self.active_tab = Some(self.tabs.len() - 1);
             }
 
-            Message::TabSelected(index) => {
-                log::info!("Selected tab {}", index);
-                self.active_tab = Some(index);
+            Message::TabSelected(id) => {
+                //log::info!("Selected tab {}", index);
+                //self.active_tab = Some(index);
             }
 
-            Message::TabClosed(index) => {
-                log::info!("Closed tab {}", index);
-                self.tabs.remove(index);
-                self.active_tab = if self.tabs.is_empty() {
-                    Some(0)
-                } else {
-                    Some(usize::max(
-                        0,
-                        usize::min(self.active_tab.unwrap(), self.tabs.len() - 1),
-                    ))
-                };
+            Message::TabClosed(id) => {
+                //log::info!("Closed tab {}", index);
             }
         }
 
