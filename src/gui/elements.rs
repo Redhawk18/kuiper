@@ -3,6 +3,8 @@ use iced::Element;
 use iced_aw::menu::{MenuBar, MenuTree};
 use iced_aw::{TabBar, TabLabel};
 
+use super::Tab;
+
 pub fn menu_bar<'a>() -> MenuBar<'a, super::Message, iced::Renderer> {
     MenuBar::new(vec![file()])
 }
@@ -35,18 +37,20 @@ pub enum TabId {
     File,
 }
 
-pub fn tab_header(tabs: &[super::FileTab], active_tab: usize) -> Element<super::Message> {
-    let mut tab_bar = TabBar::new(super::Message::TabSelected); //.on_close(super::Message::TabClosed);
+pub fn tab_header(data: &Vec<Tab>, tab_bar: &mut TabBar<super::Message, TabId>) {
+    for tab in data.iter() {
+        match tab {
+            Tab::File(file_tab) => {
+                let filename = file_tab
+                    .path
+                    .file_name() // this already checks the "empty" case
+                    .and_then(|filename| filename.to_str())
+                    .unwrap_or("New Tab");
 
-    for tab in tabs.iter() {
-        let filename = tab
-            .path
-            .file_name() // this already checks the "empty" case
-            .and_then(|filename| filename.to_str())
-            .unwrap_or("New Tab");
+                tab_bar.push(TabId::File, TabLabel::Text(String::from(filename)));
+            },
+        }
 
-        tab_bar = tab_bar.push(TabId::File, TabLabel::Text(String::from(filename)));
+
     }
-
-    row!(tab_bar).into()
 }
