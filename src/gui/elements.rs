@@ -37,7 +37,9 @@ pub enum TabId {
     File,
 }
 
-pub fn tab_header(data: &Vec<Tab>, tab_bar: &mut TabBar<super::Message, TabId>) {
+pub fn tab_header(data: &Vec<Tab>) -> TabBar<super::Message, TabId> {
+    let mut tab_bar = TabBar::new(super::Message::TabSelected);
+
     for tab in data.iter() {
         match tab {
             Tab::File(file_tab) => {
@@ -47,10 +49,10 @@ pub fn tab_header(data: &Vec<Tab>, tab_bar: &mut TabBar<super::Message, TabId>) 
                     .and_then(|filename| filename.to_str())
                     .unwrap_or("New Tab");
 
-                tab_bar.push(TabId::File, TabLabel::Text(String::from(filename)));
+                    tab_bar = tab_bar.push(TabId::File, TabLabel::Text(String::from(filename)));
             },
         }
-
-
     }
+    
+    tab_bar
 }

@@ -8,6 +8,9 @@ mod elements;
 mod file_dialog;
 
 pub use elements::menu_bar;
+use iced_aw::style::tab_bar;
+
+use self::elements::TabId;
 
 #[derive(Debug, Clone)]
 pub enum Message {
@@ -23,7 +26,7 @@ pub enum Message {
 
     //tabs
     TabNew(FileTab),
-    TabSelected(elements::TabId),
+    TabSelected(TabId),
     TabClosed(elements::TabId),
 }
 
@@ -32,14 +35,14 @@ pub struct Blaze {
 }
 
 struct Tabs {
-    tab_bar: iced_aw::TabBar<Message, elements::TabId>,
+    tab_bar: Vec<elements::TabId>,
     data: Vec<Tab>,
 }
 
 impl Default for Tabs {
     fn default() -> Self {
         Self {
-            tab_bar: iced_aw::TabBar::new(Message::TabSelected),
+            tab_bar: Vec::new(),
             data: Vec::new(),
         }
     }
@@ -101,9 +104,13 @@ impl Application for Blaze {
 
             Message::Quit => return iced::window::close(),
 
-            Message::TabNew(tab) => todo!(),
+            Message::TabNew(tab) => {
+                self.tabs.data.push(Tab::File(FileTab::default()));
+            },
 
-            Message::TabSelected(id) => todo!(),
+            Message::TabSelected(id) => {
+
+            },
 
             Message::TabClosed(id) => todo!(),
         }
@@ -130,7 +137,10 @@ impl Application for Blaze {
         // }
 
         if !self.tabs.data.is_empty() {
-            elements::tab_header(&self.tabs.data, &mut self.tabs.tab_bar)
+            let tab_bar = elements::tab_header(&self.tabs.data);
+            println!("{}", tab_bar.get_active_tab_idx());
+            c = c.push(tab_bar);
+            
         }
 
         c.into()
