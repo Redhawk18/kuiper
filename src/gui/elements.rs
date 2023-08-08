@@ -1,20 +1,18 @@
-use iced::widget::{button, row};
-use iced::Length;
-
+use iced::widget::button;
 use iced_aw::menu::{MenuBar, MenuTree};
 use iced_aw::{TabBar, TabLabel};
 
 use super::{FileTab, Message, Tab};
 
-use crate::gui::theme::{Element, Renderer};
+use crate::gui::theme::Renderer;
 
-pub fn menu_bar<'a>() -> MenuBar<'a, super::Message, Renderer> {
+pub fn menu_bar<'a>() -> MenuBar<'a, Message, Renderer> {
     MenuBar::new(vec![file()])
 }
 
 fn file<'a>() -> MenuTree<'a, Message, Renderer> {
     let new_file =
-        MenuTree::new(button("New File").on_press(Message::TabNew(Tab::File(FileTab::default()))));
+        MenuTree::new(button("New File").on_press(Message::TabNew(Tab::File(FileTab::default()))).width(150),);
 
     let open_file = MenuTree::new(
         button("Open File")
