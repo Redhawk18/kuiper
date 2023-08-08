@@ -70,7 +70,7 @@ impl button::StyleSheet for Theme {
             Button::Primary => button::Appearance {
                 background: None,
                 border_color: self.colors.accent.default,
-                border_radius: 0.0,
+                border_radius: 0.0.into(),
                 border_width: 0.0,
                 shadow_offset: iced::Vector::default(),
                 text_color: self.colors.text.default,
@@ -83,7 +83,7 @@ impl button::StyleSheet for Theme {
             Button::Primary => button::Appearance {
                 background: Some(Background::Color(self.colors.accent.default)),
                 border_color: self.colors.accent.default,
-                border_radius: 8.0,
+                border_radius: 8.0.into(),
                 border_width: 0.0,
                 shadow_offset: iced::Vector::default(),
                 text_color: self.colors.text.default,
@@ -196,7 +196,7 @@ impl text_input::StyleSheet for Theme {
         match style {
             TextInput::Primary => text_input::Appearance {
                 background: Background::Color(self.colors.background.default),
-                border_radius: 4.0,
+                border_radius: 4.0.into(),
                 border_width: 1.0,
                 border_color: self.colors.primary.default,
                 icon_color: self.colors.primary.default,
@@ -217,7 +217,7 @@ impl text_input::StyleSheet for Theme {
         match style {
             TextInput::Primary => text_input::Appearance {
                 background: Background::Color(self.colors.background.default),
-                border_radius: 4.0,
+                border_radius: 4.0.into(),
                 border_width: 1.0,
                 border_color: self.colors.accent.default,
                 // XXX Not currently displayed in application.
