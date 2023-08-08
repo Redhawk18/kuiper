@@ -23,24 +23,34 @@ pub enum Message {
     Quit,
 
     //tabs
-    TabNew(FileTab),
+    TabNew(Tab),
     TabSelected(usize),
     TabClosed(usize),
 }
 
+pub struct Blaze {
+    tabs: Tabs,
+    theme: theme::Theme,
+}
+
+#[derive(Default)]
+struct Tabs {
+    active: usize,
+    data: Vec<Tab>,
+}
+
 #[derive(Debug, Clone)]
+pub enum Tab {
+    File(FileTab),
+}
+
+#[derive(Debug, Clone, Default)]
 pub struct FileTab {
     text: String,
     path: PathBuf,
 }
 
-pub struct State {
-    active_tab: Option<usize>,
-    tabs: Vec<FileTab>,
-    theme: Theme,
-}
-
-impl Application for State {
+impl Application for Blaze {
     type Executor = iced::executor::Default;
     type Message = Message;
     type Theme = Theme;
@@ -48,9 +58,8 @@ impl Application for State {
 
     fn new(_flags: Self::Flags) -> (Self, Command<Self::Message>) {
         (
-            State {
-                active_tab: None,
-                tabs: Vec::new(),
+            Blaze {
+                tabs: Tabs::default(),
                 theme: Theme::default(),
             },
             Command::none(),
@@ -58,91 +67,60 @@ impl Application for State {
     }
 
     fn title(&self) -> String {
-        String::from("code editor")
+        String::from("Blaze")
     }
 
     fn update(&mut self, message: Message) -> Command<Message> {
         match message {
-            Message::TextUpdate(text) => match self.active_tab {
-                Some(index) => {
-                    let tab = self.tabs.get_mut(index).unwrap();
-                    tab.text = text;
-                }
-                None => {
-                    return self.update(Message::TabNew(FileTab {
-                        text: String::default(),
-                        path: PathBuf::default(),
-                    }))
+            Message::TextUpdate(text) => {
+                let tab = self.tabs.data.get_mut(self.tabs.active).unwrap();
+
+                match tab {
+                    Tab::File(file_tab) => file_tab.text = text,
                 }
             },
 
-            Message::NewFile => {
-                return self.update(Message::TabNew(FileTab {
-                    text: String::default(),
-                    path: PathBuf::default(),
-                }))
-            }
+            Message::NewFile => return self.update(Message::TabNew(Tab::File(FileTab::default()))),
 
             Message::OpenFile => {
                 let (file_contents, path) = file_dialog::pick_file();
+                let Ok(text) = file_contents else { return Command::none() };
 
-                match file_contents {
-                    Ok(text) => match self.active_tab {
-                        Some(index) => {
-                            let tab = self.tabs.get_mut(index).unwrap();
-                            tab.path = path;
-                            return self.update(Message::TextUpdate(text));
-                        }
-                        None => return self.update(Message::TabNew(FileTab { text, path })),
-                    },
-                    Err(_e) => {
-                        return Command::none();
-                    }
-                }
+                self.tabs.data.push(Tab::File(FileTab { text, path }));
             }
 
             Message::OpenFolder => file_dialog::pick_folder(),
 
-            Message::Save => match self.active_tab {
-                Some(index) => {
-                    let tab = self.tabs.get(index).unwrap();
-                    file_dialog::save_file(tab.text.as_str(), tab.path.as_path()).unwrap();
+            Message::Save => {
+                let tab = self.tabs.data.get(self.tabs.active).unwrap();
+                match tab {
+                    Tab::File(file_tab) => file_dialog::save_file(file_tab).unwrap(),
                 }
-                None => return Command::none(),
-            },
+            }
 
-            Message::SaveAs => match self.active_tab {
-                Some(index) => {
-                    let tab = self.tabs.get(index).unwrap();
-                    file_dialog::save_as(tab.text.as_str(), tab.path.as_path()).unwrap();
+            Message::SaveAs => {
+                let tab = self.tabs.data.get(self.tabs.active).unwrap();
+                match tab {
+                    Tab::File(file_tab) => file_dialog::save_file_as(file_tab).unwrap(),
                 }
-                None => return Command::none(),
-            },
+            }
 
-            Message::Quit => std::process::exit(0),
+            Message::Quit => return iced::window::close(),
 
             Message::TabNew(tab) => {
-                log::info!("New tab");
-                self.tabs.push(tab);
-                self.active_tab = Some(self.tabs.len() - 1);
+                self.tabs.data.push(tab);
             }
 
-            Message::TabSelected(index) => {
-                log::info!("Selected tab {}", index);
-                self.active_tab = Some(index);
+            Message::TabSelected(id) => {
+                self.tabs.active = id;
             }
 
-            Message::TabClosed(index) => {
-                log::info!("Closed tab {}", index);
-                self.tabs.remove(index);
-                self.active_tab = if self.tabs.is_empty() {
-                    Some(0)
-                } else {
-                    Some(usize::max(
-                        0,
-                        usize::min(self.active_tab.unwrap(), self.tabs.len() - 1),
-                    ))
-                };
+            Message::TabClosed(id) => {
+                if id == self.tabs.active {
+                    self.tabs.active = 0;
+                }
+
+                self.tabs.data.remove(id);
             }
         }
 
@@ -152,19 +130,19 @@ impl Application for State {
     fn view(&self) -> Element<Message> {
         let mut c = Column::new().push(menu_bar());
 
-        if !self.tabs.is_empty() {
-            c = c.push(elements::tab_header(&self.tabs, self.active_tab.unwrap()));
-            c = c.push(
-                text_input(
-                    "",
-                    self.tabs
-                        .get(self.active_tab.unwrap())
-                        .unwrap()
-                        .text
-                        .as_str(),
-                )
-                .on_input(Message::TextUpdate),
-            );
+        let tab_bar = elements::tab_header(self.tabs.active, &self.tabs.data);
+        c = c.push(tab_bar);
+
+        let tab = self.tabs.data.get(self.tabs.active);
+
+        if let Some(active_tab) = tab {
+            match active_tab {
+                Tab::File(file_tab) => {
+                    c = c.push(
+                        text_input("placeholder", &file_tab.text).on_input(Message::TextUpdate),
+                    );
+                }
+            }
         }
 
         c.into()

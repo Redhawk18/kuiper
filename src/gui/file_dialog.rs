@@ -1,9 +1,10 @@
 use std::io::Result;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use std::string::String;
 
 use rfd::FileDialog;
 
+use super::FileTab;
 use crate::core;
 
 /// Displays the user's os native file dialog to pick a file to open.
@@ -35,11 +36,11 @@ pub fn pick_folder() {
 
 /// Opens the file dialog if the path given is blank,
 /// Otherwise it simpley saves the file.
-pub fn save_file(contents: &str, path: &Path) -> Result<()> {
+pub fn save_file(file_tab: &FileTab) -> Result<()> {
     // incase we know where the current file is,
     // just save instead of opening the dialog.
-    if path != PathBuf::default() {
-        return core::save_file(path, contents);
+    if file_tab.path != PathBuf::default() {
+        return core::save_file(&file_tab.path, &file_tab.text);
     }
 
     let path_opt = FileDialog::new().save_file();
@@ -51,14 +52,14 @@ pub fn save_file(contents: &str, path: &Path) -> Result<()> {
         };
 
     log::info!("File path: {:?}", path);
-    core::save_file(&path, contents)
+    core::save_file(&path, &file_tab.text)
 }
 
 /// Opens the file picker to choose file name and location,
 /// if a location is picked the file is saved.
-pub fn save_as(contents: &str, path: &Path) -> Result<()> {
+pub fn save_file_as(file_tab: &FileTab) -> Result<()> {
     let path_opt = FileDialog::new()
-        .set_file_name(path.to_str().unwrap())
+        .set_file_name(file_tab.path.to_str().unwrap())
         .save_file();
 
     let Some(path) = path_opt
@@ -68,5 +69,5 @@ pub fn save_as(contents: &str, path: &Path) -> Result<()> {
         };
 
     log::info!("File path: {:?}", path);
-    core::save_file(&path, contents)
+    core::save_file(&path, &file_tab.text)
 }
