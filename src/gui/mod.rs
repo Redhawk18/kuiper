@@ -3,13 +3,11 @@ use std::path::PathBuf;
 use iced::widget::text_input;
 use iced::widget::Column;
 use iced::{theme, Application, Command, Element, Subscription};
-use log;
 
 mod elements;
 mod file_dialog;
 
 pub use elements::menu_bar;
-use iced_aw::style::tab_bar;
 
 #[derive(Debug, Clone)]
 pub enum Message {
@@ -33,18 +31,10 @@ pub struct Blaze {
     tabs: Tabs,
 }
 
+#[derive(Default)]
 struct Tabs {
     active: usize,
     data: Vec<Tab>,
-}
-
-impl Default for Tabs {
-    fn default() -> Self {
-        Self {
-            active: 0,
-            data: Vec::new(),
-        }
-    }
 }
 
 #[derive(Debug, Clone)]
@@ -52,19 +42,10 @@ pub enum Tab {
     File(FileTab),
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct FileTab {
     text: String,
     path: PathBuf,
-}
-
-impl Default for FileTab {
-    fn default() -> Self {
-        Self {
-            text: String::default(),
-            path: PathBuf::default(),
-        }
-    }
 }
 
 impl Application for Blaze {
@@ -102,10 +83,7 @@ impl Application for Blaze {
                 let (file_contents, path) = file_dialog::pick_file();
                 let Ok(text) = file_contents else { return Command::none() };
 
-                self.tabs.data.push(Tab::File(FileTab {
-                    text: text,
-                    path: path,
-                }));
+                self.tabs.data.push(Tab::File(FileTab { text, path }));
             }
 
             Message::OpenFolder => file_dialog::pick_folder(),
@@ -113,14 +91,14 @@ impl Application for Blaze {
             Message::Save => {
                 let tab = self.tabs.data.get(self.tabs.active).unwrap();
                 match tab {
-                    Tab::File(file_tab) => file_dialog::save_file(&file_tab).unwrap(),
+                    Tab::File(file_tab) => file_dialog::save_file(file_tab).unwrap(),
                 }
             }
 
             Message::SaveAs => {
                 let tab = self.tabs.data.get(self.tabs.active).unwrap();
                 match tab {
-                    Tab::File(file_tab) => file_dialog::save_file_as(&file_tab).unwrap(),
+                    Tab::File(file_tab) => file_dialog::save_file_as(file_tab).unwrap(),
                 }
             }
 
@@ -154,15 +132,14 @@ impl Application for Blaze {
 
         let tab = self.tabs.data.get(self.tabs.active);
 
-        match tab {
-            Some(active_tab) => match active_tab {
+        if let Some(active_tab) = tab {
+            match active_tab {
                 Tab::File(file_tab) => {
                     c = c.push(
                         text_input("placeholder", &file_tab.text).on_input(Message::TextUpdate),
                     );
                 }
-            },
-            None => {}
+            }
         }
 
         c.into()

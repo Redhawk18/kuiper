@@ -1,28 +1,26 @@
-use iced::widget::{button, row};
-use iced::Element;
+use iced::widget::button;
 use iced_aw::menu::{MenuBar, MenuTree};
 use iced_aw::{TabBar, TabLabel};
 
-use super::{Message, Tab};
+use super::{FileTab, Message, Tab};
 
-pub fn menu_bar<'a>() -> MenuBar<'a, super::Message, iced::Renderer> {
+pub fn menu_bar<'a>() -> MenuBar<'a, Message, iced::Renderer> {
     MenuBar::new(vec![file()])
 }
 
-fn file<'a>() -> MenuTree<'a, super::Message, iced::Renderer> {
-    let new_file = MenuTree::new(button("New File").on_press(super::Message::TabNew(
-        super::Tab::File(super::FileTab::default()),
-    )));
+fn file<'a>() -> MenuTree<'a, Message, iced::Renderer> {
+    let new_file =
+        MenuTree::new(button("New File").on_press(Message::TabNew(Tab::File(FileTab::default()))));
 
-    let open_file = MenuTree::new(button("Open File").on_press(super::Message::OpenFile));
+    let open_file = MenuTree::new(button("Open File").on_press(Message::OpenFile));
 
-    let open_folder = MenuTree::new(button("Open Folder").on_press(super::Message::OpenFolder));
+    let open_folder = MenuTree::new(button("Open Folder").on_press(Message::OpenFolder));
 
-    let save = MenuTree::new(button("Save").on_press(super::Message::Save));
+    let save = MenuTree::new(button("Save").on_press(Message::Save));
 
-    let save_as = MenuTree::new(button("Save As").on_press(super::Message::SaveAs));
+    let save_as = MenuTree::new(button("Save As").on_press(Message::SaveAs));
 
-    let quit = MenuTree::new(button("Quit").on_press(super::Message::Quit));
+    let quit = MenuTree::new(button("Quit").on_press(Message::Quit));
 
     let root = MenuTree::with_children(
         button("File"),
@@ -32,8 +30,8 @@ fn file<'a>() -> MenuTree<'a, super::Message, iced::Renderer> {
     root
 }
 
-pub fn tab_header(active: usize, data: &[Tab]) -> TabBar<super::Message, usize> {
-    let mut tab_bar = TabBar::new(super::Message::TabSelected).on_close(super::Message::TabClosed);
+pub fn tab_header(active: usize, data: &[Tab]) -> TabBar<Message, usize> {
+    let mut tab_bar = TabBar::new(Message::TabSelected).on_close(Message::TabClosed);
 
     for (i, tab) in data.iter().enumerate() {
         match tab {
