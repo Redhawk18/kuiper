@@ -1,7 +1,6 @@
 use iced::widget::{button, text, text_input};
 use iced::{application, Background};
-use iced_aw::menu;
-use iced_aw::style::tab_bar; //FIXME https://github.com/iced-rs/iced_aw/issues/151
+use iced_aw::{menu, tab_bar};
 
 mod colors;
 mod palette;
