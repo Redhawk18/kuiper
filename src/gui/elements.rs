@@ -3,7 +3,7 @@ use iced::Element;
 use iced_aw::menu::{MenuBar, MenuTree};
 use iced_aw::{TabBar, TabLabel};
 
-use super::Tab;
+use super::{Tab, Message};
 
 pub fn menu_bar<'a>() -> MenuBar<'a, super::Message, iced::Renderer> {
     MenuBar::new(vec![file()])
@@ -38,7 +38,7 @@ pub enum TabId {
 }
 
 pub fn tab_header(active: usize, data: &[Tab]) -> TabBar<super::Message, usize> {
-    let mut tab_bar = TabBar::new(super::Message::TabSelected);
+    let mut tab_bar = TabBar::new(super::Message::TabSelected).on_close(super::Message::TabClosed);
 
     for (i, tab) in data.iter().enumerate() {
         match tab {

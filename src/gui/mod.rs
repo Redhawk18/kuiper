@@ -121,7 +121,9 @@ impl Application for Blaze {
                 self.tabs.active = id;
             }
 
-            Message::TabClosed(id) => todo!(),
+            Message::TabClosed(id) => {
+                self.tabs.data.remove(id);
+            },
         }
 
         Command::none()
