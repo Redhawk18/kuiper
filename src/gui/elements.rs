@@ -11,7 +11,7 @@ pub fn menu_bar<'a>() -> MenuBar<'a, super::Message, iced::Renderer> {
 
 fn file<'a>() -> MenuTree<'a, super::Message, iced::Renderer> {
     let new_file = MenuTree::new(
-        button("New File").on_press(super::Message::TabNew(super::FileTab::default())),
+        button("New File").on_press(super::Message::TabNew(super::Tab::File(super::FileTab::default()))),
     );
 
     let open_file = MenuTree::new(button("Open File").on_press(super::Message::OpenFile));
@@ -37,10 +37,10 @@ pub enum TabId {
     File,
 }
 
-pub fn tab_header(data: &Vec<Tab>) -> TabBar<super::Message, TabId> {
+pub fn tab_header(active: usize, data: &[Tab]) -> TabBar<super::Message, usize> {
     let mut tab_bar = TabBar::new(super::Message::TabSelected);
 
-    for tab in data.iter() {
+    for (i, tab) in data.iter().enumerate() {
         match tab {
             Tab::File(file_tab) => {
                 let filename = file_tab
@@ -49,10 +49,10 @@ pub fn tab_header(data: &Vec<Tab>) -> TabBar<super::Message, TabId> {
                     .and_then(|filename| filename.to_str())
                     .unwrap_or("New Tab");
 
-                    tab_bar = tab_bar.push(TabId::File, TabLabel::Text(String::from(filename)));
-            },
+                tab_bar = tab_bar.push(i, TabLabel::Text(String::from(filename)));
+            }
         }
     }
-    
-    tab_bar
+
+    tab_bar.set_active_tab(&active)
 }

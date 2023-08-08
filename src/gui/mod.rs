@@ -25,9 +25,9 @@ pub enum Message {
     Quit,
 
     //tabs
-    TabNew(FileTab),
-    TabSelected(TabId),
-    TabClosed(elements::TabId),
+    TabNew(Tab),
+    TabSelected(usize),
+    TabClosed(usize),
 }
 
 pub struct Blaze {
@@ -36,25 +36,27 @@ pub struct Blaze {
 
 struct Tabs {
     tab_bar: Vec<elements::TabId>,
+    active: usize,
     data: Vec<Tab>,
 }
 
 impl Default for Tabs {
     fn default() -> Self {
         Self {
+            active: 0,
             tab_bar: Vec::new(),
             data: Vec::new(),
         }
     }
 }
 
+#[derive(Debug, Clone)]
 pub enum Tab {
     File(FileTab),
 }
 
 #[derive(Debug, Clone)]
 pub struct FileTab {
-    id: elements::TabId,
     text: String,
     path: PathBuf,
 }
@@ -62,7 +64,6 @@ pub struct FileTab {
 impl Default for FileTab {
     fn default() -> Self {
         Self {
-            id: elements::TabId::File,
             text: String::default(),
             path: PathBuf::default(),
         }
@@ -92,9 +93,17 @@ impl Application for Blaze {
         match message {
             Message::TextUpdate(text) => todo!(),
 
-            Message::NewFile => return self.update(Message::TabNew(FileTab::default())),
+            Message::NewFile => return self.update(Message::TabNew(Tab::File(FileTab::default()))),
 
-            Message::OpenFile => todo!(),
+            Message::OpenFile => {
+                let (file_contents, path) = file_dialog::pick_file();
+                let Ok(text) = file_contents else { return Command::none() };
+
+                self.tabs.data.push(Tab::File(FileTab {
+                    text: text,
+                    path: path,
+                }));
+            }
 
             Message::OpenFolder => file_dialog::pick_folder(),
 
@@ -105,12 +114,12 @@ impl Application for Blaze {
             Message::Quit => return iced::window::close(),
 
             Message::TabNew(tab) => {
-                self.tabs.data.push(Tab::File(FileTab::default()));
-            },
+                self.tabs.data.push(tab);
+            }
 
             Message::TabSelected(id) => {
-
-            },
+                self.tabs.active = id;
+            }
 
             Message::TabClosed(id) => todo!(),
         }
@@ -137,10 +146,8 @@ impl Application for Blaze {
         // }
 
         if !self.tabs.data.is_empty() {
-            let tab_bar = elements::tab_header(&self.tabs.data);
-            println!("{}", tab_bar.get_active_tab_idx());
+            let tab_bar = elements::tab_header(self.tabs.active, &self.tabs.data);
             c = c.push(tab_bar);
-            
         }
 
         c.into()
