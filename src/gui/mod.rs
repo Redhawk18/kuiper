@@ -3,14 +3,13 @@ use std::path::PathBuf;
 use iced::widget::text_input;
 use iced::widget::Column;
 use iced::{theme, Application, Command, Element, Subscription};
+use log;
 
 mod elements;
 mod file_dialog;
 
 pub use elements::menu_bar;
 use iced_aw::style::tab_bar;
-
-use self::elements::TabId;
 
 #[derive(Debug, Clone)]
 pub enum Message {
@@ -35,7 +34,6 @@ pub struct Blaze {
 }
 
 struct Tabs {
-    tab_bar: Vec<elements::TabId>,
     active: usize,
     data: Vec<Tab>,
 }
@@ -44,7 +42,6 @@ impl Default for Tabs {
     fn default() -> Self {
         Self {
             active: 0,
-            tab_bar: Vec::new(),
             data: Vec::new(),
         }
     }
@@ -86,12 +83,18 @@ impl Application for Blaze {
     }
 
     fn title(&self) -> String {
-        String::from("code editor")
+        String::from("Blaze")
     }
 
     fn update(&mut self, message: Message) -> Command<Message> {
         match message {
-            Message::TextUpdate(text) => todo!(),
+            Message::TextUpdate(text) => {
+                let tab = self.tabs.data.get_mut(self.tabs.active).unwrap();
+
+                match tab {
+                    Tab::File(file_tab) => file_tab.text = text,
+                }
+            }
 
             Message::NewFile => return self.update(Message::TabNew(Tab::File(FileTab::default()))),
 
@@ -107,9 +110,19 @@ impl Application for Blaze {
 
             Message::OpenFolder => file_dialog::pick_folder(),
 
-            Message::Save => todo!(),
+            Message::Save => {
+                let tab = self.tabs.data.get(self.tabs.active).unwrap();
+                match tab {
+                    Tab::File(file_tab) => file_dialog::save_file(&file_tab).unwrap(),
+                }
+            }
 
-            Message::SaveAs => todo!(),
+            Message::SaveAs => {
+                let tab = self.tabs.data.get(self.tabs.active).unwrap();
+                match tab {
+                    Tab::File(file_tab) => file_dialog::save_file_as(&file_tab).unwrap(),
+                }
+            }
 
             Message::Quit => return iced::window::close(),
 
@@ -122,8 +135,12 @@ impl Application for Blaze {
             }
 
             Message::TabClosed(id) => {
+                if id == self.tabs.active {
+                    self.tabs.active = 0;
+                }
+
                 self.tabs.data.remove(id);
-            },
+            }
         }
 
         Command::none()
@@ -132,24 +149,20 @@ impl Application for Blaze {
     fn view(&self) -> Element<Message> {
         let mut c = Column::new().push(menu_bar());
 
-        // if !self.tabs.is_empty() {
-        //     c = c.push(elements::tab_header(&self.tabs, self.active_tab.unwrap()));
-        //     c = c.push(
-        //         text_input(
-        //             "",
-        //             self.tabs
-        //                 .get(self.active_tab.unwrap())
-        //                 .unwrap()
-        //                 .text
-        //                 .as_str(),
-        //         )
-        //         .on_input(Message::TextUpdate),
-        //     );
-        // }
+        let tab_bar = elements::tab_header(self.tabs.active, &self.tabs.data);
+        c = c.push(tab_bar);
 
-        if !self.tabs.data.is_empty() {
-            let tab_bar = elements::tab_header(self.tabs.active, &self.tabs.data);
-            c = c.push(tab_bar);
+        let tab = self.tabs.data.get(self.tabs.active);
+
+        match tab {
+            Some(active_tab) => match active_tab {
+                Tab::File(file_tab) => {
+                    c = c.push(
+                        text_input("placeholder", &file_tab.text).on_input(Message::TextUpdate),
+                    );
+                }
+            },
+            None => {}
         }
 
         c.into()

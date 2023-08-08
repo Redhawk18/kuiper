@@ -3,16 +3,16 @@ use iced::Element;
 use iced_aw::menu::{MenuBar, MenuTree};
 use iced_aw::{TabBar, TabLabel};
 
-use super::{Tab, Message};
+use super::{Message, Tab};
 
 pub fn menu_bar<'a>() -> MenuBar<'a, super::Message, iced::Renderer> {
     MenuBar::new(vec![file()])
 }
 
 fn file<'a>() -> MenuTree<'a, super::Message, iced::Renderer> {
-    let new_file = MenuTree::new(
-        button("New File").on_press(super::Message::TabNew(super::Tab::File(super::FileTab::default()))),
-    );
+    let new_file = MenuTree::new(button("New File").on_press(super::Message::TabNew(
+        super::Tab::File(super::FileTab::default()),
+    )));
 
     let open_file = MenuTree::new(button("Open File").on_press(super::Message::OpenFile));
 
@@ -30,11 +30,6 @@ fn file<'a>() -> MenuTree<'a, super::Message, iced::Renderer> {
     );
 
     root
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum TabId {
-    File,
 }
 
 pub fn tab_header(active: usize, data: &[Tab]) -> TabBar<super::Message, usize> {
