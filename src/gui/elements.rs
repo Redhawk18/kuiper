@@ -11,8 +11,11 @@ pub fn menu_bar<'a>() -> MenuBar<'a, Message, Renderer> {
 }
 
 fn file<'a>() -> MenuTree<'a, Message, Renderer> {
-    let new_file =
-        MenuTree::new(button("New File").on_press(Message::TabNew(Tab::File(FileTab::default()))).width(150),);
+    let new_file = MenuTree::new(
+        button("New File")
+            .on_press(Message::TabNew(Tab::File(FileTab::default())))
+            .width(150),
+    );
 
     let open_file = MenuTree::new(
         button("Open File")

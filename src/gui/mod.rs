@@ -78,7 +78,7 @@ impl Application for Blaze {
                 match tab {
                     Tab::File(file_tab) => file_tab.text = text,
                 }
-            },
+            }
 
             Message::NewFile => return self.update(Message::TabNew(Tab::File(FileTab::default()))),
 
@@ -92,16 +92,34 @@ impl Application for Blaze {
             Message::OpenFolder => file_dialog::pick_folder(),
 
             Message::Save => {
-                let tab = self.tabs.data.get(self.tabs.active).unwrap();
+                let Some(tab) = self.tabs.data.get(self.tabs.active) else {
+                    log::warn!("cannot save, data vector is empty"); 
+                    return Command::none()
+                };
+
                 match tab {
-                    Tab::File(file_tab) => file_dialog::save_file(file_tab).unwrap(),
+                    Tab::File(file_tab) => {
+                        if let Err(e) = file_dialog::save_file(file_tab) {
+                            log::warn!("Saving error: {e}");
+                            return Command::none();
+                        }
+                    }
                 }
             }
 
             Message::SaveAs => {
-                let tab = self.tabs.data.get(self.tabs.active).unwrap();
+                let Some(tab) = self.tabs.data.get(self.tabs.active) else {
+                    log::warn!("cannot save as, data vector is empty"); 
+                    return Command::none()
+                };
+
                 match tab {
-                    Tab::File(file_tab) => file_dialog::save_file_as(file_tab).unwrap(),
+                    Tab::File(file_tab) => {
+                        if let Err(e) = file_dialog::save_file_as(file_tab) {
+                            log::warn!("Saving as error: {e}");
+                            return Command::none();
+                        }
+                    }
                 }
             }
 
