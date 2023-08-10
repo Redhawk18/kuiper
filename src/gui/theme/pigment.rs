@@ -2,7 +2,7 @@ use iced::Color;
 
 /// raw hex colors from the theme files
 #[derive(Clone, Copy)]
-pub struct Palette {
+pub struct Pigment {
     pub accent: Color,
     pub background: Color,
     pub primary: Color,
@@ -10,9 +10,9 @@ pub struct Palette {
     pub text: Color,
 }
 
-impl Default for Palette {
-    fn default() -> Palette {
-        Palette {
+impl Default for Pigment {
+    fn default() -> Pigment {
+        Pigment {
             accent: hex_to_color("#928fd6").unwrap(),
             background: hex_to_color("#050505").unwrap(),
             primary: hex_to_color("#2a4b74").unwrap(),

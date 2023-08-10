@@ -1,8 +1,8 @@
 mod colors;
-mod palette;
+mod pigment;
 mod shade;
 use colors::Colors;
-use palette::Palette;
+use pigment::Pigment;
 use shade::Shade;
 
 use iced::widget::{button, text, text_input};
@@ -19,24 +19,24 @@ pub struct Theme {
 
 impl Default for Theme {
     fn default() -> Self {
-        let palette = Palette::default();
+        let pigment = Pigment::default();
 
         Theme {
             colors: Colors {
                 accent: Shade {
-                    default: palette.accent,
+                    default: pigment.accent,
                 },
                 background: Shade {
-                    default: palette.background,
+                    default: pigment.background,
                 },
                 primary: Shade {
-                    default: palette.primary,
+                    default: pigment.primary,
                 },
                 secondary: Shade {
-                    default: palette.secondary,
+                    default: pigment.secondary,
                 },
                 text: Shade {
-                    default: palette.text,
+                    default: pigment.text,
                 },
             },
         }
