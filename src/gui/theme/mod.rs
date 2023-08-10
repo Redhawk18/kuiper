@@ -1,14 +1,13 @@
-use iced::widget::{button, text, text_input};
-use iced::{application, Background};
-use iced_aw::{menu, tab_bar};
-
 mod colors;
 mod palette;
 mod shade;
-
 use colors::Colors;
 use palette::Palette;
 use shade::Shade;
+
+use iced::widget::{button, text, text_input};
+use iced::{application, Background};
+use iced_aw::{menu, tab_bar};
 
 pub type Renderer = iced::Renderer<Theme>;
 pub type Element<'msg, Message> = iced::Element<'msg, Message, Renderer>;

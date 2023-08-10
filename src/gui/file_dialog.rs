@@ -1,11 +1,10 @@
+use crate::core;
+use super::FileTab;
+
+use rfd::FileDialog;
 use std::io::Result;
 use std::path::PathBuf;
 use std::string::String;
-
-use rfd::FileDialog;
-
-use super::FileTab;
-use crate::core;
 
 /// Displays the user's os native file dialog to pick a file to open.
 /// Returns the contents of the file and the absolute path.

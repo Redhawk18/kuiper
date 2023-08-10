@@ -1,9 +1,18 @@
-use crate::gui::theme::Renderer;
+use crate::gui::theme::{Element, Renderer};
 use crate::gui::{Message, Tab};
 
+use iced::widget::{column, text_input, Column};
 use iced_aw::{TabBar, TabLabel};
 
-pub fn tab_header(active: usize, data: &[Tab]) -> TabBar<Message, usize, Renderer> {
+pub fn tab_bar(active: usize, data: &[Tab]) -> Column<'_, Message, Renderer> {
+    if data.is_empty() {
+        column!()
+    } else {
+        column!(tab_head(active, data), tab_body(active, data))
+    }
+}
+
+fn tab_head(active: usize, data: &[Tab]) -> TabBar<Message, usize, Renderer> {
     let mut tab_bar = TabBar::new(Message::TabSelected).on_close(Message::TabClosed);
 
     for (i, tab) in data.iter().enumerate() {
@@ -21,4 +30,14 @@ pub fn tab_header(active: usize, data: &[Tab]) -> TabBar<Message, usize, Rendere
     }
 
     tab_bar.set_active_tab(&active)
+}
+
+fn tab_body(active: usize, data: &[Tab]) -> Element<Message> {
+    let active_tab = data.get(active).unwrap();
+
+    match active_tab {
+        Tab::File(file_tab) => text_input("placeholder", &file_tab.text)
+            .on_input(Message::TextUpdate)
+            .into(),
+    }
 }

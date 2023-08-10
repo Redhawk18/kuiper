@@ -1,13 +1,13 @@
-use std::path::PathBuf;
-
-use iced::widget::text_input;
-use iced::widget::Column;
-use iced::{Application, Command, Subscription};
 mod file_dialog;
 mod theme;
 mod widgets;
-
 use theme::{Element, Theme};
+use widgets::menu_bar::menu_bar;
+use widgets::tab_bar::tab_bar;
+
+use iced::widget::column;
+use iced::{Application, Command, Subscription};
+use std::path::PathBuf;
 
 #[derive(Debug, Clone)]
 pub enum Message {
@@ -145,24 +145,7 @@ impl Application for Blaze {
     }
 
     fn view(&self) -> Element<Message> {
-        let mut c = Column::new().push(widgets::menu_bar::menu_bar());
-
-        let tab_bar = widgets::tab_bar::tab_header(self.tabs.active, &self.tabs.data);
-        c = c.push(tab_bar);
-
-        let tab = self.tabs.data.get(self.tabs.active);
-
-        if let Some(active_tab) = tab {
-            match active_tab {
-                Tab::File(file_tab) => {
-                    c = c.push(
-                        text_input("placeholder", &file_tab.text).on_input(Message::TextUpdate),
-                    );
-                }
-            }
-        }
-
-        c.into()
+        column!(menu_bar(), tab_bar(self.tabs.active, &self.tabs.data)).into()
     }
 
     fn theme(&self) -> Theme {
