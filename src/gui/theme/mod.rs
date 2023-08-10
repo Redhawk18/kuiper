@@ -1,9 +1,9 @@
 mod colors;
 mod pigment;
-mod shade;
+mod shades;
 use colors::Colors;
 use pigment::Pigment;
-use shade::Shade;
+use shades::Shades;
 
 use iced::widget::{button, text, text_input};
 use iced::{application, Background};
@@ -23,21 +23,11 @@ impl Default for Theme {
 
         Theme {
             colors: Colors {
-                accent: Shade {
-                    default: pigment.accent,
-                },
-                background: Shade {
-                    default: pigment.background,
-                },
-                primary: Shade {
-                    default: pigment.primary,
-                },
-                secondary: Shade {
-                    default: pigment.secondary,
-                },
-                text: Shade {
-                    default: pigment.text,
-                },
+                accent: Shades::new(pigment.accent),
+                background: Shades::new(pigment.background),
+                primary: Shades::new(pigment.primary),
+                secondary: Shades::new(pigment.secondary),
+                text: Shades::new(pigment.text),
             },
         }
     }
@@ -226,7 +216,7 @@ impl text_input::StyleSheet for Theme {
 
     fn placeholder_color(&self, style: &Self::Style) -> iced::Color {
         match style {
-            TextInput::Primary => self.colors.text.default, //TODO lightest
+            TextInput::Primary => self.colors.text.dark, //TODO lightest
         }
     }
 

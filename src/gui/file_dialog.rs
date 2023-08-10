@@ -1,5 +1,5 @@
-use crate::core;
 use super::FileTab;
+use crate::core;
 
 use rfd::FileDialog;
 use std::io::Result;

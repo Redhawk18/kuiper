@@ -1,5 +1,6 @@
 use iced::Color;
 
+
 /// raw hex colors from the theme files
 #[derive(Clone, Copy)]
 pub struct Pigment {
@@ -42,3 +43,4 @@ fn hex_to_color(hex: &str) -> Option<Color> {
 
     None
 }
+
