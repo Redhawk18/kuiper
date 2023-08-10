@@ -1,6 +1,5 @@
 use iced::Color;
 
-
 /// raw hex colors from the theme files
 #[derive(Clone, Copy)]
 pub struct Pigment {
@@ -14,11 +13,19 @@ pub struct Pigment {
 impl Default for Pigment {
     fn default() -> Pigment {
         Pigment {
-            accent: hex_to_color("#928fd6").unwrap(),
-            background: hex_to_color("#050505").unwrap(),
-            primary: hex_to_color("#2a4b74").unwrap(),
-            secondary: hex_to_color("#0e0e25").unwrap(),
-            text: hex_to_color("#fafafa").unwrap(),
+            //day theme
+            accent: hex_to_color("#f8073b").unwrap(),
+            background: hex_to_color("#fafafa").unwrap(),
+            primary: hex_to_color("#f9682f").unwrap(),
+            secondary: hex_to_color("#fef2cd").unwrap(),
+            text: hex_to_color("#050505").unwrap(),
+
+            //night theme
+            // accent: hex_to_color("#928fd6").unwrap(),
+            // background: hex_to_color("#050505").unwrap(),
+            // primary: hex_to_color("#2a4b74").unwrap(),
+            // secondary: hex_to_color("#0e0e25").unwrap(),
+            // text: hex_to_color("#fafafa").unwrap(),
         }
     }
 }
@@ -43,4 +50,3 @@ fn hex_to_color(hex: &str) -> Option<Color> {
 
     None
 }
-

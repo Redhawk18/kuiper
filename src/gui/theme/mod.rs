@@ -216,7 +216,7 @@ impl text_input::StyleSheet for Theme {
 
     fn placeholder_color(&self, style: &Self::Style) -> iced::Color {
         match style {
-            TextInput::Primary => self.colors.text.dark, //TODO lightest
+            TextInput::Primary => self.colors.text.light, //TODO lightest
         }
     }
 

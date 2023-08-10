@@ -11,13 +11,13 @@ pub struct Shades {
 }
 
 impl Shades {
-    pub fn new(color: Color) -> Self{
+    pub fn new(color: Color) -> Self {
         Self {
-          default: color,
-          light: lighten(color, 0.5),
-          dark: darken(color, 0.5),
+            default: color,
+            light: lighten(color, 0.5),
+            dark: darken(color, 0.5),
         }
-      }
+    }
 }
 
 // special thanks to Halloy https://github.com/squidowl/halloy
