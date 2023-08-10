@@ -3,11 +3,10 @@ use std::path::PathBuf;
 use iced::widget::text_input;
 use iced::widget::Column;
 use iced::{Application, Command, Subscription};
-mod elements;
 mod file_dialog;
 mod theme;
+mod widgets;
 
-pub use elements::menu_bar;
 use theme::{Element, Theme};
 
 #[derive(Debug, Clone)]
@@ -146,9 +145,9 @@ impl Application for Blaze {
     }
 
     fn view(&self) -> Element<Message> {
-        let mut c = Column::new().push(menu_bar());
+        let mut c = Column::new().push(widgets::menu_bar::menu_bar());
 
-        let tab_bar = elements::tab_header(self.tabs.active, &self.tabs.data);
+        let tab_bar = widgets::tab_bar::tab_header(self.tabs.active, &self.tabs.data);
         c = c.push(tab_bar);
 
         let tab = self.tabs.data.get(self.tabs.active);
