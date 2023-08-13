@@ -100,9 +100,9 @@ impl menu::StyleSheet for Theme {
         match style {
             Menu::Primary => menu::Appearance {
                 background: self.colors.background.default,
+                border_color: self.colors.primary.default,
                 border_width: 2.0,
                 border_radius: [4.0; 4],
-                border_color: self.colors.primary.default,
                 background_expand: [0; 4],
                 path: self.colors.accent.default,
             },
@@ -186,9 +186,9 @@ impl text_input::StyleSheet for Theme {
         match style {
             TextInput::Primary => text_input::Appearance {
                 background: Background::Color(self.colors.background.default),
+                border_color: self.colors.primary.default,
                 border_radius: 4.0.into(),
                 border_width: 1.0,
-                border_color: self.colors.primary.default,
                 icon_color: self.colors.primary.default,
             },
         }
@@ -207,10 +207,9 @@ impl text_input::StyleSheet for Theme {
         match style {
             TextInput::Primary => text_input::Appearance {
                 background: Background::Color(self.colors.background.default),
+                border_color: self.colors.accent.default,
                 border_radius: 4.0.into(),
                 border_width: 1.0,
-                border_color: self.colors.accent.default,
-                // XXX Not currently displayed in application.
                 icon_color: self.colors.accent.default,
             },
         }
@@ -218,7 +217,13 @@ impl text_input::StyleSheet for Theme {
 
     fn placeholder_color(&self, style: &Self::Style) -> iced::Color {
         match style {
-            TextInput::Primary => if self.is_light {self.colors.text.lightest} else {self.colors.text.darkest}
+            TextInput::Primary => {
+                if self.is_light {
+                    self.colors.text.lightest
+                } else {
+                    self.colors.text.darkest
+                }
+            }
         }
     }
 
