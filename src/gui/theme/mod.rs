@@ -15,6 +15,7 @@ pub type Element<'msg, Message> = iced::Element<'msg, Message, Renderer>;
 #[derive(Clone)]
 pub struct Theme {
     colors: Colors,
+    is_light: bool,
 }
 
 impl Default for Theme {
@@ -29,6 +30,7 @@ impl Default for Theme {
                 secondary: Shades::new(pigment.secondary),
                 text: Shades::new(pigment.text),
             },
+            is_light: shades::is_light(pigment.background),
         }
     }
 }
@@ -216,7 +218,7 @@ impl text_input::StyleSheet for Theme {
 
     fn placeholder_color(&self, style: &Self::Style) -> iced::Color {
         match style {
-            TextInput::Primary => self.colors.text.light, //TODO lightest
+            TextInput::Primary => if self.is_light {self.colors.text.lightest} else {self.colors.text.darkest}
         }
     }
 

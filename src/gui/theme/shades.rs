@@ -62,6 +62,6 @@ fn lighten(color: Color, amount: f32) -> Color {
     from_hsl(hsl)
 }
 
-pub fn is_dark(color: Color) -> bool {
-    to_hsl(color).lightness < 0.5
+pub fn is_light(color: Color) -> bool {
+    to_hsl(color).lightness > 0.5
 }
