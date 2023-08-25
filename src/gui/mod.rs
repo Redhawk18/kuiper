@@ -2,11 +2,9 @@ mod file_dialog;
 mod theme;
 mod widgets;
 use theme::{Element, Theme};
-use widgets::menu_bar::menu_bar;
-use widgets::tab_bar::tab_bar;
+use widgets::{menu_bar::menu_bar, tab_bar::tab_bar};
 
-use iced::widget::column;
-use iced::{Application, Command, Subscription};
+use iced::{widget::column, Application, Command, Subscription};
 use std::path::PathBuf;
 
 #[derive(Debug, Clone)]

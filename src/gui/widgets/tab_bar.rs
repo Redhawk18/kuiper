@@ -8,11 +8,11 @@ pub fn tab_bar(active: usize, data: &[Tab]) -> Column<'_, Message, Renderer> {
     if data.is_empty() {
         column!()
     } else {
-        column!(tab_head(active, data), tab_body(active, data))
+        column!(head(active, data), body(active, data))
     }
 }
 
-fn tab_head(active: usize, data: &[Tab]) -> TabBar<Message, usize, Renderer> {
+fn head(active: usize, data: &[Tab]) -> TabBar<Message, usize, Renderer> {
     let mut tab_bar = TabBar::new(Message::TabSelected).on_close(Message::TabClosed);
 
     for (i, tab) in data.iter().enumerate() {
@@ -32,7 +32,7 @@ fn tab_head(active: usize, data: &[Tab]) -> TabBar<Message, usize, Renderer> {
     tab_bar.set_active_tab(&active)
 }
 
-fn tab_body(active: usize, data: &[Tab]) -> Element<Message> {
+fn body(active: usize, data: &[Tab]) -> Element<Message> {
     let active_tab = data.get(active).unwrap();
 
     match active_tab {
