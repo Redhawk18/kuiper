@@ -1,5 +1,5 @@
-mod core;
 mod gui;
+mod io;
 pub use gui::Blaze;
 
 use iced::{Application, Settings};

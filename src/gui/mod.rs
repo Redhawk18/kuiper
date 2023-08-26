@@ -4,12 +4,13 @@ mod widgets;
 use theme::{Element, Theme};
 use widgets::{menu_bar::menu_bar, tab_bar::tab_bar};
 
-use iced::{widget::column, Application, Command, Subscription};
+use iced::{font, widget::column, Application, Command, Subscription};
 use std::path::PathBuf;
 
 #[derive(Debug, Clone)]
 pub enum Message {
-    TextUpdate(String),
+    //application
+    FontLoaded(Result<(), font::Error>),
 
     //menu bar
     NewFile,
@@ -23,6 +24,9 @@ pub enum Message {
     TabNew(Tab),
     TabSelected(usize),
     TabClosed(usize),
+
+    //text input
+    TextUpdate(String),
 }
 
 pub struct Blaze {
@@ -59,7 +63,7 @@ impl Application for Blaze {
                 tabs: Tabs::default(),
                 theme: Theme::default(),
             },
-            Command::none(),
+            font::load(iced_aw::graphics::icons::ICON_FONT_BYTES).map(Message::FontLoaded),
         )
     }
 
@@ -69,24 +73,18 @@ impl Application for Blaze {
 
     fn update(&mut self, message: Message) -> Command<Message> {
         match message {
-            Message::TextUpdate(text) => {
-                let tab = self.tabs.data.get_mut(self.tabs.active).unwrap();
-
-                match tab {
-                    Tab::File(file_tab) => file_tab.text = text,
-                }
-            }
+            Message::FontLoaded(_) => {}
 
             Message::NewFile => return self.update(Message::TabNew(Tab::File(FileTab::default()))),
 
             Message::OpenFile => {
-                let (file_contents, path) = file_dialog::pick_file();
+                let (file_contents, path) = file_dialog::pick_file_dialog();
                 let Ok(text) = file_contents else { return Command::none() };
 
                 self.tabs.data.push(Tab::File(FileTab { text, path }));
             }
 
-            Message::OpenFolder => file_dialog::pick_folder(),
+            Message::OpenFolder => file_dialog::pick_folder_dialog(),
 
             Message::Save => {
                 let Some(tab) = self.tabs.data.get(self.tabs.active) else {
@@ -96,7 +94,7 @@ impl Application for Blaze {
 
                 match tab {
                     Tab::File(file_tab) => {
-                        if let Err(e) = file_dialog::save_file(file_tab) {
+                        if let Err(e) = file_dialog::save_file_dialog(file_tab) {
                             log::warn!("Saving error: {e}");
                             return Command::none();
                         }
@@ -112,7 +110,7 @@ impl Application for Blaze {
 
                 match tab {
                     Tab::File(file_tab) => {
-                        if let Err(e) = file_dialog::save_file_as(file_tab) {
+                        if let Err(e) = file_dialog::save_file_as_dialog(file_tab) {
                             log::warn!("Saving as error: {e}");
                             return Command::none();
                         }
@@ -136,6 +134,14 @@ impl Application for Blaze {
                 }
 
                 self.tabs.data.remove(id);
+            }
+
+            Message::TextUpdate(text) => {
+                let tab = self.tabs.data.get_mut(self.tabs.active).unwrap();
+
+                match tab {
+                    Tab::File(file_tab) => file_tab.text = text,
+                }
             }
         }
 

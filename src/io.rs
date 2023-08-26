@@ -1,7 +1,4 @@
-use std::fs;
-use std::io::Result;
-use std::path::Path;
-use std::string::String;
+use std::{fs, io::Result, path::Path, string::String};
 
 /// Reads the contents of the file at the path given and returns it
 pub fn read_file(path: &Path) -> Result<String> {
