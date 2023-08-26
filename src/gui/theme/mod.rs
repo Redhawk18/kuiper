@@ -5,6 +5,7 @@ use colors::Colors;
 use pigment::Pigment;
 use shades::Shades;
 
+use dark_light::{detect, Mode};
 use iced::widget::{button, text, text_input};
 use iced::{application, Background};
 use iced_aw::{menu, tab_bar};
@@ -20,7 +21,11 @@ pub struct Theme {
 
 impl Default for Theme {
     fn default() -> Self {
-        let pigment = Pigment::default();
+        let is_light = match detect() {
+            Mode::Light | Mode::Default => true,
+            Mode::Dark => false,
+        };
+        let pigment = Pigment::new(is_light);
 
         Theme {
             colors: Colors {
@@ -30,7 +35,7 @@ impl Default for Theme {
                 secondary: Shades::new(pigment.secondary),
                 text: Shades::new(pigment.text),
             },
-            is_light: shades::is_light(pigment.background),
+            is_light: is_light,
         }
     }
 }

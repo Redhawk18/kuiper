@@ -28,7 +28,6 @@ impl Shades {
     }
 }
 
-// special thanks to Halloy https://github.com/squidowl/halloy
 fn to_hsl(color: Color) -> Okhsl {
     let mut hsl = Okhsl::from_color(Rgb::from(color));
     if hsl.saturation.is_nan() {
@@ -41,10 +40,6 @@ fn to_hsl(color: Color) -> Okhsl {
 fn from_hsl(hsl: Okhsl) -> Color {
     Srgb::from_color(hsl).into()
 }
-
-// fn alpha(color: Color, alpha: f32) -> Color {
-//     Color { a: alpha, ..color }
-// }
 
 fn darken(color: Color, amount: f32) -> Color {
     let mut hsl = to_hsl(color);
@@ -60,8 +55,4 @@ fn lighten(color: Color, amount: f32) -> Color {
     hsl.lighten_fixed_assign(amount);
 
     from_hsl(hsl)
-}
-
-pub fn is_light(color: Color) -> bool {
-    to_hsl(color).lightness > 0.5
 }

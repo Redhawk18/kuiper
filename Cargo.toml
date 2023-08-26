@@ -6,9 +6,10 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+dark-light = "1.0.0"
 iced = { version = "0.10.0", features = ["palette"]}
 iced_aw = { version = "0.6", default-features = false, features = ["menu", "tab_bar"] }
 log = "0.4.18"
-palette = "0.7.0"
+palette = "*"
 pretty_env_logger = "0.5"
 rfd = "0.11.4"

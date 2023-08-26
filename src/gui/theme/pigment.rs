@@ -10,22 +10,34 @@ pub struct Pigment {
     pub text: Color,
 }
 
-impl Default for Pigment {
-    fn default() -> Pigment {
-        Pigment {
-            //day theme
-            // accent: hex_to_color("#f8073b").unwrap(),
-            // background: hex_to_color("#fafafa").unwrap(),
-            // primary: hex_to_color("#f9682f").unwrap(),
-            // secondary: hex_to_color("#fef2cd").unwrap(),
-            // text: hex_to_color("#050505").unwrap(),
-
-            //night theme
-            accent: hex_to_color("#928fd6").unwrap(),
-            background: hex_to_color("#050505").unwrap(),
-            primary: hex_to_color("#2a4b74").unwrap(),
-            secondary: hex_to_color("#0e0e25").unwrap(),
-            text: hex_to_color("#fafafa").unwrap(),
+impl Pigment {
+    pub fn new(is_light: bool) -> Self {
+        Self {
+            accent: if is_light {
+                hex_to_color("#f8073b").unwrap()
+            } else {
+                hex_to_color("#928fd6").unwrap()
+            },
+            background: if is_light {
+                hex_to_color("#fafafa").unwrap()
+            } else {
+                hex_to_color("#050505").unwrap()
+            },
+            primary: if is_light {
+                hex_to_color("#f9682f").unwrap()
+            } else {
+                hex_to_color("#2a4b74").unwrap()
+            },
+            secondary: if is_light {
+                hex_to_color("#fef2cd").unwrap()
+            } else {
+                hex_to_color("#0e0e25").unwrap()
+            },
+            text: if is_light {
+                hex_to_color("#050505").unwrap()
+            } else {
+                hex_to_color("#fafafa").unwrap()
+            },
         }
     }
 }
