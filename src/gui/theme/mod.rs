@@ -1,12 +1,13 @@
 mod colors;
 mod pigment;
 mod shades;
+
 use colors::Colors;
 use pigment::Pigment;
 use shades::Shades;
 
 use dark_light::{detect, Mode};
-use iced::widget::{button, text, text_input};
+use iced::widget::{button, container, pane_grid, text, text_input};
 use iced::{application, Background};
 use iced_aw::{menu, tab_bar};
 
@@ -94,10 +95,29 @@ impl button::StyleSheet for Theme {
 }
 
 #[derive(Default)]
+pub enum Container {
+    #[default]
+    Primary,
+}
+
+impl container::StyleSheet for Theme {
+    type Style = Container;
+
+    fn appearance(&self, style: &Self::Style) -> container::Appearance {
+        match style {
+            Container::Primary => container::Appearance {
+                ..Default::default()
+            },
+        }
+    }
+}
+
+#[derive(Default)]
 pub enum Menu {
     #[default]
     Primary,
 }
+
 impl menu::StyleSheet for Theme {
     type Style = Menu;
 
@@ -111,6 +131,39 @@ impl menu::StyleSheet for Theme {
                 background_expand: [0; 4],
                 path: self.colors.accent.default,
             },
+        }
+    }
+}
+
+#[derive(Default)]
+pub enum PaneGrid {
+    #[default]
+    Primary,
+}
+
+impl pane_grid::StyleSheet for Theme {
+    type Style = PaneGrid;
+
+    fn hovered_region(&self, style: &Self::Style) -> pane_grid::Appearance {
+        match style {
+            PaneGrid::Primary => pane_grid::Appearance {
+                background: Background::Color(self.colors.background.default),
+                border_width: 0.0,
+                border_color: self.colors.accent.default,
+                border_radius: [4.0; 4].into(),
+            },
+        }
+    }
+
+    fn picked_split(&self, style: &Self::Style) -> Option<pane_grid::Line> {
+        match style {
+            PaneGrid::Primary => None,
+        }
+    }
+
+    fn hovered_split(&self, style: &Self::Style) -> Option<pane_grid::Line> {
+        match style {
+            PaneGrid::Primary => None,
         }
     }
 }

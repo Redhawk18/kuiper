@@ -4,7 +4,11 @@ mod widgets;
 use theme::{Element, Theme};
 use widgets::{menu_bar::menu_bar, tab_bar::tab_bar};
 
-use iced::{font, widget::column, Application, Command, Subscription};
+use iced::{
+    font,
+    widget::{column, pane_grid, text},
+    Application, Command, Subscription,
+};
 use std::path::PathBuf;
 
 #[derive(Debug, Clone)]
@@ -25,6 +29,9 @@ pub enum Message {
     TabSelected(usize),
     TabClosed(usize),
 
+    PaneDragged(pane_grid::DragEvent),
+    PaneResized(pane_grid::ResizeEvent),
+
     //text input
     TextUpdate(String),
 }
@@ -32,6 +39,7 @@ pub enum Message {
 pub struct Blaze {
     tabs: Tabs,
     theme: theme::Theme,
+    pane: pane_grid::State<PaneState>,
 }
 
 #[derive(Default)]
@@ -51,6 +59,11 @@ pub struct FileTab {
     path: PathBuf,
 }
 
+enum PaneState {
+    SomePane,
+    AnotherKindOfPane,
+}
+
 impl Application for Blaze {
     type Executor = iced::executor::Default;
     type Message = Message;
@@ -58,10 +71,12 @@ impl Application for Blaze {
     type Flags = ();
 
     fn new(_flags: Self::Flags) -> (Self, Command<Self::Message>) {
+        let (state, _) = pane_grid::State::new(PaneState::SomePane);
         (
             Blaze {
                 tabs: Tabs::default(),
                 theme: Theme::default(),
+                pane: state,
             },
             font::load(iced_aw::graphics::icons::ICON_FONT_BYTES).map(Message::FontLoaded),
         )
@@ -143,13 +158,26 @@ impl Application for Blaze {
                     Tab::File(file_tab) => file_tab.text = text,
                 }
             }
+            Message::PaneDragged(_) => todo!(),
+            Message::PaneResized(_) => todo!(),
         }
 
         Command::none()
     }
 
     fn view(&self) -> Element<Message> {
-        column!(menu_bar(), tab_bar(self.tabs.active, &self.tabs.data)).into()
+        // column!(menu_bar(), tab_bar(self.tabs.active, &self.tabs.data)).into()
+
+        let pane_grid = pane_grid::PaneGrid::new(&self.pane, |pane, state, is_maximized| {
+            pane_grid::Content::new(match state {
+                PaneState::SomePane => text("This is some pane"),
+                PaneState::AnotherKindOfPane => text("This is another kind of pane"),
+            })
+        })
+        .on_drag(Message::PaneDragged)
+        .on_resize(10, Message::PaneResized);
+
+        column!(pane_grid).into()
     }
 
     fn theme(&self) -> Theme {
