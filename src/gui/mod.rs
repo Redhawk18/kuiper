@@ -2,11 +2,14 @@ mod file_dialog;
 mod theme;
 mod widgets;
 use theme::{Element, Theme};
-use widgets::{menu_bar::menu_bar, tab_bar::tab_bar};
+use widgets::{menu_bar::menu_bar, pane_grid::pane_grid};
 
 use iced::{
     font,
-    widget::{column, pane_grid, text},
+    widget::{
+        column,
+        pane_grid
+    },
     Application, Command, Subscription,
 };
 use std::path::PathBuf;
@@ -59,7 +62,7 @@ pub struct FileTab {
     path: PathBuf,
 }
 
-enum PaneState {
+pub enum PaneState {
     SomePane,
     AnotherKindOfPane,
 }
@@ -158,7 +161,10 @@ impl Application for Blaze {
                     Tab::File(file_tab) => file_tab.text = text,
                 }
             }
-            Message::PaneDragged(_) => todo!(),
+            Message::PaneDragged(pane_grid::DragEvent::Dropped { pane, target }) => {
+                self.pane.drop(&pane, target);
+            }
+            Message::PaneDragged(_) => {}
             Message::PaneResized(_) => todo!(),
         }
 
@@ -166,18 +172,9 @@ impl Application for Blaze {
     }
 
     fn view(&self) -> Element<Message> {
-        // column!(menu_bar(), tab_bar(self.tabs.active, &self.tabs.data)).into()
 
-        let pane_grid = pane_grid::PaneGrid::new(&self.pane, |pane, state, is_maximized| {
-            pane_grid::Content::new(match state {
-                PaneState::SomePane => text("This is some pane"),
-                PaneState::AnotherKindOfPane => text("This is another kind of pane"),
-            })
-        })
-        .on_drag(Message::PaneDragged)
-        .on_resize(10, Message::PaneResized);
 
-        column!(pane_grid).into()
+        column!(menu_bar(), pane_grid(&self.pane)).padding(8).into()
     }
 
     fn theme(&self) -> Theme {

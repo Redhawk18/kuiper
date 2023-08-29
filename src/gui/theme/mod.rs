@@ -7,8 +7,7 @@ use pigment::Pigment;
 use shades::Shades;
 
 use dark_light::{detect, Mode};
-use iced::widget::{button, container, pane_grid, text, text_input};
-use iced::{application, Background};
+use iced::{application, Background, widget::{button, container, pane_grid, text, text_input}};
 use iced_aw::{menu, tab_bar};
 
 pub type Renderer = iced::Renderer<Theme>;
