@@ -29,6 +29,7 @@ pub enum Message {
     TabSelected(usize),
     TabClosed(usize),
 
+    PaneClick(pane_grid::Pane),
     PaneDragged(pane_grid::DragEvent),
     PaneResized(pane_grid::ResizeEvent),
 
@@ -176,18 +177,17 @@ impl Application for Blaze {
             }
             Message::PaneDragged(_) => {}
             Message::PaneResized(_) => todo!(),
+
+            Message::PaneClick(pane) => self.panes.active = Some(pane),
         }
 
         Command::none()
     }
 
     fn view(&self) -> Element<Message> {
-        column!(
-            menu_bar(),
-            pane_grid(&self.panes, &self.tabs)
-        )
-        .padding(8)
-        .into()
+        column!(menu_bar(), pane_grid(&self.panes, &self.tabs))
+            .padding(8)
+            .into()
     }
 
     fn theme(&self) -> Theme {

@@ -1,5 +1,7 @@
-use crate::gui::theme::{Element, Renderer};
-use crate::gui::{Message, Tab};
+use crate::gui::{
+    theme::{Element, Renderer},
+    Message, Tab,
+};
 
 use iced::widget::{column, text_input, Column};
 use iced_aw::{TabBar, TabLabel};

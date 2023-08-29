@@ -1,5 +1,4 @@
-use crate::gui::theme::Renderer;
-use crate::gui::{FileTab, Message, Tab};
+use crate::gui::{theme::Renderer, FileTab, Message, Tab};
 
 use iced::widget::button;
 use iced_aw::{MenuBar, MenuTree};

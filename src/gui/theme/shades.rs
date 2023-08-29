@@ -1,6 +1,5 @@
 use iced::Color;
-use palette::rgb::Rgb;
-use palette::{DarkenAssign, FromColor, LightenAssign, Okhsl, Srgb};
+use palette::{rgb::Rgb, DarkenAssign, FromColor, LightenAssign, Okhsl, Srgb};
 
 /// provides post-processing to Pigment's raw colors
 #[derive(Clone)]
