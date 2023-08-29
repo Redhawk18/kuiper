@@ -6,7 +6,10 @@ use widgets::{menu_bar::menu_bar, pane_grid::pane_grid};
 
 use iced::{
     font,
-    widget::{column, pane_grid},
+    widget::{
+        column,
+        pane_grid::{DragEvent, Pane, ResizeEvent, State},
+    },
     Application, Command, Subscription,
 };
 use std::path::PathBuf;
@@ -29,9 +32,9 @@ pub enum Message {
     TabSelected(usize),
     TabClosed(usize),
 
-    PaneClick(pane_grid::Pane),
-    PaneDragged(pane_grid::DragEvent),
-    PaneResized(pane_grid::ResizeEvent),
+    PaneClicked(Pane),
+    PaneDragged(DragEvent),
+    PaneResized(ResizeEvent),
 
     //text input
     TextUpdate(String),
@@ -44,13 +47,13 @@ pub struct Blaze {
 }
 
 pub struct Panes {
-    active: Option<pane_grid::Pane>,
-    data: pane_grid::State<PaneState>,
+    active: Option<Pane>,
+    data: State<PaneState>,
 }
 
 impl Default for Panes {
     fn default() -> Self {
-        let (state, _) = pane_grid::State::new(PaneState::Tab);
+        let (state, _) = State::new(PaneState::Tab);
         Self {
             active: None,
             data: state,
@@ -172,13 +175,13 @@ impl Application for Blaze {
                     Tab::File(file_tab) => file_tab.text = text,
                 }
             }
-            Message::PaneDragged(pane_grid::DragEvent::Dropped { pane, target }) => {
+            Message::PaneDragged(DragEvent::Dropped { pane, target }) => {
                 self.panes.data.drop(&pane, target);
             }
             Message::PaneDragged(_) => {}
             Message::PaneResized(_) => todo!(),
 
-            Message::PaneClick(pane) => self.panes.active = Some(pane),
+            Message::PaneClicked(pane) => self.panes.active = Some(pane),
         }
 
         Command::none()

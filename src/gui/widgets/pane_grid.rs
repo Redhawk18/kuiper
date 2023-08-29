@@ -14,7 +14,7 @@ pub fn pane_grid<'a>(panes: &'a Panes, tabs: &'a Tabs) -> PaneGrid<'a, Message, 
                 .style(crate::gui::theme::Container::PaneGridTitleBar(is_focused)),
         )
     })
-    .on_click(Message::PaneClick)
+    .on_click(Message::PaneClicked)
     .on_drag(Message::PaneDragged)
     .on_resize(10, Message::PaneResized)
 }
