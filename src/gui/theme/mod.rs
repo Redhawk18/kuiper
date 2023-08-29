@@ -7,7 +7,11 @@ use pigment::Pigment;
 use shades::Shades;
 
 use dark_light::{detect, Mode};
-use iced::{application, Background, widget::{button, container, pane_grid, text, text_input}};
+use iced::{
+    application,
+    widget::{button, container, pane_grid, text, text_input},
+    Background,
+};
 use iced_aw::{menu, tab_bar};
 
 pub type Renderer = iced::Renderer<Theme>;
@@ -97,6 +101,8 @@ impl button::StyleSheet for Theme {
 pub enum Container {
     #[default]
     Primary,
+    PaneGridTitleBar(bool),
+    PaneGridContent
 }
 
 impl container::StyleSheet for Theme {
@@ -107,6 +113,12 @@ impl container::StyleSheet for Theme {
             Container::Primary => container::Appearance {
                 ..Default::default()
             },
+            Container::PaneGridTitleBar(_) => container::Appearance {
+                text_color: Some(self.colors.accent.default),
+                border_color: self.colors.accent.default,
+                ..Default::default()
+            },
+            Container::PaneGridContent => todo!(),
         }
     }
 }

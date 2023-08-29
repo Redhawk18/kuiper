@@ -6,10 +6,7 @@ use widgets::{menu_bar::menu_bar, pane_grid::pane_grid};
 
 use iced::{
     font,
-    widget::{
-        column,
-        pane_grid
-    },
+    widget::{column, pane_grid},
     Application, Command, Subscription,
 };
 use std::path::PathBuf;
@@ -63,8 +60,7 @@ pub struct FileTab {
 }
 
 pub enum PaneState {
-    SomePane,
-    AnotherKindOfPane,
+    Tab,
 }
 
 impl Application for Blaze {
@@ -74,7 +70,7 @@ impl Application for Blaze {
     type Flags = ();
 
     fn new(_flags: Self::Flags) -> (Self, Command<Self::Message>) {
-        let (state, _) = pane_grid::State::new(PaneState::SomePane);
+        let (state, _) = pane_grid::State::new(PaneState::Tab);
         (
             Blaze {
                 tabs: Tabs::default(),
@@ -172,9 +168,7 @@ impl Application for Blaze {
     }
 
     fn view(&self) -> Element<Message> {
-
-
-        column!(menu_bar(), pane_grid(&self.pane)).padding(8).into()
+        column!(menu_bar(), pane_grid(&self.pane, self.tabs.active, &self.tabs.data)).padding(8).into()
     }
 
     fn theme(&self) -> Theme {
