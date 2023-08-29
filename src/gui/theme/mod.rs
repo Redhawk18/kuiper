@@ -39,7 +39,7 @@ impl Default for Theme {
                 secondary: Shades::new(pigment.secondary),
                 text: Shades::new(pigment.text),
             },
-            is_light: is_light,
+            is_light,
         }
     }
 }
@@ -102,7 +102,7 @@ pub enum Container {
     #[default]
     Primary,
     PaneGridTitleBar(bool),
-    PaneGridContent
+    PaneGridContent,
 }
 
 impl container::StyleSheet for Theme {
@@ -118,7 +118,7 @@ impl container::StyleSheet for Theme {
                 border_color: self.colors.text.default,
                 background: Some(Background::Color(self.colors.accent.default)),
                 border_width: 4.0,
-                border_radius: 4.0.into()
+                border_radius: 4.0.into(),
             },
             Container::PaneGridContent => todo!(),
         }

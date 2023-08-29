@@ -1,23 +1,20 @@
-use crate::gui::theme::{Container, Renderer, Theme};
-use crate::gui::widgets::tab_bar;
+use crate::gui::theme::Renderer;
+use crate::gui::{Tabs, Panes};
+
 use crate::gui::{Message, PaneState, Tab};
 
 use iced::widget::pane_grid::{Content, PaneGrid, State, TitleBar};
-use iced::widget::{container, text};
 
 use super::tab_bar::tab_bar;
 
-pub fn pane_grid<'a>(
-    state: &'a State<PaneState>,
-    active: usize,
-    data: &'a [Tab],
-) -> PaneGrid<'a, Message, Renderer> {
-    PaneGrid::new(state, |pane, state, is_maximized| {
+pub fn pane_grid<'a>(panes: &'a Panes, tabs: &'a Tabs) -> PaneGrid<'a, Message, Renderer> {
+    PaneGrid::new(&panes.data, |pane, state, _is_maximized| {
         Content::new(match state {
-            PaneState::Tab => tab_bar(active, data),
+            PaneState::Tab => tab_bar(tabs.active, &tabs.data),
         })
+        .style(crate::gui::theme::Container::PaneGridTitleBar(true))
         .title_bar(
-            TitleBar::new("content").style(crate::gui::theme::Container::PaneGridTitleBar(true))
+            TitleBar::new("content").style(crate::gui::theme::Container::PaneGridTitleBar(true)),
         )
     })
     .on_drag(Message::PaneDragged)

@@ -37,13 +37,28 @@ pub enum Message {
 }
 
 pub struct Blaze {
+    panes: Panes,
     tabs: Tabs,
     theme: theme::Theme,
-    pane: pane_grid::State<PaneState>,
+}
+
+pub struct Panes {
+    active: Option<pane_grid::Pane>,
+    data: pane_grid::State<PaneState>,
+}
+
+impl Default for Panes {
+    fn default() -> Self {
+        let (state, _) = pane_grid::State::new(PaneState::Tab);
+        Self {
+            active: None,
+            data: state,
+        }
+    }
 }
 
 #[derive(Default)]
-struct Tabs {
+pub struct Tabs {
     active: usize,
     data: Vec<Tab>,
 }
@@ -70,12 +85,11 @@ impl Application for Blaze {
     type Flags = ();
 
     fn new(_flags: Self::Flags) -> (Self, Command<Self::Message>) {
-        let (state, _) = pane_grid::State::new(PaneState::Tab);
         (
             Blaze {
                 tabs: Tabs::default(),
                 theme: Theme::default(),
-                pane: state,
+                panes: Panes::default(),
             },
             font::load(iced_aw::graphics::icons::ICON_FONT_BYTES).map(Message::FontLoaded),
         )
@@ -158,7 +172,7 @@ impl Application for Blaze {
                 }
             }
             Message::PaneDragged(pane_grid::DragEvent::Dropped { pane, target }) => {
-                self.pane.drop(&pane, target);
+                self.panes.data.drop(&pane, target);
             }
             Message::PaneDragged(_) => {}
             Message::PaneResized(_) => todo!(),
@@ -170,7 +184,7 @@ impl Application for Blaze {
     fn view(&self) -> Element<Message> {
         column!(
             menu_bar(),
-            pane_grid(&self.pane, self.tabs.active, &self.tabs.data)
+            pane_grid(&self.panes, &self.tabs)
         )
         .padding(8)
         .into()
