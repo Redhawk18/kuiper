@@ -168,7 +168,12 @@ impl Application for Blaze {
     }
 
     fn view(&self) -> Element<Message> {
-        column!(menu_bar(), pane_grid(&self.pane, self.tabs.active, &self.tabs.data)).padding(8).into()
+        column!(
+            menu_bar(),
+            pane_grid(&self.pane, self.tabs.active, &self.tabs.data)
+        )
+        .padding(8)
+        .into()
     }
 
     fn theme(&self) -> Theme {

@@ -115,8 +115,10 @@ impl container::StyleSheet for Theme {
             },
             Container::PaneGridTitleBar(_) => container::Appearance {
                 text_color: Some(self.colors.accent.default),
-                border_color: self.colors.accent.default,
-                ..Default::default()
+                border_color: self.colors.text.default,
+                background: Some(Background::Color(self.colors.accent.default)),
+                border_width: 4.0,
+                border_radius: 4.0.into()
             },
             Container::PaneGridContent => todo!(),
         }
