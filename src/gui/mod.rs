@@ -77,6 +77,7 @@ pub struct FileTab {
     text: String,
 }
 
+#[derive(Debug)]
 pub struct PaneState {
     active_tab: usize,
     data: Vec<DefaultKey>,
@@ -242,6 +243,11 @@ impl Application for Blaze {
     }
 
     fn view(&self) -> Element<Message> {
+        println!("{:?}", self.tab_data);
+        println!();
+        println!("{:?}", self.panes.data);
+        println!();
+        println!();
         let index = self.panes.data.get(&self.panes.active).unwrap().active_tab;
         let pane_vec = &self.panes.data.get(&self.panes.active).unwrap().data;
         column!(
