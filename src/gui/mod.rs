@@ -8,11 +8,11 @@ use iced::{
     font,
     widget::{
         column,
-        pane_grid::{DragEvent, Pane, ResizeEvent, State},
+        pane_grid::{Axis, DragEvent, Pane, ResizeEvent, State},
     },
     Application, Command, Subscription,
 };
-use generational_array::{GenerationalArray, GenerationalIndex};
+use slotmap::{DefaultKey, SlotMap};
 use std::path::PathBuf;
 
 #[derive(Debug, Clone)]
@@ -34,16 +34,19 @@ pub enum Message {
     TabClosed(usize),
 
     //panegrid
+    //panegrid
     PaneClicked(Pane),
+    PaneClosed(Pane),
     PaneDragged(DragEvent),
     PaneResized(ResizeEvent),
+    PaneSplit(Axis, Pane),
 
     //text input
     TextUpdate(String),
 }
 
 pub struct Blaze {
-    tab_data: GenerationalArray<Tab>,
+    tab_data: SlotMap<DefaultKey, Tab>,
     panes: Panes,
     theme: theme::Theme,
 }
@@ -76,7 +79,7 @@ pub struct FileTab {
 
 pub struct PaneState {
     active_tab: usize,
-    data: Vec<GenerationalIndex>,
+    data: Vec<DefaultKey>,
     tab: Tab,
 }
 
@@ -99,7 +102,7 @@ impl Application for Blaze {
     fn new(_flags: Self::Flags) -> (Self, Command<Self::Message>) {
         (
             Blaze {
-                tab_data: GenerationalArray::new(),
+                tab_data: SlotMap::default(),
                 theme: Theme::default(),
                 panes: Panes::default(),
             },
@@ -129,7 +132,7 @@ impl Application for Blaze {
             Message::Save => {
                 // let Some(tab) = self.data.data.get(
                 //     self.panes.data.get(&self.panes.active.unwrap()).unwrap().active) else {
-                //     log::warn!("cannot save, data vector is empty"); 
+                //     log::warn!("cannot save, data vector is empty");
                 //     return Command::none()
                 // };
 
@@ -145,7 +148,7 @@ impl Application for Blaze {
 
             Message::SaveAs => {
                 // let Some(tab) = self.data.data.get(self.panes.data.get(&self.panes.active.unwrap()).unwrap().active) else {
-                //     log::warn!("cannot save as, data vector is empty"); 
+                //     log::warn!("cannot save as, data vector is empty");
                 //     return Command::none()
                 // };
 
@@ -163,37 +166,55 @@ impl Application for Blaze {
 
             Message::TabNew(tab) => {
                 let index = self.tab_data.insert(tab);
-                self.panes.data.get_mut(&self.panes.active).unwrap().data.push(index);
+                self.panes
+                    .data
+                    .get_mut(&self.panes.active)
+                    .unwrap()
+                    .data
+                    .push(index);
             }
 
             Message::TabSelected(id) => {
-                self.panes.data.get_mut(&self.panes.active).unwrap().active_tab = id;
-                
+                self.panes
+                    .data
+                    .get_mut(&self.panes.active)
+                    .unwrap()
+                    .active_tab = id;
             }
 
             Message::TabClosed(id) => {
                 // //deleting data is hard, i'll work on it later
-                if id == self.panes.data.get_mut(&self.panes.active).unwrap().active_tab {
-                    self.panes.data.get_mut(&self.panes.active).unwrap().active_tab = 0;
+                if id
+                    == self
+                        .panes
+                        .data
+                        .get_mut(&self.panes.active)
+                        .unwrap()
+                        .active_tab
+                {
+                    self.panes
+                        .data
+                        .get_mut(&self.panes.active)
+                        .unwrap()
+                        .active_tab = 0;
                 }
-                
-                self.panes.data.get_mut(&self.panes.active).unwrap().data.remove(id); // current we arent removing the data from the program, just removing it from being visable
-                // self.tab_data.remove(id);
+
+                self.panes
+                    .data
+                    .get_mut(&self.panes.active)
+                    .unwrap()
+                    .data
+                    .remove(id); // current we arent removing the data from the program, just removing it from being visable
+                                 // self.tab_data.remove(id);
             }
 
             Message::TextUpdate(text) => {
-                let index = self.panes.data.get(&self.panes.active).unwrap().active_tab;
-                let generational_index = self.panes.data.get(&self.panes.active).unwrap().data.get(index).unwrap();
-                let resul = self.tab_data.get_mut(generational_index);
+                let pane_state = self.panes.data.get(&self.panes.active).unwrap();
+                let key = pane_state.data.get(pane_state.active_tab).unwrap();
+                let tab = self.tab_data.get_mut(*key).unwrap();
 
-                match resul {
-                    generational_array::GenerationalArrayResultMut::None => todo!(),
-                    generational_array::GenerationalArrayResultMut::OutDated => todo!(),
-                    generational_array::GenerationalArrayResultMut::OutOfBounds => todo!(),
-                    generational_array::GenerationalArrayResultMut::Some(tab) => match tab {
-                        Tab::File(file_tab) => file_tab.text = text,
-                    },
-
+                match tab {
+                    Tab::File(file_tab) => file_tab.text = text,
                 }
             }
             Message::PaneDragged(DragEvent::Dropped { pane, target }) => {
@@ -202,7 +223,19 @@ impl Application for Blaze {
             Message::PaneDragged(_) => {}
             Message::PaneResized(_) => todo!(),
 
-            Message::PaneClicked(pane) => self.panes.active = Some(pane),
+            Message::PaneClicked(pane) => self.panes.active = pane,
+            Message::PaneSplit(axis, pane) => {
+                let result = self.panes.data.split(axis, &pane, PaneState::default());
+
+                if let Some((pane, _)) = result {
+                    self.panes.active = pane;
+                }
+            }
+            Message::PaneClosed(pane) => {
+                if let Some((_, sibling)) = self.panes.data.close(&pane) {
+                    self.panes.active = sibling;
+                }
+            }
         }
 
         Command::none()
@@ -211,9 +244,12 @@ impl Application for Blaze {
     fn view(&self) -> Element<Message> {
         let index = self.panes.data.get(&self.panes.active).unwrap().active_tab;
         let pane_vec = &self.panes.data.get(&self.panes.active).unwrap().data;
-        column!(menu_bar(), pane_grid(&self.panes, &pane_vec, &self.tab_data))
-            .padding(8)
-            .into()
+        column!(
+            menu_bar(),
+            pane_grid(&self.panes, &pane_vec, &self.tab_data)
+        )
+        .padding(8)
+        .into()
     }
 
     fn theme(&self) -> Theme {
