@@ -1,9 +1,10 @@
 use crate::gui::{
-    theme::{Element, Renderer},
+    theme::{Container, Element, Renderer},
     widgets::tab_bar::tab_bar,
-    Message, PaneState, Panes, Tabs,
+    Message, PaneState, Panes, Tab,
 };
 
+use generational_array::{GenerationalIndex, GenerationalArray};
 use iced::{
     widget::{
         button,
@@ -13,16 +14,15 @@ use iced::{
     Alignment,
 };
 
-pub fn pane_grid<'a>(panes: &'a Panes, tabs: &'a Tabs) -> PaneGrid<'a, Message, Renderer> {
+pub fn pane_grid<'a>(panes: &'a Panes, tabs: &'a [GenerationalIndex], gen_array: &GenerationalArray<Tab>) -> PaneGrid<'a, Message, Renderer> {
     PaneGrid::new(&panes.data, |pane, state, _is_maximized| {
-        let is_focused = panes.active == Some(pane);
-        Content::new(match state {
-            PaneState::Tab => tab_bar(tabs.active, &tabs.data),
+        let is_focused = panes.active == pane;
+        Content::new(match state.tab {
+            crate::gui::Tab::File(_) => tab_bar(state.active_tab, &tabs, gen_array),
         })
-        .style(crate::gui::theme::Container::PaneGridContent(is_focused))
+        .style(Container::PaneGridContent(is_focused))
         .title_bar(
-            TitleBar::new(title_bar(pane, state))
-                .style(crate::gui::theme::Container::PaneGridTitleBar(is_focused)),
+            TitleBar::new(title_bar(pane, state)).style(Container::PaneGridTitleBar(is_focused)),
         )
     })
     .on_click(Message::PaneClicked)

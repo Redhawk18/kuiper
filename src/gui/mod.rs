@@ -12,6 +12,7 @@ use iced::{
     },
     Application, Command, Subscription,
 };
+use generational_array::{GenerationalArray, GenerationalIndex};
 use std::path::PathBuf;
 
 #[derive(Debug, Clone)]
@@ -32,6 +33,7 @@ pub enum Message {
     TabSelected(usize),
     TabClosed(usize),
 
+    //panegrid
     PaneClicked(Pane),
     PaneClosed(Pane),
     PaneDragged(DragEvent),
@@ -44,30 +46,24 @@ pub enum Message {
 }
 
 pub struct Blaze {
+    tab_data: GenerationalArray<Tab>,
     panes: Panes,
-    tabs: Tabs,
     theme: theme::Theme,
 }
 
 pub struct Panes {
-    active: Option<Pane>,
+    active: Pane,
     data: State<PaneState>,
 }
 
 impl Default for Panes {
     fn default() -> Self {
-        let (state, _) = State::new(PaneState::Tab);
+        let (state, pane) = State::new(PaneState::default());
         Self {
-            active: None,
+            active: pane,
             data: state,
         }
     }
-}
-
-#[derive(Default)]
-pub struct Tabs {
-    active: usize,
-    data: Vec<Tab>,
 }
 
 #[derive(Debug, Clone)]
@@ -77,12 +73,24 @@ pub enum Tab {
 
 #[derive(Debug, Clone, Default)]
 pub struct FileTab {
-    text: String,
     path: PathBuf,
+    text: String,
 }
 
-pub enum PaneState {
-    Tab,
+pub struct PaneState {
+    active_tab: usize,
+    data: Vec<GenerationalIndex>,
+    tab: Tab,
+}
+
+impl Default for PaneState {
+    fn default() -> Self {
+        Self {
+            active_tab: 0,
+            data: Vec::default(),
+            tab: Tab::File(FileTab::default()),
+        }
+    }
 }
 
 impl Application for Blaze {
@@ -94,7 +102,7 @@ impl Application for Blaze {
     fn new(_flags: Self::Flags) -> (Self, Command<Self::Message>) {
         (
             Blaze {
-                tabs: Tabs::default(),
+                tab_data: GenerationalArray::new(),
                 theme: Theme::default(),
                 panes: Panes::default(),
             },
@@ -113,77 +121,90 @@ impl Application for Blaze {
             Message::NewFile => return self.update(Message::TabNew(Tab::File(FileTab::default()))),
 
             Message::OpenFile => {
-                let (file_contents, path) = file_dialog::pick_file_dialog();
-                let Ok(text) = file_contents else { return Command::none() };
+                // let (file_contents, path) = file_dialog::pick_file_dialog();
+                // let Ok(text) = file_contents else { return Command::none() };
 
-                self.tabs.data.push(Tab::File(FileTab { text, path }));
+                // self.data.data.push(Tab::File(FileTab { text, path }));
             }
 
             Message::OpenFolder => file_dialog::pick_folder_dialog(),
 
             Message::Save => {
-                let Some(tab) = self.tabs.data.get(self.tabs.active) else {
-                    log::warn!("cannot save, data vector is empty"); 
-                    return Command::none()
-                };
+                // let Some(tab) = self.data.data.get(
+                //     self.panes.data.get(&self.panes.active.unwrap()).unwrap().active) else {
+                //     log::warn!("cannot save, data vector is empty"); 
+                //     return Command::none()
+                // };
 
-                match tab {
-                    Tab::File(file_tab) => {
-                        if let Err(e) = file_dialog::save_file_dialog(file_tab) {
-                            log::warn!("Saving error: {e}");
-                            return Command::none();
-                        }
-                    }
-                }
+                // match tab {
+                //     Tab::File(file_tab) => {
+                //         if let Err(e) = file_dialog::save_file_dialog(file_tab) {
+                //             log::warn!("Saving error: {e}");
+                //             return Command::none();
+                //         }
+                //     }
+                // }
             }
 
             Message::SaveAs => {
-                let Some(tab) = self.tabs.data.get(self.tabs.active) else {
-                    log::warn!("cannot save as, data vector is empty"); 
-                    return Command::none()
-                };
+                // let Some(tab) = self.data.data.get(self.panes.data.get(&self.panes.active.unwrap()).unwrap().active) else {
+                //     log::warn!("cannot save as, data vector is empty"); 
+                //     return Command::none()
+                // };
 
-                match tab {
-                    Tab::File(file_tab) => {
-                        if let Err(e) = file_dialog::save_file_as_dialog(file_tab) {
-                            log::warn!("Saving as error: {e}");
-                            return Command::none();
-                        }
-                    }
-                }
+                // match tab {
+                //     Tab::File(file_tab) => {
+                //         if let Err(e) = file_dialog::save_file_as_dialog(file_tab) {
+                //             log::warn!("Saving as error: {e}");
+                //             return Command::none();
+                //         }
+                //     }
+                // }
             }
 
             Message::Quit => return iced::window::close(),
 
             Message::TabNew(tab) => {
-                self.tabs.data.push(tab);
+                let index = self.tab_data.insert(tab);
+                self.panes.data.get_mut(&self.panes.active).unwrap().data.push(index);
             }
 
             Message::TabSelected(id) => {
-                self.tabs.active = id;
+                self.panes.data.get_mut(&self.panes.active).unwrap().active_tab = id;
+                
             }
 
             Message::TabClosed(id) => {
-                if id == self.tabs.active {
-                    self.tabs.active = 0;
+                // //deleting data is hard, i'll work on it later
+                if id == self.panes.data.get_mut(&self.panes.active).unwrap().active_tab {
+                    self.panes.data.get_mut(&self.panes.active).unwrap().active_tab = 0;
                 }
-
-                self.tabs.data.remove(id);
+                
+                self.panes.data.get_mut(&self.panes.active).unwrap().data.remove(id); // current we arent removing the data from the program, just removing it from being visable
+                // self.tab_data.remove(id);
             }
 
             Message::TextUpdate(text) => {
-                let tab = self.tabs.data.get_mut(self.tabs.active).unwrap();
+                let index = self.panes.data.get(&self.panes.active).unwrap().active_tab;
+                let generational_index = self.panes.data.get(&self.panes.active).unwrap().data.get(index).unwrap();
+                let resul = self.tab_data.get_mut(generational_index);
 
-                match tab {
-                    Tab::File(file_tab) => file_tab.text = text,
+                match resul {
+                    generational_array::GenerationalArrayResultMut::None => todo!(),
+                    generational_array::GenerationalArrayResultMut::OutDated => todo!(),
+                    generational_array::GenerationalArrayResultMut::OutOfBounds => todo!(),
+                    generational_array::GenerationalArrayResultMut::Some(tab) => match tab {
+                        Tab::File(file_tab) => file_tab.text = text,
+                    },
+
                 }
             }
 
-            Message::PaneClicked(pane) => self.panes.active = Some(pane),
+            Message::PaneClicked(pane) => self.panes.active = pane,
 
             Message::PaneClosed(pane) => {
                 if let Some((_, sibling)) = self.panes.data.close(&pane) {
-                    self.panes.active = Some(sibling);
+                    self.panes.active = sibling;
                 }
             }
 
@@ -198,10 +219,10 @@ impl Application for Blaze {
             }
 
             Message::PaneSplit(axis, pane) => {
-                let result = self.panes.data.split(axis, &pane, PaneState::Tab);
+                let result = self.panes.data.split(axis, &pane, PaneState::default());
 
                 if let Some((pane, _)) = result {
-                    self.panes.active = Some(pane);
+                    self.panes.active = pane;
                 }
             }
 
@@ -212,7 +233,9 @@ impl Application for Blaze {
     }
 
     fn view(&self) -> Element<Message> {
-        column!(menu_bar(), pane_grid(&self.panes, &self.tabs))
+        let index = self.panes.data.get(&self.panes.active).unwrap().active_tab;
+        let pane_vec = &self.panes.data.get(&self.panes.active).unwrap().data;
+        column!(menu_bar(), pane_grid(&self.panes, &pane_vec, &self.tab_data))
             .padding(8)
             .into()
     }
