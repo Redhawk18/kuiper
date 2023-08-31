@@ -8,7 +8,7 @@ use iced::{
     font,
     widget::{
         column,
-        pane_grid::{Axis, DragEvent, Pane, ResizeEvent, State},
+        pane_grid::{DragEvent, Pane, ResizeEvent, State},
     },
     Application, Command, Subscription,
 };
@@ -35,11 +35,8 @@ pub enum Message {
 
     //panegrid
     PaneClicked(Pane),
-    PaneClosed(Pane),
     PaneDragged(DragEvent),
     PaneResized(ResizeEvent),
-    PaneSplit(Axis, Pane),
-    PaneSplitFocused(Axis),
 
     //text input
     TextUpdate(String),
@@ -199,34 +196,13 @@ impl Application for Blaze {
 
                 }
             }
-
-            Message::PaneClicked(pane) => self.panes.active = pane,
-
-            Message::PaneClosed(pane) => {
-                if let Some((_, sibling)) = self.panes.data.close(&pane) {
-                    self.panes.active = sibling;
-                }
-            }
-
             Message::PaneDragged(DragEvent::Dropped { pane, target }) => {
                 self.panes.data.drop(&pane, target);
             }
-
             Message::PaneDragged(_) => {}
+            Message::PaneResized(_) => todo!(),
 
-            Message::PaneResized(ResizeEvent { split, ratio }) => {
-                self.panes.data.resize(&split, ratio);
-            }
-
-            Message::PaneSplit(axis, pane) => {
-                let result = self.panes.data.split(axis, &pane, PaneState::default());
-
-                if let Some((pane, _)) = result {
-                    self.panes.active = pane;
-                }
-            }
-
-            Message::PaneSplitFocused(_) => todo!(),
+            Message::PaneClicked(pane) => self.panes.active = Some(pane),
         }
 
         Command::none()
