@@ -5,29 +5,19 @@ use crate::gui::{
 
 use iced::widget::{column, text_input, Column};
 use iced_aw::{TabBar, TabLabel};
-use slotmap::{DefaultKey, SlotMap};
 
-pub fn tab_bar<'a>(
-    active: usize,
-    data: &[DefaultKey],
-    map: &SlotMap<DefaultKey, Tab>,
-) -> Column<'a, Message, Renderer> {
+pub fn tab_bar<'a>(active: usize, data: &[&Tab]) -> Column<'a, Message, Renderer> {
     if data.is_empty() {
         column!()
     } else {
-        column!(head(active, data, map), body(active, data, map))
+        column!(head(active, data), body(active, data))
     }
 }
 
-fn head(
-    active: usize,
-    data: &[DefaultKey],
-    map: &SlotMap<DefaultKey, Tab>,
-) -> TabBar<Message, usize, Renderer> {
+fn head(active: usize, data: &[&Tab]) -> TabBar<Message, usize, Renderer> {
     let mut tab_bar = TabBar::new(Message::TabSelected).on_close(Message::TabClosed);
 
-    for (i, key) in data.iter().enumerate() {
-        let tab = map.get(*key).unwrap();
+    for (i, tab) in data.iter().enumerate() {
         match tab {
             Tab::File(file_tab) => {
                 let filename = file_tab
@@ -44,15 +34,10 @@ fn head(
     tab_bar.set_active_tab(&active)
 }
 
-fn body<'a>(
-    active: usize,
-    data: &[DefaultKey],
-    map: &SlotMap<DefaultKey, Tab>,
-) -> Element<'a, Message> {
-    //let key =
+fn body<'a>(active: usize, data: &[&Tab]) -> Element<'a, Message> {
+    let active_tab = data.get(active).unwrap(); //wrong
 
-    let tab = map.get(*data.get(active).unwrap()).unwrap();
-    match tab {
+    match active_tab {
         Tab::File(file_tab) => text_input("placeholder", &file_tab.text)
             .on_input(Message::TextUpdate)
             .into(),

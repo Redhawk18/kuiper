@@ -13,6 +13,7 @@ use iced::{
     Alignment,
 };
 use slotmap::{DefaultKey, SlotMap};
+use std::vec::Vec;
 
 pub fn pane_grid<'a>(
     panes: &'a Panes,
@@ -20,14 +21,18 @@ pub fn pane_grid<'a>(
     map: &SlotMap<DefaultKey, Tab>,
 ) -> PaneGrid<'a, Message, Renderer> {
     PaneGrid::new(&panes.data, |pane, state, _is_maximized| {
-        let is_focused = panes.active == pane;
+        let active = panes.active == pane;
+
+        let mut pane_tabs = Vec::new(); //use array since we know the size
+        for key in state.data.iter() {
+            pane_tabs.push(map.get(*key).unwrap());
+        }
+
         Content::new(match state.tab {
-            crate::gui::Tab::File(_) => tab_bar(state.active_tab, &tabs, map),
+            Tab::File(_) => tab_bar(state.active_tab, &pane_tabs),
         })
-        .style(Container::PaneGridContent(is_focused))
-        .title_bar(
-            TitleBar::new(title_bar(pane, state)).style(Container::PaneGridTitleBar(is_focused)),
-        )
+        .style(Container::PaneGridContent(active))
+        .title_bar(TitleBar::new(title_bar(pane, state)).style(Container::PaneGridTitleBar(active)))
     })
     .on_click(Message::PaneClicked)
     .on_drag(Message::PaneDragged)
