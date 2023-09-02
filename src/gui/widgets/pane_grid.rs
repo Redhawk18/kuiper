@@ -17,7 +17,6 @@ use std::vec::Vec;
 
 pub fn pane_grid<'a>(
     panes: &'a Panes,
-    tabs: &'a [DefaultKey],
     map: &SlotMap<DefaultKey, Tab>,
 ) -> PaneGrid<'a, Message, Renderer> {
     PaneGrid::new(&panes.data, |pane, state, _is_maximized| {

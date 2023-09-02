@@ -135,7 +135,6 @@ impl container::StyleSheet for Theme {
                 border_width: 1.0,
                 border_radius: [4.0, 4.0, 0.0, 0.0].into(),
             },
-
         }
     }
 }

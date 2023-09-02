@@ -243,19 +243,9 @@ impl Application for Blaze {
     }
 
     fn view(&self) -> Element<Message> {
-        println!("{:?}", self.tab_data);
-        println!();
-        println!("{:?}", self.panes.data);
-        println!();
-        println!();
-        let index = self.panes.data.get(&self.panes.active).unwrap().active_tab;
-        let pane_vec = &self.panes.data.get(&self.panes.active).unwrap().data;
-        column!(
-            menu_bar(),
-            pane_grid(&self.panes, &pane_vec, &self.tab_data)
-        )
-        .padding(8)
-        .into()
+        column!(menu_bar(), pane_grid(&self.panes, &self.tab_data))
+            .padding(8)
+            .into()
     }
 
     fn theme(&self) -> Theme {
