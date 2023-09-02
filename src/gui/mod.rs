@@ -122,57 +122,60 @@ impl Application for Blaze {
             Message::NewFile => return self.update(Message::TabNew(Tab::File(FileTab::default()))),
 
             Message::OpenFile => {
-                // let (file_contents, path) = file_dialog::pick_file_dialog();
-                // let Ok(text) = file_contents else { return Command::none() };
+                let (file_contents, path) = file_dialog::pick_file_dialog();
+                let Ok(text) = file_contents else { return Command::none() };
 
-                // self.data.data.push(Tab::File(FileTab { text, path }));
+                return self.update(Message::TabNew(Tab::File(FileTab { path, text })));
             }
 
             Message::OpenFolder => file_dialog::pick_folder_dialog(),
 
             Message::Save => {
-                // let Some(tab) = self.data.data.get(
-                //     self.panes.data.get(&self.panes.active.unwrap()).unwrap().active) else {
-                //     log::warn!("cannot save, data vector is empty");
-                //     return Command::none()
-                // };
+                let tab_id = self.panes.data.get(&self.panes.active).unwrap().active_tab;
+                let local_vector = &self.panes.data.get(&self.panes.active).unwrap().data;
+                let Some(tab) = self.tab_data.get(local_vector[tab_id]) else {
+                    log::warn!("TODO ERROR MESSAGE Message:Save");
+                    return Command::none()
+                };
 
-                // match tab {
-                //     Tab::File(file_tab) => {
-                //         if let Err(e) = file_dialog::save_file_dialog(file_tab) {
-                //             log::warn!("Saving error: {e}");
-                //             return Command::none();
-                //         }
-                //     }
-                // }
+                match tab {
+                    Tab::File(file_tab) => {
+                        if let Err(e) = file_dialog::save_file_dialog(file_tab) {
+                            log::warn!("Saving error: {e}");
+                            return Command::none();
+                        }
+                    }
+                }
             }
 
             Message::SaveAs => {
-                // let Some(tab) = self.data.data.get(self.panes.data.get(&self.panes.active.unwrap()).unwrap().active) else {
-                //     log::warn!("cannot save as, data vector is empty");
-                //     return Command::none()
-                // };
+                let tab_id = self.panes.data.get(&self.panes.active).unwrap().active_tab;
+                let local_vector = &self.panes.data.get(&self.panes.active).unwrap().data;
+                let Some(tab) = self.tab_data.get(local_vector[tab_id]) else {
+                    log::warn!("TODO ERROR MESSAGE Message:SaveAs");
+                    return Command::none()
+                };
 
-                // match tab {
-                //     Tab::File(file_tab) => {
-                //         if let Err(e) = file_dialog::save_file_as_dialog(file_tab) {
-                //             log::warn!("Saving as error: {e}");
-                //             return Command::none();
-                //         }
-                //     }
-                // }
+                match tab {
+                    Tab::File(file_tab) => {
+                        if let Err(e) = file_dialog::save_file_as_dialog(file_tab) {
+                            log::warn!("Saving error: {e}");
+                            return Command::none();
+                        }
+                    }
+                }
             }
 
             Message::Quit => return iced::window::close(),
 
             Message::TabNew(tab) => {
-                let index = self.tab_data.insert(tab);
+                let key = self.tab_data.insert(tab);
                 self.panes
                     .data
                     .get_mut(&self.panes.active)
                     .unwrap()
                     .data
-                    .push(index);
+                    .push(key);
             }
 
             Message::TabSelected(id) => {
@@ -226,9 +229,7 @@ impl Application for Blaze {
 
             Message::PaneClicked(pane) => self.panes.active = pane,
             Message::PaneSplit(axis, pane) => {
-                let result = self.panes.data.split(axis, &pane, PaneState::default());
-
-                if let Some((pane, _)) = result {
+                if let Some((pane, _)) = self.panes.data.split(axis, &pane, PaneState::default()) {
                     self.panes.active = pane;
                 }
             }
