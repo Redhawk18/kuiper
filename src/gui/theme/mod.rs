@@ -101,8 +101,8 @@ impl button::StyleSheet for Theme {
 pub enum Container {
     #[default]
     Primary,
-    PaneGridTitleBar(bool),
     PaneGridContent(bool),
+    PaneGridTitleBar(bool),
 }
 
 impl container::StyleSheet for Theme {
@@ -112,6 +112,17 @@ impl container::StyleSheet for Theme {
         match style {
             Container::Primary => container::Appearance {
                 ..Default::default()
+            },
+            Container::PaneGridContent(active) => container::Appearance {
+                text_color: Some(self.colors.text.default),
+                border_color: if *active {
+                    self.colors.accent.default
+                } else {
+                    self.colors.primary.default
+                },
+                background: Some(Background::Color(self.colors.background.default)),
+                border_width: 1.0,
+                border_radius: [4.0; 4].into(),
             },
             Container::PaneGridTitleBar(active) => container::Appearance {
                 text_color: Some(self.colors.text.default),
@@ -124,17 +135,7 @@ impl container::StyleSheet for Theme {
                 border_width: 1.0,
                 border_radius: [4.0, 4.0, 0.0, 0.0].into(),
             },
-            Container::PaneGridContent(active) => container::Appearance {
-                text_color: Some(self.colors.text.default),
-                border_color: if *active {
-                    self.colors.accent.default
-                } else {
-                    self.colors.primary.default
-                },
-                background: Some(Background::Color(self.colors.background.default)),
-                border_width: 1.0,
-                border_radius: [0.0, 0.0, 4.0, 4.0].into(),
-            },
+
         }
     }
 }

@@ -37,6 +37,7 @@ pub fn pane_grid<'a>(
     .on_click(Message::PaneClicked)
     .on_drag(Message::PaneDragged)
     .on_resize(10, Message::PaneResized)
+    .spacing(15)
 }
 
 fn title_bar(pane: Pane, _state: &PaneState) -> Element<'static, Message> {
