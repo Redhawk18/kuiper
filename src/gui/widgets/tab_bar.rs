@@ -6,11 +6,11 @@ use crate::gui::{
 use iced::widget::{column, text_input, Column};
 use iced_aw::{TabBar, TabLabel};
 
-pub fn tab_bar<'a>(active: usize, data: &[&Tab]) -> Column<'a, Message, Renderer> {
+pub fn tab_bar(active: usize, data: &[&Tab]) -> Column<'static, Message, Renderer> {
     if data.is_empty() {
         column!()
     } else {
-        column!(head(active, data), body(active, data))
+        column!(head(active, data), body(active, data)).padding(1)
     }
 }
 
@@ -34,7 +34,7 @@ fn head(active: usize, data: &[&Tab]) -> TabBar<Message, usize, Renderer> {
     tab_bar.set_active_tab(&active)
 }
 
-fn body<'a>(active: usize, data: &[&Tab]) -> Element<'a, Message> {
+fn body(active: usize, data: &[&Tab]) -> Element<'static, Message> {
     let active_tab = data.get(active).unwrap(); //wrong
 
     match active_tab {

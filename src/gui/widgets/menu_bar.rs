@@ -3,11 +3,11 @@ use crate::gui::{theme::Renderer, FileTab, Message, Tab};
 use iced::widget::button;
 use iced_aw::{MenuBar, MenuTree};
 
-pub fn menu_bar<'a>() -> MenuBar<'a, Message, Renderer> {
+pub fn menu_bar() -> MenuBar<'static, Message, Renderer> {
     MenuBar::new(vec![file()])
 }
 
-fn file<'a>() -> MenuTree<'a, Message, Renderer> {
+fn file() -> MenuTree<'static, Message, Renderer> {
     let new_file = MenuTree::new(
         button("New File")
             .on_press(Message::TabNew(Tab::File(FileTab::default())))

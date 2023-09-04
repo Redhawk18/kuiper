@@ -1,7 +1,7 @@
 use crate::gui::{
-    theme::{Container, Element, Renderer},
+    theme::{Container, Renderer},
     widgets::tab_bar::tab_bar,
-    Message, PaneState, Panes, Tab,
+    Message, Panes, Tab,
 };
 
 use iced::{
@@ -21,17 +21,17 @@ pub fn pane_grid<'a>(
 ) -> PaneGrid<'a, Message, Renderer> {
     PaneGrid::new(&panes.data, |pane, state, _is_maximized| {
         let active = panes.active == pane;
-
-        let mut pane_tabs = Vec::new(); //use array since we know the size
-        for key in state.data.iter() {
-            pane_tabs.push(map.get(*key).unwrap());
-        }
+        let pane_tabs: Vec<_> = state // this is kind of stupid TODO
+            .data
+            .iter()
+            .map(|key| map.get(*key).unwrap())
+            .collect();
 
         Content::new(match state.tab {
             Tab::File(_) => tab_bar(state.active_tab, &pane_tabs),
         })
         .style(Container::PaneGridContent(active))
-        .title_bar(TitleBar::new(title_bar(pane, state)).style(Container::PaneGridTitleBar(active)))
+        .title_bar(title_bar(active, pane))
     })
     .on_click(Message::PaneClicked)
     .on_drag(Message::PaneDragged)
@@ -39,13 +39,15 @@ pub fn pane_grid<'a>(
     .spacing(15)
 }
 
-fn title_bar(pane: Pane, _state: &PaneState) -> Element<'static, Message> {
-    row!(
-        text("content"),
-        button("split |").on_press(Message::PaneSplit(Axis::Vertical, pane)),
-        button("split -").on_press(Message::PaneSplit(Axis::Horizontal, pane)),
-        button("close THIS pane").on_press(Message::PaneClosed(pane))
+fn title_bar(active: bool, pane: Pane) -> TitleBar<'static, Message, Renderer> {
+    TitleBar::new(
+        row!(
+            text("content"),
+            button("split |").on_press(Message::PaneSplit(Axis::Vertical, pane)),
+            button("split -").on_press(Message::PaneSplit(Axis::Horizontal, pane)),
+            button("close THIS pane").on_press(Message::PaneClosed(pane))
+        )
+        .align_items(Alignment::Center),
     )
-    .align_items(Alignment::Center)
-    .into()
+    .style(Container::PaneGridTitleBar(active))
 }
