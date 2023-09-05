@@ -187,7 +187,7 @@ impl Application for Blaze {
                     pane_state.active_tab = 0;
                 }
 
-                pane_state.data.remove(id); 
+                pane_state.data.remove(id);
                 // current we arent removing the data from the program, just removing it from being visable
             }
 

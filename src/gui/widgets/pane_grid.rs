@@ -8,9 +8,8 @@ use iced::{
     widget::{
         button,
         pane_grid::{Axis, Content, Pane, PaneGrid, TitleBar},
-        row, text,
-    },
-    Alignment,
+        row,
+    }, Length,
 };
 use slotmap::{DefaultKey, SlotMap};
 use std::vec::Vec;
@@ -38,14 +37,13 @@ pub fn pane_grid<'a>(
 }
 
 fn title_bar(active: bool, pane: Pane) -> TitleBar<'static, Message, Renderer> {
-    TitleBar::new(
+    TitleBar::new(row!(
+        row!().width(Length::Fill),
         row!(
-            text("content"),
-            button("split |").on_press(Message::PaneSplit(Axis::Vertical, pane)),
-            button("split -").on_press(Message::PaneSplit(Axis::Horizontal, pane)),
-            button("close THIS pane").on_press(Message::PaneClosed(pane))
+            button("|").on_press(Message::PaneSplit(Axis::Vertical, pane)),
+            button("--").on_press(Message::PaneSplit(Axis::Horizontal, pane)),
+            button("x").on_press(Message::PaneClosed(pane)),
         )
-        .align_items(Alignment::Center),
-    )
+    ))
     .style(Container::PaneGridTitleBar(active))
 }
