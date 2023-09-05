@@ -46,7 +46,8 @@ pub enum Message {
 }
 
 pub struct Blaze {
-    tab_data: SlotMap<DefaultKey, Tab>,
+    /// Holds all the data of the application
+    data: SlotMap<DefaultKey, Tab>,
     panes: Panes,
     theme: theme::Theme,
 }
@@ -77,20 +78,19 @@ pub struct FileTab {
     text: String,
 }
 
-#[derive(Debug)]
+#[derive(Default)]
 pub struct PaneState {
     active_tab: usize,
     data: Vec<DefaultKey>,
-    tab: Tab,
 }
 
-impl Default for PaneState {
-    fn default() -> Self {
-        Self {
-            active_tab: 0,
-            data: Vec::default(),
-            tab: Tab::File(FileTab::default()),
-        }
+impl Blaze {
+    pub fn get_panestate(&self) -> &PaneState {
+        self.panes.data.get(&self.panes.active).unwrap()
+    }
+
+    pub fn get_mut_panestate(&mut self) -> &mut PaneState {
+        self.panes.data.get_mut(&self.panes.active).unwrap()
     }
 }
 
@@ -103,7 +103,7 @@ impl Application for Blaze {
     fn new(_flags: Self::Flags) -> (Self, Command<Self::Message>) {
         (
             Blaze {
-                tab_data: SlotMap::default(),
+                data: SlotMap::default(),
                 theme: Theme::default(),
                 panes: Panes::default(),
             },
@@ -132,8 +132,8 @@ impl Application for Blaze {
 
             Message::Save => {
                 let tab_id = self.panes.data.get(&self.panes.active).unwrap().active_tab;
-                let local_vector = &self.panes.data.get(&self.panes.active).unwrap().data;
-                let Some(tab) = self.tab_data.get(local_vector[tab_id]) else {
+                let current_tab = &self.panes.data.get(&self.panes.active).unwrap().data;
+                let Some(tab) = self.data.get(current_tab[tab_id]) else {
                     log::warn!("TODO ERROR MESSAGE Message:Save");
                     return Command::none()
                 };
@@ -150,8 +150,8 @@ impl Application for Blaze {
 
             Message::SaveAs => {
                 let tab_id = self.panes.data.get(&self.panes.active).unwrap().active_tab;
-                let local_vector = &self.panes.data.get(&self.panes.active).unwrap().data;
-                let Some(tab) = self.tab_data.get(local_vector[tab_id]) else {
+                let current_tab = &self.panes.data.get(&self.panes.active).unwrap().data;
+                let Some(tab) = self.data.get(current_tab[tab_id]) else {
                     log::warn!("TODO ERROR MESSAGE Message:SaveAs");
                     return Command::none()
                 };
@@ -169,13 +169,8 @@ impl Application for Blaze {
             Message::Quit => return iced::window::close(),
 
             Message::TabNew(tab) => {
-                let key = self.tab_data.insert(tab);
-                self.panes
-                    .data
-                    .get_mut(&self.panes.active)
-                    .unwrap()
-                    .data
-                    .push(key);
+                let key = self.data.insert(tab);
+                self.get_mut_panestate().data.push(key);
             }
 
             Message::TabSelected(id) => {
@@ -187,35 +182,19 @@ impl Application for Blaze {
             }
 
             Message::TabClosed(id) => {
-                // //deleting data is hard, i'll work on it later
-                if id
-                    == self
-                        .panes
-                        .data
-                        .get_mut(&self.panes.active)
-                        .unwrap()
-                        .active_tab
-                {
-                    self.panes
-                        .data
-                        .get_mut(&self.panes.active)
-                        .unwrap()
-                        .active_tab = 0;
+                let pane_state = self.get_mut_panestate();
+                if id == pane_state.active_tab {
+                    pane_state.active_tab = 0;
                 }
 
-                self.panes
-                    .data
-                    .get_mut(&self.panes.active)
-                    .unwrap()
-                    .data
-                    .remove(id); // current we arent removing the data from the program, just removing it from being visable
-                                 // self.tab_data.remove(id);
+                pane_state.data.remove(id); 
+                // current we arent removing the data from the program, just removing it from being visable
             }
 
             Message::TextUpdate(text) => {
-                let pane_state = self.panes.data.get(&self.panes.active).unwrap();
+                let pane_state = self.get_panestate();
                 let key = pane_state.data.get(pane_state.active_tab).unwrap();
-                let tab = self.tab_data.get_mut(*key).unwrap();
+                let tab = self.data.get_mut(*key).unwrap();
 
                 match tab {
                     Tab::File(file_tab) => file_tab.text = text,
@@ -244,7 +223,7 @@ impl Application for Blaze {
     }
 
     fn view(&self) -> Element<Message> {
-        column!(menu_bar(), pane_grid(&self.panes, &self.tab_data))
+        column!(menu_bar(), pane_grid(&self.panes, &self.data))
             .padding(8)
             .into()
     }

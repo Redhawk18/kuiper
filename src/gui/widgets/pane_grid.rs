@@ -27,11 +27,9 @@ pub fn pane_grid<'a>(
             .map(|key| map.get(*key).unwrap())
             .collect();
 
-        Content::new(match state.tab {
-            Tab::File(_) => tab_bar(state.active_tab, &pane_tabs),
-        })
-        .style(Container::PaneGridContent(active))
-        .title_bar(title_bar(active, pane))
+        Content::new(tab_bar(state.active_tab, &pane_tabs)) // currently this is fine if we want all gui elements to be tabs
+            .style(Container::PaneGridContent(active))
+            .title_bar(title_bar(active, pane))
     })
     .on_click(Message::PaneClicked)
     .on_drag(Message::PaneDragged)
