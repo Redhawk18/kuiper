@@ -34,7 +34,6 @@ pub enum Message {
     TabClosed(usize),
 
     //panegrid
-    //panegrid
     PaneClicked(Pane),
     PaneClosed(Pane),
     PaneDragged(DragEvent),
@@ -180,10 +179,7 @@ impl Application for Blaze {
             }
 
             Message::TabSelected(id) => {
-                self.panes
-                    .data
-                    .get_mut(&self.panes.active)
-                    .unwrap()
+                self.get_mut_panestate()
                     .active_tab = id;
             }
 
@@ -204,15 +200,16 @@ impl Application for Blaze {
 
                 match tab {
                     Tab::File(file_tab) => file_tab.text = text,
-                }
+                };
             }
             Message::PaneDragged(DragEvent::Dropped { pane, target }) => {
                 self.panes.data.drop(&pane, target);
             }
             Message::PaneDragged(_) => {}
-            Message::PaneResized(_) => todo!(),
-
-            Message::PaneClicked(pane) => self.panes.active = pane,
+            Message::PaneResized(ResizeEvent { split, ratio }) => {
+                self.panes.data.resize(&split, ratio);
+            }
+            Message::PaneClicked(pane) => {self.panes.active = pane}
             Message::PaneSplit(axis, pane) => {
                 if let Some((pane, _)) = self.panes.data.split(axis, &pane, PaneState::default()) {
                     self.panes.active = pane;
