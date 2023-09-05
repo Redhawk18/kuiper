@@ -12,7 +12,6 @@ use iced::{
     }, Length,
 };
 use slotmap::{DefaultKey, SlotMap};
-use std::vec::Vec;
 
 pub fn pane_grid<'a>(
     panes: &'a Panes,
@@ -20,13 +19,8 @@ pub fn pane_grid<'a>(
 ) -> PaneGrid<'a, Message, Renderer> {
     PaneGrid::new(&panes.data, |pane, state, _is_maximized| {
         let active = panes.active == pane;
-        let pane_tabs: Vec<_> = state // this is kind of stupid TODO
-            .data
-            .iter()
-            .map(|key| map.get(*key).unwrap())
-            .collect();
 
-        Content::new(tab_bar(state.active_tab, &pane_tabs)) // currently this is fine if we want all gui elements to be tabs
+        Content::new(tab_bar(state.active_tab, &state.get_data(map))) // currently this is fine if we want all gui elements to be tabs
             .style(Container::PaneGridContent(active))
             .title_bar(title_bar(active, pane))
     })
