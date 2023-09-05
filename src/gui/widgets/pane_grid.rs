@@ -45,4 +45,5 @@ fn title_bar(active: bool, pane: Pane) -> TitleBar<'static, Message, Renderer> {
         .align_items(Alignment::Center),
     )
     .style(Container::PaneGridTitleBar(active))
+    .padding(25) //adding padding makes a grabable section?
 }
