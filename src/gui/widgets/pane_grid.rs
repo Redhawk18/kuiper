@@ -9,7 +9,8 @@ use iced::{
         button,
         pane_grid::{Axis, Content, Pane, PaneGrid, TitleBar},
         row,
-    }, Length,
+    },
+    Alignment, Length,
 };
 use slotmap::{DefaultKey, SlotMap};
 
@@ -31,13 +32,17 @@ pub fn pane_grid<'a>(
 }
 
 fn title_bar(active: bool, pane: Pane) -> TitleBar<'static, Message, Renderer> {
-    TitleBar::new(row!(
-        row!().width(Length::Fill),
+    TitleBar::new(
         row!(
-            button("|").on_press(Message::PaneSplit(Axis::Vertical, pane)),
-            button("--").on_press(Message::PaneSplit(Axis::Horizontal, pane)),
-            button("x").on_press(Message::PaneClosed(pane)),
+            row!().width(Length::Fill),
+            row!("What to put here?").width(Length::Fill),
+            row!(
+                button("|").on_press(Message::PaneSplit(Axis::Vertical, pane)),
+                button("--").on_press(Message::PaneSplit(Axis::Horizontal, pane)),
+                button("x").on_press(Message::PaneClosed(pane)),
+            )
         )
-    ))
+        .align_items(Alignment::Center),
+    )
     .style(Container::PaneGridTitleBar(active))
 }

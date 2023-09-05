@@ -96,11 +96,7 @@ impl Blaze {
 
 impl PaneState {
     pub fn get_data<'a>(&'a self, map: &'a SlotMap<DefaultKey, Tab>) -> Vec<&Tab> {
-        self
-            .data
-            .iter()
-            .map( |key| map.get(*key).unwrap())
-            .collect()
+        self.data.iter().map(|key| map.get(*key).unwrap()).collect()
     }
 }
 
