@@ -12,7 +12,7 @@ use iced::{
     },
     Alignment, Length,
 };
-use iced_aw::graphics::icons::{Icon, icon_to_char};
+use iced_aw::graphics::icons::{icon_to_char, Icon};
 use slotmap::{DefaultKey, SlotMap};
 
 pub fn pane_grid<'a>(
@@ -39,9 +39,18 @@ fn title_bar(active: bool, pane: Pane) -> TitleBar<'static, Message, Renderer> {
             row!().width(Length::Fill),
             row!("What to put here?").width(Length::Fill),
             row!(
-                button(text(icon_to_char(Icon::ChevronDoubleRight).to_string()).font(iced_aw::ICON_FONT)).on_press(Message::PaneSplit(Axis::Vertical, pane)),
-                button(text(icon_to_char(Icon::ChevronDoubleDown).to_string()).font(iced_aw::ICON_FONT)).on_press(Message::PaneSplit(Axis::Horizontal, pane)),
-                button(text(icon_to_char(Icon::X).to_string()).font(iced_aw::ICON_FONT)).on_press(Message::PaneClosed(pane)),
+                button(
+                    text(icon_to_char(Icon::ChevronDoubleRight).to_string())
+                        .font(iced_aw::ICON_FONT)
+                )
+                .on_press(Message::PaneSplit(Axis::Vertical, pane)),
+                button(
+                    text(icon_to_char(Icon::ChevronDoubleDown).to_string())
+                        .font(iced_aw::ICON_FONT)
+                )
+                .on_press(Message::PaneSplit(Axis::Horizontal, pane)),
+                button(text(icon_to_char(Icon::X).to_string()).font(iced_aw::ICON_FONT))
+                    .on_press(Message::PaneClosed(pane)),
             )
         )
         .align_items(Alignment::Center),
