@@ -112,7 +112,9 @@ impl Application for Blaze {
                 theme: Theme::default(),
                 panes: Panes::default(),
             },
-            font::load(iced_aw::graphics::icons::ICON_FONT_BYTES).map(Message::FontLoaded),
+            Command::batch(vec![
+                font::load(iced_aw::graphics::icons::ICON_FONT_BYTES).map(Message::FontLoaded),
+            ]),
         )
     }
 
@@ -179,8 +181,7 @@ impl Application for Blaze {
             }
 
             Message::TabSelected(id) => {
-                self.get_mut_panestate()
-                    .active_tab = id;
+                self.get_mut_panestate().active_tab = id;
             }
 
             Message::TabClosed(id) => {
@@ -209,7 +210,7 @@ impl Application for Blaze {
             Message::PaneResized(ResizeEvent { split, ratio }) => {
                 self.panes.data.resize(&split, ratio);
             }
-            Message::PaneClicked(pane) => {self.panes.active = pane}
+            Message::PaneClicked(pane) => self.panes.active = pane,
             Message::PaneSplit(axis, pane) => {
                 if let Some((pane, _)) = self.panes.data.split(axis, &pane, PaneState::default()) {
                     self.panes.active = pane;
