@@ -3,7 +3,10 @@ use crate::gui::{
     Message, Tab,
 };
 
-use iced::widget::{column, text_input, Column};
+use iced::{
+    widget::{column, text_input, Column},
+    Length,
+};
 use iced_aw::{TabBar, TabLabel};
 
 pub fn tab_bar(active: usize, data: &[&Tab]) -> Column<'static, Message, Renderer> {
@@ -31,7 +34,7 @@ fn head(active: usize, data: &[&Tab]) -> TabBar<Message, usize, Renderer> {
         }
     }
 
-    tab_bar.set_active_tab(&active)
+    tab_bar.set_active_tab(&active).tab_width(Length::Shrink)
 }
 
 fn body(active: usize, data: &[&Tab]) -> Element<'static, Message> {

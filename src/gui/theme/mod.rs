@@ -210,7 +210,7 @@ impl tab_bar::StyleSheet for Theme {
             TabBar::Primary => tab_bar::Appearance {
                 background: Some(Background::Color(self.colors.background.default)),
                 border_color: Some(self.colors.primary.default),
-                border_width: 4.0,
+                border_width: 1.0,
                 icon_background: Some(Background::Color(self.colors.background.default)),
                 icon_border_radius: 0.0.into(),
                 icon_color: self.colors.accent.default,
