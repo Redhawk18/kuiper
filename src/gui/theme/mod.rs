@@ -1,7 +1,6 @@
 mod colors;
 mod pigment;
 mod shades;
-
 use colors::Colors;
 use pigment::Pigment;
 use shades::Shades;
@@ -9,7 +8,11 @@ use shades::Shades;
 use dark_light::{detect, Mode};
 use iced::{
     application,
-    widget::{button, container, pane_grid, text, text_input},
+    widget::{
+        button, container,
+        pane_grid::{self, Line},
+        text, text_input,
+    },
     Background,
 };
 use iced_aw::{menu, tab_bar};
@@ -174,9 +177,9 @@ impl pane_grid::StyleSheet for Theme {
     fn hovered_region(&self, style: &Self::Style) -> pane_grid::Appearance {
         match style {
             PaneGrid::Primary => pane_grid::Appearance {
-                background: Background::Color(self.colors.background.default),
-                border_width: 0.0,
-                border_color: self.colors.accent.default,
+                background: Background::Color(self.colors.secondary.default),
+                border_width: 3.0,
+                border_color: self.colors.primary.default,
                 border_radius: [4.0; 4].into(),
             },
         }
@@ -184,13 +187,19 @@ impl pane_grid::StyleSheet for Theme {
 
     fn picked_split(&self, style: &Self::Style) -> Option<pane_grid::Line> {
         match style {
-            PaneGrid::Primary => None,
+            PaneGrid::Primary => Some(Line {
+                color: self.colors.accent.default,
+                width: 3.0,
+            }),
         }
     }
 
     fn hovered_split(&self, style: &Self::Style) -> Option<pane_grid::Line> {
         match style {
-            PaneGrid::Primary => None,
+            PaneGrid::Primary => Some(Line {
+                color: self.colors.accent.default,
+                width: 1.0,
+            }),
         }
     }
 }

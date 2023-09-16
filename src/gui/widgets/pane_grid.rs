@@ -10,7 +10,7 @@ use iced::{
         pane_grid::{Axis, Content, Pane, PaneGrid, TitleBar},
         row, text,
     },
-    Alignment, Length,
+    Alignment,
 };
 use iced_aw::graphics::icons::{icon_to_char, Icon};
 use slotmap::{DefaultKey, SlotMap};
@@ -36,7 +36,7 @@ pub fn pane_grid<'a>(
 fn title_bar(active: bool, pane: Pane) -> TitleBar<'static, Message, Renderer> {
     TitleBar::new(
         row!(
-            row!().width(Length::Fill),
+            //row!().width(Length::Fill),
             row!(
                 button(
                     text(icon_to_char(Icon::ChevronDoubleRight).to_string())
