@@ -91,6 +91,22 @@ impl Blaze {
     pub fn get_mut_panestate(&mut self) -> &mut PaneState {
         self.panes.data.get_mut(&self.panes.active).unwrap()
     }
+
+    pub fn get_tab(&self) -> Option<&Tab> {
+        let panestate = self.get_panestate();
+        match panestate.data.get(panestate.active_tab) {
+            Some(key) => Some(self.data.get(*key).unwrap()),
+            None => None,
+        }
+    }
+
+    pub fn get_mut_tab(&mut self) -> Option<&mut Tab> {
+        let panestate = self.get_panestate();
+        match panestate.data.get(panestate.active_tab) {
+            Some(key) => Some(self.data.get_mut(*key).unwrap()),
+            None => None,
+        }
+    }
 }
 
 impl PaneState {
@@ -138,10 +154,8 @@ impl Application for Blaze {
             Message::OpenFolder => file_dialog::pick_folder_dialog(),
 
             Message::Save => {
-                let tab_id = self.panes.data.get(&self.panes.active).unwrap().active_tab;
-                let current_tab = &self.panes.data.get(&self.panes.active).unwrap().data;
-                let Some(tab) = self.data.get(current_tab[tab_id]) else {
-                    log::warn!("TODO ERROR MESSAGE Message:Save");
+                let Some(tab) = self.get_tab() else {
+                    log::warn!("TODO ERROR MESSAGE Message::Save");
                     return Command::none()
                 };
 
@@ -156,10 +170,8 @@ impl Application for Blaze {
             }
 
             Message::SaveAs => {
-                let tab_id = self.panes.data.get(&self.panes.active).unwrap().active_tab;
-                let current_tab = &self.panes.data.get(&self.panes.active).unwrap().data;
-                let Some(tab) = self.data.get(current_tab[tab_id]) else {
-                    log::warn!("TODO ERROR MESSAGE Message:SaveAs");
+                let Some(tab) = self.get_tab() else {
+                    log::warn!("TODO ERROR MESSAGE Message::SaveAs");
                     return Command::none()
                 };
 
@@ -195,9 +207,7 @@ impl Application for Blaze {
             }
 
             Message::TextUpdate(text) => {
-                let pane_state = self.get_panestate();
-                let key = pane_state.data.get(pane_state.active_tab).unwrap();
-                let tab = self.data.get_mut(*key).unwrap();
+                let tab = self.get_mut_tab().unwrap();
 
                 match tab {
                     Tab::File(file_tab) => file_tab.text = text,
