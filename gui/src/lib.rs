@@ -83,7 +83,7 @@ pub struct PaneState {
     data: Vec<DefaultKey>,
 }
 
-pub fn start() -> iced::Result {
+pub fn start_gui() -> iced::Result {
     Blaze::run(Settings::default())
 }
 

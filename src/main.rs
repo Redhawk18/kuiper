@@ -1,6 +1,7 @@
-use blaze_gui::start;
+//use blaze_gui::start_gui;
+
+mod cli;
+
 fn main() {
     pretty_env_logger::init();
-
-    let _ = start();
 }
