@@ -1,11 +1,6 @@
-mod gui;
-mod io;
-pub use gui::Blaze;
-
-use iced::{Application, Settings};
-
-fn main() -> iced::Result {
+use blaze_gui::start;
+fn main() {
     pretty_env_logger::init();
 
-    Blaze::run(Settings::default())
+    let _ = start();
 }

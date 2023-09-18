@@ -1,6 +1,6 @@
 use std::{fs, io::Result, path::Path, string::String};
 
-/// Reads the contents of the file at the path given and returns it
+/// Reads the contents of the file and returns it's contents.
 pub fn read_file(path: &Path) -> Result<String> {
     log::info!("reading file at: {:?}", path);
     fs::read_to_string(path)

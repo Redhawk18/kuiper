@@ -1,0 +1,22 @@
+[package]
+name = "blaze-gui"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+dark-light = "1.0.0"
+iced = { version = "0.10.0", features = ["palette"]}
+log = "0.4.20"
+palette = "*"
+rfd = "0.11.4"
+slotmap = "1.0.6"
+
+blaze-core = { path = "../core" }
+
+[dependencies.iced_aw]
+git = "https://github.com/Redhawk18/iced_aw.git"
+rev = "061c453"
+default-features = false
+features = ["icons", "menu", "tab_bar"]

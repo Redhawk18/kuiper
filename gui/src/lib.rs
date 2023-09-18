@@ -10,7 +10,7 @@ use iced::{
         column,
         pane_grid::{Axis, DragEvent, Pane, ResizeEvent, State},
     },
-    Application, Command, Subscription,
+    Application, Command, Subscription, Settings
 };
 use slotmap::{DefaultKey, SlotMap};
 use std::path::PathBuf;
@@ -81,6 +81,10 @@ pub struct FileTab {
 pub struct PaneState {
     active_tab: usize,
     data: Vec<DefaultKey>,
+}
+
+pub fn start() -> iced::Result {
+    Blaze::run(Settings::default())
 }
 
 impl Blaze {

@@ -1,4 +1,4 @@
-use crate::gui::{
+use crate::{
     theme::{Container, Renderer},
     widgets::tab_bar::tab_bar,
     Message, Panes, Tab,

@@ -1,4 +1,4 @@
-use crate::gui::{
+use crate::{
     theme::{Element, Renderer},
     Message, Tab,
 };

@@ -1,4 +1,4 @@
-use crate::gui::theme::shades::Shades;
+use crate::theme::shades::Shades;
 
 /// Holds infomation about the post-processed colors at the highest level
 /// The result of Palette mixed with Shade
