@@ -5,7 +5,7 @@
 [![Builds](https://img.shields.io/github/actions/workflow/status/Redhawk18/code-editor/build.yml)](https://github.com/Redhawk18/code-editor/actions/workflows/build.yml)
 [![License](https://img.shields.io/github/license/Redhawk18/code-editor)](https://github.com/Redhawk18/code-editor/blob/main/LICENSE)
 
-The programmable hybrid GUI and TUI plugin based IDE.
+Hybrid UI integrated development environment
 
 </div>
 <a href="https://github.com/iced-rs/iced">
@@ -13,7 +13,7 @@ The programmable hybrid GUI and TUI plugin based IDE.
 </a>
 
 ## Installation
-Proper Windows and MacOs installs have not been made, nor for Linux.
+No package has been created, at this time, packaging is massively helpful to the project.
 
 Currently to install
 
@@ -28,23 +28,16 @@ Currently to install
 3. Add given path to your `$PATH`
 
 ## Building
-Blaze is hardware accelerated, so have the proper drivers installed. Rustup is used, and because of that you will need a c linker.
 
 ### Known System Dependencies
-Arch Linux
-```
-sudo pacman -S atkmm cmake fontconfig gcc gdk-3.0 make pkg-config rustup
-```
+If youre operating system needs additional packages please create a pull request with them listed. Please raise a issue if the list is wrong or outdated or has unneeded dependencies.
+<details>
+  <summary>OpenSuse</summary>
 
-Debian
-```
-sudo apt install build-essential cmake libgtk-3-dev pkg-config
-```
-
-OpenSuse
-```
-sudo zypper install atkmm-devel gdk-pixbuf-devel gdk-pixbuf-xlib-devel glib2-devel gtk3-devel harfbuzz-devel pkg-config rustup
-```
+  ```
+  sudo zypper install atkmm-devel gdk-pixbuf-devel gdk-pixbuf-xlib-devel glib2-devel gtk3-devel harfbuzz-devel ncurses5-devel pkg-config rustup
+  ```
+</details>
 
 1. Clone the repository
 

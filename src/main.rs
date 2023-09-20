@@ -1,9 +1,8 @@
-//use blaze_gui::start_gui;
-
 mod cli;
+use cli::cli;
 
 fn main() {
     pretty_env_logger::init();
 
-    cli::create_command();
+    cli();
 }
