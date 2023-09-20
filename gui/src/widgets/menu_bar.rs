@@ -3,7 +3,7 @@ use crate::{theme::Renderer, FileTab, Message, Tab};
 use iced::widget::button;
 use iced_aw::{MenuBar, MenuTree};
 
-pub fn menu_bar() -> MenuBar<'static, Message, Renderer> {
+pub(crate) fn menu_bar() -> MenuBar<'static, Message, Renderer> {
     MenuBar::new(vec![file()])
 }
 

@@ -9,7 +9,7 @@ use iced::{
 };
 use iced_aw::{TabBar, TabLabel};
 
-pub fn tab_bar(active: usize, data: &[&Tab]) -> Column<'static, Message, Renderer> {
+pub(crate) fn tab_bar(active: usize, data: &[&Tab]) -> Column<'static, Message, Renderer> {
     if data.is_empty() {
         column!()
     } else {

@@ -15,7 +15,7 @@ use iced::{
 use iced_aw::graphics::icons::{icon_to_char, Icon};
 use slotmap::{DefaultKey, SlotMap};
 
-pub fn pane_grid<'a>(
+pub(crate) fn pane_grid<'a>(
     panes: &'a Panes,
     map: &SlotMap<DefaultKey, Tab>,
 ) -> PaneGrid<'a, Message, Renderer> {

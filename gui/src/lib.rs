@@ -16,7 +16,7 @@ use slotmap::{DefaultKey, SlotMap};
 use std::path::PathBuf;
 
 #[derive(Debug, Clone)]
-pub enum Message {
+pub(crate) enum Message {
     //application
     FontLoaded(Result<(), font::Error>),
 
@@ -44,14 +44,14 @@ pub enum Message {
     TextUpdate(String),
 }
 
-pub struct Blaze {
+pub(crate) struct Blaze {
     /// Holds all the data of the application
     data: SlotMap<DefaultKey, Tab>,
     panes: Panes,
     theme: theme::Theme,
 }
 
-pub struct Panes {
+pub(crate) struct Panes {
     active: Pane,
     data: State<PaneState>,
 }
@@ -67,18 +67,18 @@ impl Default for Panes {
 }
 
 #[derive(Debug, Clone)]
-pub enum Tab {
+pub(crate) enum Tab {
     File(FileTab),
 }
 
 #[derive(Debug, Clone, Default)]
-pub struct FileTab {
+pub(crate) struct FileTab {
     path: PathBuf,
     text: String,
 }
 
 #[derive(Default)]
-pub struct PaneState {
+pub(crate) struct PaneState {
     active_tab: usize,
     data: Vec<DefaultKey>,
 }
@@ -88,15 +88,15 @@ pub fn start_gui() -> iced::Result {
 }
 
 impl Blaze {
-    pub fn get_panestate(&self) -> &PaneState {
+    pub(crate) fn get_panestate(&self) -> &PaneState {
         self.panes.data.get(&self.panes.active).unwrap()
     }
 
-    pub fn get_mut_panestate(&mut self) -> &mut PaneState {
+    pub(crate) fn get_mut_panestate(&mut self) -> &mut PaneState {
         self.panes.data.get_mut(&self.panes.active).unwrap()
     }
 
-    pub fn get_tab(&self) -> Option<&Tab> {
+    pub(crate) fn get_tab(&self) -> Option<&Tab> {
         let panestate = self.get_panestate();
         match panestate.data.get(panestate.active_tab) {
             Some(key) => Some(self.data.get(*key).unwrap()),
@@ -104,7 +104,7 @@ impl Blaze {
         }
     }
 
-    pub fn get_mut_tab(&mut self) -> Option<&mut Tab> {
+    pub(crate) fn get_mut_tab(&mut self) -> Option<&mut Tab> {
         let panestate = self.get_panestate();
         match panestate.data.get(panestate.active_tab) {
             Some(key) => Some(self.data.get_mut(*key).unwrap()),
