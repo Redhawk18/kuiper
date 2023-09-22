@@ -9,11 +9,10 @@ use std::{io::Result, path::PathBuf, string::String};
 pub(crate) fn pick_file_dialog() -> (Result<String>, PathBuf) {
     let path_opt = FileDialog::new().pick_file();
 
-    let Some(path) = path_opt
-        else {
-            log::warn!("File not picked");
-            return (Err(std::io::ErrorKind::NotFound.into()), PathBuf::default());
-        };
+    let Some(path) = path_opt else {
+        log::warn!("File not picked");
+        return (Err(std::io::ErrorKind::NotFound.into()), PathBuf::default());
+    };
 
     log::info!("File path: {:?}", path);
     (read_file(&path), path)
@@ -23,8 +22,7 @@ pub(crate) fn pick_file_dialog() -> (Result<String>, PathBuf) {
 pub(crate) fn pick_folder_dialog() {
     let path_opt = FileDialog::new().pick_folder();
 
-    let Some(path) = path_opt
-        else { return };
+    let Some(path) = path_opt else { return };
 
     println!("{:?}", path);
 
@@ -42,11 +40,10 @@ pub(crate) fn save_file_dialog(file_tab: &FileTab) -> Result<()> {
 
     let path_opt = FileDialog::new().save_file();
 
-    let Some(path) = path_opt
-        else {
-            log::warn!("File not saved"); 
-            return Err(std::io::ErrorKind::Interrupted.into());
-        };
+    let Some(path) = path_opt else {
+        log::warn!("File not saved");
+        return Err(std::io::ErrorKind::Interrupted.into());
+    };
 
     log::info!("File path: {:?}", path);
     save_file(&path, &file_tab.text)
@@ -59,11 +56,10 @@ pub(crate) fn save_file_as_dialog(file_tab: &FileTab) -> Result<()> {
         .set_file_name(file_tab.path.to_str().unwrap())
         .save_file();
 
-    let Some(path) = path_opt
-        else {
-            log::warn!("File not saved"); 
-            return Err(std::io::ErrorKind::Interrupted.into());
-        };
+    let Some(path) = path_opt else {
+        log::warn!("File not saved");
+        return Err(std::io::ErrorKind::Interrupted.into());
+    };
 
     log::info!("File path: {:?}", path);
     save_file(&path, &file_tab.text)

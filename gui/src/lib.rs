@@ -10,7 +10,7 @@ use iced::{
         column,
         pane_grid::{Axis, DragEvent, Pane, ResizeEvent, State},
     },
-    Application, Command, Subscription, Settings
+    Application, Command, Settings, Subscription,
 };
 use slotmap::{DefaultKey, SlotMap};
 use std::path::PathBuf;
@@ -150,7 +150,9 @@ impl Application for Blaze {
 
             Message::OpenFile => {
                 let (file_contents, path) = file_dialog::pick_file_dialog();
-                let Ok(text) = file_contents else { return Command::none() };
+                let Ok(text) = file_contents else {
+                    return Command::none();
+                };
 
                 return self.update(Message::TabNew(Tab::File(FileTab { path, text })));
             }
@@ -160,7 +162,7 @@ impl Application for Blaze {
             Message::Save => {
                 let Some(tab) = self.get_tab() else {
                     log::warn!("TODO ERROR MESSAGE Message::Save");
-                    return Command::none()
+                    return Command::none();
                 };
 
                 match tab {
@@ -176,7 +178,7 @@ impl Application for Blaze {
             Message::SaveAs => {
                 let Some(tab) = self.get_tab() else {
                     log::warn!("TODO ERROR MESSAGE Message::SaveAs");
-                    return Command::none()
+                    return Command::none();
                 };
 
                 match tab {

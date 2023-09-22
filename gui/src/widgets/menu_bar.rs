@@ -8,11 +8,7 @@ pub(crate) fn menu_bar() -> MenuBar<'static, Message, Renderer> {
 }
 
 fn file() -> MenuTree<'static, Message, Renderer> {
-    let new_file = MenuTree::new(
-        button("New File")
-            .on_press(Message::NewFile)
-            .width(150),
-    );
+    let new_file = MenuTree::new(button("New File").on_press(Message::NewFile).width(150));
 
     let open_file = MenuTree::new(button("Open File").on_press(Message::OpenFile).width(150));
 

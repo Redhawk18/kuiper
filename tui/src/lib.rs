@@ -1,8 +1,8 @@
 mod views;
 use views::menu_bar::menu_bar;
 
-use cursive::{event::Key, Cursive};
 use cursive::theme::{Color, PaletteColor, Theme};
+use cursive::{event::Key, Cursive};
 
 //pub(crate) struct Blaze {}
 
@@ -13,7 +13,7 @@ pub fn start_tui() {
 fn tui() {
     let mut siv = cursive::default();
 
-    let theme = custom_theme_from_cursive(&siv); 
+    let theme = custom_theme_from_cursive(&siv);
     siv.set_theme(theme);
 
     // We can quit by pressing `q`
