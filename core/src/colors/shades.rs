@@ -1,34 +1,32 @@
-use iced::Color;
 use palette::{rgb::Rgb, DarkenAssign, FromColor, LightenAssign, Okhsl, Srgb};
 
-/// provides post-processing to Pigment's raw colors
 #[derive(Clone)]
 pub struct Shades {
-    pub default: Color,
-    pub light: Color,
-    pub lighter: Color,
-    pub lightest: Color,
-    pub dark: Color,
-    pub darker: Color,
-    pub darkest: Color,
+    pub default: Rgb,
+    pub dark: Rgb,
+    pub darker: Rgb,
+    pub darkest: Rgb,
+    pub light: Rgb,
+    pub lighter: Rgb,
+    pub lightest: Rgb,
 }
 
 impl Shades {
-    pub fn new(color: Color) -> Self {
+    pub fn new(color: Rgb) -> Self {
         Self {
             default: color,
-            light: lighten(color, 0.25),
-            lighter: lighten(color, 0.50),
-            lightest: lighten(color, 0.75),
             dark: darken(color, 0.25),
             darker: darken(color, 0.50),
             darkest: darken(color, 0.75),
+            light: lighten(color, 0.25),
+            lighter: lighten(color, 0.50),
+            lightest: lighten(color, 0.75),
         }
     }
 }
 
-fn to_hsl(color: Color) -> Okhsl {
-    let mut hsl = Okhsl::from_color(Rgb::from(color));
+fn to_hsl(color: Rgb) -> Okhsl {
+    let mut hsl = Okhsl::from_color(color);
     if hsl.saturation.is_nan() {
         hsl.saturation = Okhsl::max_saturation();
     }
@@ -36,11 +34,11 @@ fn to_hsl(color: Color) -> Okhsl {
     hsl
 }
 
-fn from_hsl(hsl: Okhsl) -> Color {
+fn from_hsl(hsl: Okhsl) -> Rgb {
     Srgb::from_color(hsl).into()
 }
 
-fn darken(color: Color, amount: f32) -> Color {
+fn darken(color: Rgb, amount: f32) -> Rgb {
     let mut hsl = to_hsl(color);
 
     hsl.darken_fixed_assign(amount);
@@ -48,7 +46,7 @@ fn darken(color: Color, amount: f32) -> Color {
     from_hsl(hsl)
 }
 
-fn lighten(color: Color, amount: f32) -> Color {
+fn lighten(color: Rgb, amount: f32) -> Rgb {
     let mut hsl = to_hsl(color);
 
     hsl.lighten_fixed_assign(amount);

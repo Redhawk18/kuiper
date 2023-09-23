@@ -7,3 +7,4 @@ edition = "2021"
 
 [dependencies]
 log = "0.4.20"
+palette = "0.7.3"

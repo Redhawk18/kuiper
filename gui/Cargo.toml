@@ -10,7 +10,6 @@ blaze-core = { path = "../core" }
 dark-light = "1.0.0"
 iced = { version = "0.10.0", features = ["palette"] }
 log = "0.4.20"
-palette = "*"
 rfd = "0.12.0"
 slotmap = "1.0.6"
 
