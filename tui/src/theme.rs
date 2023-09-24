@@ -12,7 +12,6 @@ pub fn theme(siv: &Cursive) -> Theme {
 
     theme.palette[PaletteColor::Background] = Color::TerminalDefault;
 
-    log::info!("{:#?}", to_color(palette.secondary.default));
     theme.palette[PaletteColor::Highlight] = to_color(palette.accent.default);
     theme.palette[PaletteColor::HighlightInactive] = to_color(palette.secondary.default);
     theme.palette[PaletteColor::HighlightText] = to_color(palette.text.default);

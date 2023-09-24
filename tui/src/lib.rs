@@ -1,7 +1,7 @@
 mod theme;
 mod views;
 use theme::theme;
-use views::menu_bar;
+use views::{menu_bar, tab_bar};
 
 use cursive::{event::Key, Cursive};
 
@@ -21,6 +21,7 @@ fn tui() {
     siv.add_global_callback('q', Cursive::quit);
 
     menu_bar(&mut siv);
+    tab_bar(&mut siv);
 
     siv.add_global_callback(Key::Esc, |s| s.select_menubar());
 

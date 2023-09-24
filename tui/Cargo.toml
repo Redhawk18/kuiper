@@ -8,4 +8,5 @@ edition = "2021"
 [dependencies]
 blaze-core = { path = "../core" }
 cursive = "0.20.0"
+cursive-tabs = "0.7.0"
 log = "0.4.20"
