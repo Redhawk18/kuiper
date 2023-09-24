@@ -12,6 +12,7 @@ pub struct Color {
 impl Color {
     /// Creates a new color from a hex string that is hard coded (TODO),
     /// we have two colors for each value because colors in light and dark mode are completely different.
+    #[allow(clippy::if_same_then_else)]
     pub fn new(is_light: bool) -> Self {
         Self {
             accent: if is_light {

@@ -1,7 +1,7 @@
 mod theme;
 mod views;
 use theme::theme;
-use views::menu_bar::menu_bar;
+use views::menu_bar;
 
 use cursive::{event::Key, Cursive};
 

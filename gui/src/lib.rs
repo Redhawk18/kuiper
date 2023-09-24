@@ -2,7 +2,7 @@ mod file_dialog;
 mod theme;
 mod widgets;
 use theme::{Element, Theme};
-use widgets::{menu_bar::menu_bar, pane_grid::pane_grid};
+use widgets::{menu_bar, pane_grid};
 
 use iced::{
     font,

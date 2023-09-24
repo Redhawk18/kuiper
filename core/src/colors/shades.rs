@@ -35,7 +35,7 @@ fn to_hsl(color: Rgb) -> Okhsl {
 }
 
 fn from_hsl(hsl: Okhsl) -> Rgb {
-    Srgb::from_color(hsl).into()
+    Srgb::from_color(hsl)
 }
 
 fn darken(color: Rgb, amount: f32) -> Rgb {
