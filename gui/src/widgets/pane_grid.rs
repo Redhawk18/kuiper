@@ -1,6 +1,6 @@
 use crate::{
     theme::{Container, Renderer},
-    widgets::tab_bar::tab_bar,
+    widgets::tab_bar,
     Message, Panes, Tab,
 };
 
@@ -8,9 +8,9 @@ use iced::{
     widget::{
         button,
         pane_grid::{Axis, Content, Pane, PaneGrid, TitleBar},
-        row, text,
+        row, text, horizontal_space,
     },
-    Alignment,
+    Alignment, Length,
 };
 use iced_aw::graphics::icons::{icon_to_char, Icon};
 use slotmap::{DefaultKey, SlotMap};
@@ -35,9 +35,8 @@ pub(crate) fn pane_grid<'a>(
 
 fn title_bar(active: bool, pane: Pane) -> TitleBar<'static, Message, Renderer> {
     TitleBar::new(
-        row!(
-            //row!().width(Length::Fill),
             row!(
+                //horizontal_space(Length::Fill),
                 button(
                     text(icon_to_char(Icon::ChevronDoubleRight).to_string())
                         .font(iced_aw::ICON_FONT)
@@ -51,7 +50,6 @@ fn title_bar(active: bool, pane: Pane) -> TitleBar<'static, Message, Renderer> {
                 button(text(icon_to_char(Icon::X).to_string()).font(iced_aw::ICON_FONT))
                     .on_press(Message::PaneClosed(pane)),
             )
-        )
         .align_items(Alignment::Center),
     )
     .style(Container::PaneGridTitleBar(active))
