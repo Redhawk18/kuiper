@@ -35,7 +35,7 @@ If youre operating system needs additional packages please create a pull request
   <summary>OpenSuse</summary>
 
   ```
-  sudo zypper install atkmm-devel gdk-pixbuf-devel gdk-pixbuf-xlib-devel glib2-devel gtk3-devel harfbuzz-devel ncurses5-devel pkg-config rustup
+  sudo zypper install atkmm-devel gdk-pixbuf-devel gdk-pixbuf-xlib-devel glib2-devel gtk3-devel harfbuzz-devel pkg-config rustup
   ```
 </details>
 
