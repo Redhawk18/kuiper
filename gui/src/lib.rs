@@ -4,6 +4,7 @@ mod widgets;
 use theme::{Element, Theme};
 use widgets::{menu_bar, pane_grid};
 
+use blaze_core::data::{FileTab, Tab};
 use iced::{
     font,
     widget::{
@@ -13,7 +14,6 @@ use iced::{
     Application, Command, Settings, Subscription,
 };
 use slotmap::{DefaultKey, SlotMap};
-use std::path::PathBuf;
 
 #[derive(Debug, Clone)]
 pub(crate) enum Message {
@@ -64,17 +64,6 @@ impl Default for Panes {
             data: state,
         }
     }
-}
-
-#[derive(Debug, Clone)]
-pub(crate) enum Tab {
-    File(FileTab),
-}
-
-#[derive(Debug, Clone, Default)]
-pub(crate) struct FileTab {
-    path: PathBuf,
-    text: String,
 }
 
 #[derive(Default)]

@@ -7,7 +7,7 @@ use cursive::{
 pub fn theme(siv: &Cursive) -> Theme {
     let mut theme = siv.current_theme().clone();
 
-    // tui's have no concept of light and dark mode reconsider when config files happen TODO 
+    // tui's have no concept of light and dark mode reconsider when config files happen TODO
     let palette = Palette::new(false);
 
     theme.palette[PaletteColor::Background] = to_color(palette.background.default);

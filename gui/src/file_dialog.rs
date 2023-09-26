@@ -1,6 +1,4 @@
-use crate::FileTab;
-
-use blaze_core::io::{read_file, save_file};
+use blaze_core::{io::{read_file, save_file}, data::FileTab};
 use rfd::FileDialog;
 use std::{io::Result, path::PathBuf, string::String};
 
