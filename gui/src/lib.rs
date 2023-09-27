@@ -143,7 +143,10 @@ impl Application for Blaze {
                     return Command::none();
                 };
 
-                return self.update(Message::TabNew(Tab::File(FileTab { path, text })));
+                return self.update(Message::TabNew(Tab::File(FileTab {
+                    path: Some(path),
+                    text,
+                })));
             }
 
             Message::OpenFolder => file_dialog::pick_folder_dialog(),

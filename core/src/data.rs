@@ -7,6 +7,6 @@ pub enum Tab {
 
 #[derive(Debug, Clone, Default)]
 pub struct FileTab {
-    pub path: PathBuf,
+    pub path: Option<PathBuf>,
     pub text: String,
 }
