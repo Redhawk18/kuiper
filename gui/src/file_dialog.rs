@@ -34,7 +34,7 @@ pub(crate) fn pick_folder_dialog() {
 /// Otherwise it simpley saves the file.
 pub(crate) fn save_file_dialog(file_tab: &FileTab) -> Result<()> {
     match &file_tab.path {
-        Some(path) => save_file(&path, &file_tab.text),
+        Some(path) => save_file(path, &file_tab.text),
         None => save_dialog(file_tab),
     }
 }
@@ -46,8 +46,7 @@ pub(crate) fn save_file_as_dialog(file_tab: &FileTab) -> Result<()> {
 }
 
 fn save_dialog(file_tab: &FileTab) -> Result<()> {
-    let path_opt = FileDialog::new()
-        .save_file();
+    let path_opt = FileDialog::new().save_file();
 
     let Some(path) = path_opt else {
         log::warn!("File not saved");
