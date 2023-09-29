@@ -13,7 +13,7 @@ pub fn theme(siv: &Cursive) -> Theme {
     theme.palette[PaletteColor::Background] = to_color(palette.background.default);
     theme.palette[PaletteColor::Highlight] = to_color(palette.accent.default);
     theme.palette[PaletteColor::HighlightInactive] = to_color(palette.secondary.default);
-    theme.palette[PaletteColor::HighlightText] = to_color(palette.background.default);
+    theme.palette[PaletteColor::HighlightText] = to_color(palette.text.default);
     theme.palette[PaletteColor::Primary] = to_color(palette.text.default);
     theme.palette[PaletteColor::Secondary] = to_color(palette.text.default);
     theme.palette[PaletteColor::Shadow] = to_color(palette.text.default);
@@ -27,7 +27,7 @@ pub fn theme(siv: &Cursive) -> Theme {
     theme
 }
 
-fn to_color(rgb: Rgb) -> Color {
+pub fn to_color(rgb: Rgb) -> Color {
     Color::Rgb(
         (rgb.red * 255.0) as u8,
         (rgb.green * 255.0) as u8,
