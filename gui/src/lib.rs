@@ -15,6 +15,28 @@ use iced::{
 };
 use slotmap::{DefaultKey, SlotMap};
 
+pub fn start_gui() -> iced::Result {
+    Blaze::run(Settings::default())
+}
+
+pub(crate) struct Blaze {
+    /// Holds all the data of the application
+    data: SlotMap<DefaultKey, Tab>,
+    panes: Panes,
+    theme: theme::Theme,
+}
+
+pub(crate) struct Panes {
+    active: Pane,
+    data: State<PaneState>,
+}
+
+#[derive(Default)]
+pub(crate) struct PaneState {
+    active_tab: usize,
+    data: Vec<DefaultKey>,
+}
+
 #[derive(Debug, Clone)]
 pub(crate) enum Message {
     //application
@@ -42,38 +64,6 @@ pub(crate) enum Message {
 
     //text input
     TextUpdate(String),
-}
-
-pub(crate) struct Blaze {
-    /// Holds all the data of the application
-    data: SlotMap<DefaultKey, Tab>,
-    panes: Panes,
-    theme: theme::Theme,
-}
-
-pub(crate) struct Panes {
-    active: Pane,
-    data: State<PaneState>,
-}
-
-impl Default for Panes {
-    fn default() -> Self {
-        let (state, pane) = State::new(PaneState::default());
-        Self {
-            active: pane,
-            data: state,
-        }
-    }
-}
-
-#[derive(Default)]
-pub(crate) struct PaneState {
-    active_tab: usize,
-    data: Vec<DefaultKey>,
-}
-
-pub fn start_gui() -> iced::Result {
-    Blaze::run(Settings::default())
 }
 
 impl Blaze {
@@ -246,5 +236,15 @@ impl Application for Blaze {
 
     fn subscription(&self) -> Subscription<Message> {
         Subscription::none()
+    }
+}
+
+impl Default for Panes {
+    fn default() -> Self {
+        let (state, pane) = State::new(PaneState::default());
+        Self {
+            active: pane,
+            data: state,
+        }
     }
 }

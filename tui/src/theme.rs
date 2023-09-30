@@ -1,11 +1,8 @@
 use blaze_core::colors::{Palette, Rgb};
-use cursive::{
-    theme::{Color, PaletteColor, Theme},
-    Cursive,
-};
+use cursive::theme::{Color, PaletteColor, Theme};
 
-pub fn theme(siv: &Cursive) -> Theme {
-    let mut theme = siv.current_theme().clone();
+pub fn theme(theme: Theme) -> Theme {
+    let mut theme = theme;
 
     // tui's have no concept of light and dark mode reconsider when config files happen TODO
     let palette = Palette::new(false);
