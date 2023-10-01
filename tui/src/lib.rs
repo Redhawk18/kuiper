@@ -7,13 +7,12 @@ use blaze_core::data::Tab;
 use cursive::{event::Key, Cursive, CursiveRunnable};
 
 pub fn start_tui() {
-    let mut application = Blaze::new();
-    application.run()
+    let mut siv = CursiveRunnable::default();
+    siv.set_user_data(Blaze);
+    run(&mut siv)
 }
 
-pub(crate) struct Blaze {
-    siv: CursiveRunnable,
-}
+pub(crate) struct Blaze;
 
 pub(crate) enum Message {
     // menu bar
@@ -22,44 +21,9 @@ pub(crate) enum Message {
     OpenFolder,
     Save,
     SaveAs,
-    Quit,
-
-    //tabs
-    TabNew(Tab),
-    TabSelected(usize),
-    TabClosed(usize),
 }
 
 impl Blaze {
-    fn new() -> Self {
-        Self {
-            siv: cursive::default(),
-        }
-    }
-
-    fn global_callbacks(&mut self) {
-        self.siv.add_global_callback('q', Cursive::quit);
-    }
-
-    fn menu_bar(&mut self) {
-        menu_bar(&mut self.siv);
-        self.siv
-            .add_global_callback(Key::Esc, |s| s.select_menubar());
-    }
-
-    pub fn run(&mut self) {
-        self.global_callbacks();
-        self.menu_bar();
-        self.theme();
-        self.view();
-        self.siv.run()
-    }
-
-    fn theme(&mut self) {
-        let theme = theme(self.siv.current_theme().clone());
-        self.siv.set_theme(theme);
-    }
-
     pub fn update(&mut self, message: Message) {
         match message {
             Message::NewFile => todo!(),
@@ -67,15 +31,28 @@ impl Blaze {
             Message::OpenFolder => todo!(),
             Message::Save => todo!(),
             Message::SaveAs => todo!(),
-            Message::Quit => todo!(),
-            Message::TabNew(_) => todo!(),
-            Message::TabSelected(_) => todo!(),
-            Message::TabClosed(_) => todo!(),
         }
     }
+}
 
-    fn view(&mut self) {
-        let theme = self.siv.current_theme().clone();
-        self.siv.add_layer(tab_bar(theme));
-    }
+fn custom_theme(siv: &mut CursiveRunnable) {
+    let theme = theme(siv.current_theme().clone());
+    siv.set_theme(theme);
+}
+
+fn global_callbacks(siv: &mut CursiveRunnable) {
+    siv.add_global_callback('q', Cursive::quit);
+}
+
+fn run(siv: &mut CursiveRunnable) {
+    global_callbacks(siv);
+    menu_bar(siv);
+    custom_theme(siv);
+    view(siv);
+    siv.run()
+}
+
+fn view(siv: &mut CursiveRunnable) {
+    let theme = siv.current_theme().clone();
+    siv.add_layer(tab_bar(theme));
 }
