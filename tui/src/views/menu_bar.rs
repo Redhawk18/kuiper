@@ -1,4 +1,4 @@
-use crate::{Message, Blaze};
+use crate::{Blaze, Message};
 
 use cursive::{event::Key, menu::Tree, Cursive};
 
@@ -12,10 +12,20 @@ pub fn menu_bar(siv: &mut Cursive) {
 
 fn file() -> Tree {
     Tree::new()
-        .leaf("New File", |s| {s.user_data::<Blaze>().unwrap().update(Message::NewFile)})
-        .leaf("Open File", |s| {s.user_data::<Blaze>().unwrap().update(Message::OpenFile)})
-        .leaf("Open Folder", |s| {s.user_data::<Blaze>().unwrap().update(Message::OpenFolder)})
-        .leaf("Save", |s| {s.user_data::<Blaze>().unwrap().update(Message::Save)})
-        .leaf("Save As", |s| {s.user_data::<Blaze>().unwrap().update(Message::SaveAs)})
+        .leaf("New File", |s| {
+            s.user_data::<Blaze>().unwrap().update(Message::NewFile)
+        })
+        .leaf("Open File", |s| {
+            s.user_data::<Blaze>().unwrap().update(Message::OpenFile)
+        })
+        .leaf("Open Folder", |s| {
+            s.user_data::<Blaze>().unwrap().update(Message::OpenFolder)
+        })
+        .leaf("Save", |s| {
+            s.user_data::<Blaze>().unwrap().update(Message::Save)
+        })
+        .leaf("Save As", |s| {
+            s.user_data::<Blaze>().unwrap().update(Message::SaveAs)
+        })
         .leaf("Quit", |s| s.quit())
 }

@@ -3,8 +3,10 @@ mod views;
 use theme::theme;
 use views::{menu_bar, tab_bar};
 
-use blaze_core::data::Tab;
-use cursive::{event::Key, Cursive, CursiveRunnable};
+use cursive::{
+    views::{LinearLayout, Panel},
+    Cursive, CursiveRunnable,
+};
 
 pub fn start_tui() {
     let mut siv = CursiveRunnable::default();
@@ -54,5 +56,9 @@ fn run(siv: &mut CursiveRunnable) {
 
 fn view(siv: &mut CursiveRunnable) {
     let theme = siv.current_theme().clone();
-    siv.add_layer(tab_bar(theme));
+    siv.add_layer(
+        LinearLayout::vertical()
+            .child(Panel::new(tab_bar(theme.clone())).title("1"))
+            .child(Panel::new(tab_bar(theme.clone())).title("2")),
+    );
 }
