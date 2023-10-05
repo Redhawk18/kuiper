@@ -1,64 +1,7 @@
-mod theme;
-mod views;
-use theme::theme;
-use views::{menu_bar, tab_bar};
-
-use cursive::{
-    views::{LinearLayout, Panel},
-    Cursive, CursiveRunnable,
-};
-
 pub fn start_tui() {
-    let mut siv = CursiveRunnable::default();
-    siv.set_user_data(Blaze);
-    run(&mut siv)
-}
-
-pub(crate) struct Blaze;
-
-pub(crate) enum Message {
-    // menu bar
-    NewFile,
-    OpenFile,
-    OpenFolder,
-    Save,
-    SaveAs,
-}
-
-impl Blaze {
-    pub fn update(&mut self, message: Message) {
-        match message {
-            Message::NewFile => todo!(),
-            Message::OpenFile => todo!(),
-            Message::OpenFolder => todo!(),
-            Message::Save => todo!(),
-            Message::SaveAs => todo!(),
-        }
-    }
-}
-
-fn custom_theme(siv: &mut CursiveRunnable) {
-    let theme = theme(siv.current_theme().clone());
-    siv.set_theme(theme);
-}
-
-fn global_callbacks(siv: &mut CursiveRunnable) {
-    siv.add_global_callback('q', Cursive::quit);
-}
-
-fn run(siv: &mut CursiveRunnable) {
-    global_callbacks(siv);
-    menu_bar(siv);
-    custom_theme(siv);
-    view(siv);
-    siv.run()
-}
-
-fn view(siv: &mut CursiveRunnable) {
-    let theme = siv.current_theme().clone();
-    siv.add_layer(
-        LinearLayout::vertical()
-            .child(Panel::new(tab_bar(theme.clone())).title("1"))
-            .child(Panel::new(tab_bar(theme.clone())).title("2")),
-    );
+    println!("Not implemented, YET");
+    println!("I'm making my own tui crate since none of the ones out there really support or allow me to make the ui i want");
+    println!("It's a lot harder than just making a pr to add the features i want");
+    println!("The problem with the other tui crates is core to their design, ie state management and not being able to update the ui");
+    println!("stay tuned, this is just a roadblock for now");
 }

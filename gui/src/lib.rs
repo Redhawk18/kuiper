@@ -20,7 +20,6 @@ pub fn start_gui() -> iced::Result {
 }
 
 pub(crate) struct Blaze {
-    /// Holds all the data of the application
     data: SlotMap<DefaultKey, Tab>,
     panes: Panes,
     theme: theme::Theme,
