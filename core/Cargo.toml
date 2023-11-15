@@ -1,10 +1,12 @@
 [package]
-name = "blaze-core"
-version = "0.1.0"
-edition = "2021"
+name = "blaze_core"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-log = "0.4.20"
-palette = "0.7.3"
+log.workspace = true
+palette.workspace = true
