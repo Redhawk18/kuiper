@@ -1,5 +1,36 @@
 use iced::widget::container;
-use iced::Theme;
+use iced::{Border, Theme};
+
+const WIDTH: f32 = 2.0;
+const RADIUS: f32 = 4.0;
+
+pub fn pane_active(theme: &Theme) -> container::Appearance {
+    let palette = theme.extended_palette();
+
+    container::Appearance {
+        background: Some(palette.background.base.color.into()),
+        border: Border {
+            color: palette.background.strong.color,
+            width: WIDTH,
+            radius: RADIUS.into(),
+        },
+        ..Default::default()
+    }
+}
+
+pub fn pane_inactive(theme: &Theme) -> container::Appearance {
+    let palette = theme.extended_palette();
+
+    container::Appearance {
+        background: Some(palette.background.base.color.into()),
+        border: Border {
+            color: palette.background.strong.color,
+            width: WIDTH,
+            radius: RADIUS.into(),
+        },
+        ..Default::default()
+    }
+}
 
 pub fn title_bar_active(theme: &Theme) -> container::Appearance {
     let palette = theme.extended_palette();
@@ -17,28 +48,6 @@ pub fn title_bar_inactive(theme: &Theme) -> container::Appearance {
     container::Appearance {
         text_color: Some(palette.primary.strong.text),
         background: Some(palette.primary.strong.color.into()),
-        ..Default::default()
-    }
-}
-
-pub fn pane_active(theme: &Theme) -> container::Appearance {
-    let palette = theme.extended_palette();
-
-    container::Appearance {
-        background: Some(palette.background.weak.color.into()),
-        border_width: 2.0,
-        border_color: palette.background.strong.color,
-        ..Default::default()
-    }
-}
-
-pub fn pane_inactive(theme: &Theme) -> container::Appearance {
-    let palette = theme.extended_palette();
-
-    container::Appearance {
-        background: Some(palette.background.weak.color.into()),
-        border_width: 2.0,
-        border_color: palette.primary.strong.color,
         ..Default::default()
     }
 }

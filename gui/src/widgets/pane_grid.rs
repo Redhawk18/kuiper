@@ -10,15 +10,15 @@ use iced::{
         pane_grid::{Axis, Content, Pane, PaneGrid, TitleBar},
         row, text,
     },
-    Alignment, Renderer,
+    Alignment, Renderer, Theme,
 };
-use iced_aw::graphics::icons::{icon_to_char, Icon};
+use iced_aw::graphics::icons::{icon_to_char, BootstrapIcon};
 use slotmap::{DefaultKey, SlotMap};
 
 pub(crate) fn pane_grid<'a>(
     panes: &'a Panes,
     map: &SlotMap<DefaultKey, Tab>,
-) -> PaneGrid<'a, Message, Renderer> {
+) -> PaneGrid<'a, Message, Theme, Renderer> {
     PaneGrid::new(&panes.data, |pane, state, _is_maximized| {
         let active = panes.active != pane;
 
@@ -33,19 +33,20 @@ pub(crate) fn pane_grid<'a>(
     .spacing(15)
 }
 
-fn title_bar(active: bool, pane: Pane) -> TitleBar<'static, Message, Renderer> {
+fn title_bar(active: bool, pane: Pane) -> TitleBar<'static, Message, Theme, Renderer> {
     TitleBar::new(
         row!(
-            //horizontal_space(Length::Fill),
             button(
-                text(icon_to_char(Icon::ChevronDoubleRight).to_string()).font(iced_aw::ICON_FONT)
+                text(icon_to_char(BootstrapIcon::ChevronDoubleRight).to_string())
+                    .font(iced_aw::BOOTSTRAP_FONT)
             )
             .on_press(Message::PaneSplit(Axis::Vertical, pane)),
             button(
-                text(icon_to_char(Icon::ChevronDoubleDown).to_string()).font(iced_aw::ICON_FONT)
+                text(icon_to_char(BootstrapIcon::ChevronDoubleDown).to_string())
+                    .font(iced_aw::BOOTSTRAP_FONT)
             )
             .on_press(Message::PaneSplit(Axis::Horizontal, pane)),
-            button(text(icon_to_char(Icon::X).to_string()).font(iced_aw::ICON_FONT))
+            button(text(icon_to_char(BootstrapIcon::X).to_string()).font(iced_aw::BOOTSTRAP_FONT))
                 .on_press(Message::PaneClosed(pane)),
         )
         .align_items(Alignment::Center),

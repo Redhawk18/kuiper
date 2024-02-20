@@ -65,11 +65,11 @@ pub(crate) enum Message {
 
 impl Blaze {
     pub(crate) fn get_panestate(&self) -> &PaneState {
-        self.panes.data.get(&self.panes.active).unwrap()
+        self.panes.data.get(self.panes.active).unwrap()
     }
 
     pub(crate) fn get_mut_panestate(&mut self) -> &mut PaneState {
-        self.panes.data.get_mut(&self.panes.active).unwrap()
+        self.panes.data.get_mut(self.panes.active).unwrap()
     }
 
     pub(crate) fn get_tab(&self) -> Option<&Tab> {
@@ -108,7 +108,7 @@ impl Application for Blaze {
                 panes: Panes::default(),
             },
             Command::batch(vec![
-                font::load(iced_aw::graphics::icons::ICON_FONT_BYTES).map(Message::FontLoaded)
+                font::load(iced_aw::BOOTSTRAP_FONT_BYTES).map(Message::FontLoaded)
             ]),
         )
     }
@@ -169,7 +169,7 @@ impl Application for Blaze {
                 }
             }
 
-            Message::Quit => return iced::window::close(),
+            Message::Quit => return iced::window::close(iced::window::Id::MAIN),
 
             Message::TabNew(tab) => {
                 let key = self.data.insert(tab);
@@ -198,20 +198,20 @@ impl Application for Blaze {
                 };
             }
             Message::PaneDragged(DragEvent::Dropped { pane, target }) => {
-                self.panes.data.drop(&pane, target);
+                self.panes.data.drop(pane, target);
             }
             Message::PaneDragged(_) => {}
             Message::PaneResized(ResizeEvent { split, ratio }) => {
-                self.panes.data.resize(&split, ratio);
+                self.panes.data.resize(split, ratio);
             }
             Message::PaneClicked(pane) => self.panes.active = pane,
             Message::PaneSplit(axis, pane) => {
-                if let Some((pane, _)) = self.panes.data.split(axis, &pane, PaneState::default()) {
+                if let Some((pane, _)) = self.panes.data.split(axis, pane, PaneState::default()) {
                     self.panes.active = pane;
                 }
             }
             Message::PaneClosed(pane) => {
-                if let Some((_, sibling)) = self.panes.data.close(&pane) {
+                if let Some((_, sibling)) = self.panes.data.close(pane) {
                     self.panes.active = sibling;
                 }
             }
@@ -227,7 +227,7 @@ impl Application for Blaze {
     }
 
     fn theme(&self) -> Theme {
-        iced::Theme::Light
+        iced::Theme::GruvboxDark
     }
 
     fn subscription(&self) -> Subscription<Message> {

@@ -2,11 +2,11 @@ use crate::{Message, Tab};
 
 use iced::{
     widget::{column, text_input, Column},
-    Element, Length, Renderer,
+    Element, Length, Renderer, Theme,
 };
 use iced_aw::{TabBar, TabLabel};
 
-pub(crate) fn tab_bar(active: usize, data: &[&Tab]) -> Column<'static, Message, Renderer> {
+pub(crate) fn tab_bar(active: usize, data: &[&Tab]) -> Column<'static, Message, Theme, Renderer> {
     if data.is_empty() {
         column!()
     } else {
@@ -14,7 +14,7 @@ pub(crate) fn tab_bar(active: usize, data: &[&Tab]) -> Column<'static, Message, 
     }
 }
 
-fn head(active: usize, data: &[&Tab]) -> TabBar<Message, usize, Renderer> {
+fn head(active: usize, data: &[&Tab]) -> TabBar<Message, usize, Theme, Renderer> {
     let mut tab_bar = TabBar::new(Message::TabSelected).on_close(Message::TabClosed);
 
     for (i, tab) in data.iter().enumerate() {
