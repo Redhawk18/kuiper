@@ -1,17 +1,15 @@
 mod file_dialog;
-mod theme;
 mod widgets;
-use theme::{Element, Theme};
 use widgets::{menu_bar, pane_grid};
 
 use blaze_core::data::{FileTab, Tab};
 use iced::{
-    font,
+    executor, font,
     widget::{
         column,
         pane_grid::{Axis, DragEvent, Pane, ResizeEvent, State},
     },
-    Application, Command, Settings, Subscription,
+    Application, Command, Element, Settings, Subscription, Theme,
 };
 use slotmap::{DefaultKey, SlotMap};
 
@@ -22,7 +20,6 @@ pub fn start_gui() -> iced::Result {
 pub(crate) struct Blaze {
     data: SlotMap<DefaultKey, Tab>,
     panes: Panes,
-    theme: theme::Theme,
 }
 
 pub(crate) struct Panes {
@@ -98,7 +95,7 @@ impl PaneState {
 }
 
 impl Application for Blaze {
-    type Executor = iced::executor::Default;
+    type Executor = executor::Default;
     type Message = Message;
     type Theme = Theme;
     type Flags = ();
@@ -107,7 +104,6 @@ impl Application for Blaze {
         (
             Blaze {
                 data: SlotMap::default(),
-                theme: Theme::default(),
                 panes: Panes::default(),
             },
             Command::batch(vec![
@@ -230,7 +226,7 @@ impl Application for Blaze {
     }
 
     fn theme(&self) -> Theme {
-        self.theme.clone()
+        iced::Theme::Dark
     }
 
     fn subscription(&self) -> Subscription<Message> {

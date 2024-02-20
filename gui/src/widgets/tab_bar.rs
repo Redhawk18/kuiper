@@ -1,11 +1,8 @@
-use crate::{
-    theme::{Element, Renderer},
-    Message, Tab,
-};
+use crate::{Message, Tab};
 
 use iced::{
     widget::{column, text_input, Column},
-    Length,
+    Element, Length, Renderer,
 };
 use iced_aw::{TabBar, TabLabel};
 

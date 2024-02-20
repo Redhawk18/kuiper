@@ -1,6 +1,6 @@
-use crate::{theme::Renderer, Message};
+use crate::Message;
 
-use iced::widget::button;
+use iced::{widget::button, Renderer};
 use iced_aw::{MenuBar, MenuTree};
 
 pub(crate) fn menu_bar() -> MenuBar<'static, Message, Renderer> {
@@ -24,10 +24,8 @@ fn file() -> MenuTree<'static, Message, Renderer> {
 
     let quit = MenuTree::new(button("Quit").on_press(Message::Quit).width(150));
 
-    let root = MenuTree::with_children(
+    MenuTree::with_children(
         button("File"),
         vec![new_file, open_file, open_folder, save, save_as, quit],
-    );
-
-    root
+    )
 }

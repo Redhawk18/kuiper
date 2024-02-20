@@ -1,8 +1,4 @@
-use crate::{
-    theme::{Container, Renderer},
-    widgets::tab_bar,
-    Message, Panes, Tab,
-};
+use crate::{widgets::tab_bar, Message, Panes, Tab};
 
 use iced::{
     widget::{
@@ -12,6 +8,7 @@ use iced::{
         text, //horizontal_space,
     },
     Alignment, //Length,
+    Renderer,
 };
 use iced_aw::graphics::icons::{icon_to_char, Icon};
 use slotmap::{DefaultKey, SlotMap};
@@ -21,12 +18,8 @@ pub(crate) fn pane_grid<'a>(
     map: &SlotMap<DefaultKey, Tab>,
 ) -> PaneGrid<'a, Message, Renderer> {
     PaneGrid::new(&panes.data, |pane, state, _is_maximized| {
-        let active = panes.active == pane;
-
         // currently this is fine **if** we want all gui elements to be tabs
-        Content::new(tab_bar(state.active_tab, &state.get_data(map)))
-            .style(Container::PaneGridContent(active))
-            .title_bar(title_bar(active, pane))
+        Content::new(tab_bar(state.active_tab, &state.get_data(map))).title_bar(title_bar(pane))
     })
     .on_click(Message::PaneClicked)
     .on_drag(Message::PaneDragged)
@@ -34,10 +27,9 @@ pub(crate) fn pane_grid<'a>(
     .spacing(15)
 }
 
-fn title_bar(active: bool, pane: Pane) -> TitleBar<'static, Message, Renderer> {
+fn title_bar(pane: Pane) -> TitleBar<'static, Message, Renderer> {
     TitleBar::new(
         row!(
-            //horizontal_space(Length::Fill),
             button(
                 text(icon_to_char(Icon::ChevronDoubleRight).to_string()).font(iced_aw::ICON_FONT)
             )
@@ -51,5 +43,4 @@ fn title_bar(active: bool, pane: Pane) -> TitleBar<'static, Message, Renderer> {
         )
         .align_items(Alignment::Center),
     )
-    .style(Container::PaneGridTitleBar(active))
 }
