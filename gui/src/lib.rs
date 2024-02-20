@@ -1,4 +1,5 @@
 mod file_dialog;
+mod style;
 mod widgets;
 use widgets::{menu_bar, pane_grid};
 
@@ -226,7 +227,7 @@ impl Application for Blaze {
     }
 
     fn theme(&self) -> Theme {
-        iced::Theme::Dark
+        iced::Theme::Light
     }
 
     fn subscription(&self) -> Subscription<Message> {
