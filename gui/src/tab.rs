@@ -1,11 +1,11 @@
 use std::path::PathBuf;
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub enum Tab {
     File(FileTab),
 }
 
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Default)]
 pub struct FileTab {
     pub path: Option<PathBuf>,
     pub text: String,

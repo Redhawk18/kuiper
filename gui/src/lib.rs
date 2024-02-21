@@ -1,9 +1,10 @@
 mod file_dialog;
 mod style;
+mod tab;
 mod widgets;
+use tab::{FileTab, Tab};
 use widgets::{menu_bar, pane_grid};
 
-use blaze_core::data::{FileTab, Tab};
 use iced::{
     executor, font,
     widget::{
@@ -48,7 +49,6 @@ pub(crate) enum Message {
     Quit,
 
     //tabs
-    TabNew(Tab),
     TabSelected(usize),
     TabClosed(usize),
 
@@ -87,15 +87,20 @@ impl Blaze {
             None => None,
         }
     }
+
+    pub(crate) fn insert_tab(&mut self, tab: Tab) {
+        let key = self.data.insert(tab);
+        self.get_mut_panestate().data.push(key);
+    }
 }
 
 impl PaneState {
-    pub fn get_data<'a>(&'a self, map: &'a SlotMap<DefaultKey, Tab>) -> Vec<&Tab> {
-        self.data.iter().map(|key| map.get(*key).unwrap()).collect()
-    }
-
     pub fn get_active_key(&self) -> Option<&DefaultKey> {
         self.data.get(self.active_tab_index)
+    }
+
+    pub fn get_data<'a>(&'a self, map: &'a SlotMap<DefaultKey, Tab>) -> Vec<&Tab> {
+        self.data.iter().map(|key| map.get(*key).unwrap()).collect()
     }
 
     pub fn with_key(key: &DefaultKey) -> Self {
@@ -132,7 +137,7 @@ impl Application for Blaze {
         match message {
             Message::FontLoaded(_) => {}
 
-            Message::NewFile => return self.update(Message::TabNew(Tab::File(FileTab::default()))),
+            Message::NewFile => self.insert_tab(Tab::File(FileTab::default())),
 
             Message::OpenFile => {
                 let (file_contents, path) = file_dialog::pick_file_dialog();
@@ -140,10 +145,10 @@ impl Application for Blaze {
                     return Command::none();
                 };
 
-                return self.update(Message::TabNew(Tab::File(FileTab {
+                self.insert_tab(Tab::File(FileTab {
                     path: Some(path),
                     text,
-                })));
+                }))
             }
 
             Message::OpenFolder => file_dialog::pick_folder_dialog(),
@@ -182,11 +187,6 @@ impl Application for Blaze {
 
             Message::Quit => return iced::window::close(iced::window::Id::MAIN),
 
-            Message::TabNew(tab) => {
-                let key = self.data.insert(tab);
-                self.get_mut_panestate().data.push(key);
-            }
-
             Message::TabSelected(id) => {
                 self.get_mut_panestate().active_tab_index = id;
             }
@@ -208,14 +208,19 @@ impl Application for Blaze {
                     Tab::File(file_tab) => file_tab.text = text,
                 };
             }
+
             Message::PaneDragged(DragEvent::Dropped { pane, target }) => {
                 self.panes.data.drop(pane, target);
             }
+
             Message::PaneDragged(_) => {}
+
             Message::PaneResized(ResizeEvent { split, ratio }) => {
                 self.panes.data.resize(split, ratio);
             }
+
             Message::PaneClicked(pane) => self.panes.active = pane,
+
             Message::PaneSplit(axis, pane) => {
                 if let Some((pane, _)) = self.panes.data.split(
                     axis,
@@ -225,6 +230,7 @@ impl Application for Blaze {
                     self.panes.active = pane;
                 }
             }
+
             Message::PaneClosed(pane) => {
                 if let Some((_, sibling)) = self.panes.data.close(pane) {
                     self.panes.active = sibling;
