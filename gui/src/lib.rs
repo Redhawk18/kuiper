@@ -30,7 +30,7 @@ pub(crate) struct Panes {
 
 #[derive(Default)]
 pub(crate) struct PaneState {
-    active_tab: usize,
+    active_tab_index: usize,
     data: Vec<DefaultKey>,
 }
 
@@ -74,7 +74,7 @@ impl Blaze {
 
     pub(crate) fn get_tab(&self) -> Option<&Tab> {
         let panestate = self.get_panestate();
-        match panestate.data.get(panestate.active_tab) {
+        match panestate.data.get(panestate.active_tab_index) {
             Some(key) => Some(self.data.get(*key).unwrap()),
             None => None,
         }
@@ -82,7 +82,7 @@ impl Blaze {
 
     pub(crate) fn get_mut_tab(&mut self) -> Option<&mut Tab> {
         let panestate = self.get_panestate();
-        match panestate.data.get(panestate.active_tab) {
+        match panestate.get_active_key() {
             Some(key) => Some(self.data.get_mut(*key).unwrap()),
             None => None,
         }
@@ -92,6 +92,17 @@ impl Blaze {
 impl PaneState {
     pub fn get_data<'a>(&'a self, map: &'a SlotMap<DefaultKey, Tab>) -> Vec<&Tab> {
         self.data.iter().map(|key| map.get(*key).unwrap()).collect()
+    }
+
+    pub fn get_active_key(&self) -> Option<&DefaultKey> {
+        self.data.get(self.active_tab_index)
+    }
+
+    pub fn with_key(key: &DefaultKey) -> Self {
+        PaneState {
+            data: vec![*key],
+            ..Default::default()
+        }
     }
 }
 
@@ -177,13 +188,13 @@ impl Application for Blaze {
             }
 
             Message::TabSelected(id) => {
-                self.get_mut_panestate().active_tab = id;
+                self.get_mut_panestate().active_tab_index = id;
             }
 
             Message::TabClosed(id) => {
                 let pane_state = self.get_mut_panestate();
-                if id == pane_state.active_tab {
-                    pane_state.active_tab = 0;
+                if id == pane_state.active_tab_index {
+                    pane_state.active_tab_index = 0;
                 }
 
                 pane_state.data.remove(id);
@@ -206,7 +217,11 @@ impl Application for Blaze {
             }
             Message::PaneClicked(pane) => self.panes.active = pane,
             Message::PaneSplit(axis, pane) => {
-                if let Some((pane, _)) = self.panes.data.split(axis, pane, PaneState::default()) {
+                if let Some((pane, _)) = self.panes.data.split(
+                    axis,
+                    pane,
+                    PaneState::with_key(self.get_panestate().get_active_key().unwrap()),
+                ) {
                     self.panes.active = pane;
                 }
             }

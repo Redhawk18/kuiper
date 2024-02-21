@@ -23,7 +23,7 @@ pub(crate) fn pane_grid<'a>(
         let active = panes.active != pane;
 
         // currently this is fine **if** we want all gui elements to be tabs
-        Content::new(tab_bar(state.active_tab, &state.get_data(map)))
+        Content::new(tab_bar(state.active_tab_index, &state.get_data(map)))
             .style(if active { pane_active } else { pane_inactive })
             .title_bar(title_bar(active, pane))
     })
@@ -57,4 +57,3 @@ fn title_bar(active: bool, pane: Pane) -> TitleBar<'static, Message, Theme, Rend
         title_bar_inactive
     })
 }
-
