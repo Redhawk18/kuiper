@@ -10,6 +10,7 @@ use iced::{
     widget::{
         column,
         pane_grid::{Axis, DragEvent, Pane, ResizeEvent, State},
+        text_editor::{Action, Content},
     },
     Application, Command, Element, Settings, Subscription, Theme,
 };
@@ -59,8 +60,10 @@ pub(crate) enum Message {
     PaneResized(ResizeEvent),
     PaneSplit(Axis, Pane),
 
+    //text editor
+    TextEditorUpdate(Action),
     //text input
-    TextUpdate(String),
+    // TextInputUpdate(String),
 }
 
 impl Blaze {
@@ -147,7 +150,7 @@ impl Application for Blaze {
 
                 self.insert_tab(Tab::File(FileTab {
                     path: Some(path),
-                    text,
+                    content: Content::with_text(&text),
                 }))
             }
 
@@ -201,14 +204,6 @@ impl Application for Blaze {
                 // current we arent removing the data from the program, just removing it from being visable
             }
 
-            Message::TextUpdate(text) => {
-                let tab = self.get_mut_tab().unwrap();
-
-                match tab {
-                    Tab::File(file_tab) => file_tab.text = text,
-                };
-            }
-
             Message::PaneDragged(DragEvent::Dropped { pane, target }) => {
                 self.panes.data.drop(pane, target);
             }
@@ -236,6 +231,18 @@ impl Application for Blaze {
                     self.panes.active = sibling;
                 }
             }
+            Message::TextEditorUpdate(action) => {
+                let tab = self.get_mut_tab().unwrap();
+                match tab {
+                    Tab::File(filetab) => filetab.content.perform(action),
+                }
+            } //             Message::TextInputUpdate(text) => {
+              //                 let tab = self.get_mut_tab().unwrap();
+
+              //                 match tab {
+              //                     Tab::File(file_tab) => file_tab.text = text,
+              //                 };
+              //             }
         }
 
         Command::none()

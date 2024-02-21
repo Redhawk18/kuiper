@@ -17,7 +17,7 @@ use slotmap::{DefaultKey, SlotMap};
 
 pub(crate) fn pane_grid<'a>(
     panes: &'a Panes,
-    map: &SlotMap<DefaultKey, Tab>,
+    map: &'a SlotMap<DefaultKey, Tab>,
 ) -> PaneGrid<'a, Message, Theme, Renderer> {
     PaneGrid::new(&panes.data, |pane, state, _is_maximized| {
         let active = panes.active != pane;

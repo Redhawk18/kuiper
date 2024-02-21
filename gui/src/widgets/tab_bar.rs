@@ -1,12 +1,12 @@
 use crate::{Message, Tab};
 
 use iced::{
-    widget::{column, text_input, Column},
+    widget::{column, text_editor, Column},
     Element, Length, Renderer, Theme,
 };
 use iced_aw::{TabBar, TabLabel};
 
-pub(crate) fn tab_bar(active: usize, data: &[&Tab]) -> Column<'static, Message, Theme, Renderer> {
+pub(crate) fn tab_bar<'a>(active: usize, data: &[&'a Tab]) -> Column<'a, Message, Theme, Renderer> {
     if data.is_empty() {
         column!()
     } else {
@@ -33,12 +33,13 @@ fn head(active: usize, data: &[&Tab]) -> TabBar<Message, usize, Theme, Renderer>
     tab_bar.set_active_tab(&active).tab_width(Length::Shrink)
 }
 
-fn body(active: usize, data: &[&Tab]) -> Element<'static, Message> {
+fn body<'a>(active: usize, data: &[&'a Tab]) -> Element<'a, Message> {
     let active_tab = data.get(active).unwrap(); //wrong
 
     match active_tab {
-        Tab::File(file_tab) => text_input("placeholder", &file_tab.text)
-            .on_input(Message::TextUpdate)
+        Tab::File(file_tab) => text_editor(&file_tab.content)
+            .height(Length::Fill)
+            .on_action(Message::TextEditorUpdate)
             .into(),
     }
 }
