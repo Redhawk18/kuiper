@@ -1,57 +1,68 @@
-use crate::tab::FileTab;
 
-use blaze_core::io::{read_file, save_file};
-use rfd::FileDialog;
-use std::{io::Result, path::PathBuf, string::String};
 
-/// Displays the user's os native file dialog to pick a file to open.
-/// Returns the contents of the file and the absolute path.
-pub(crate) fn pick_file_dialog() -> (Result<String>, PathBuf) {
-    let path_opt = FileDialog::new().pick_file();
+use rfd::AsyncFileDialog;
+use snafu::{ResultExt, Snafu};
+use std::{
+    path::{PathBuf},
+    sync::Arc,
+};
+use tokio::fs;
 
-    let Some(path) = path_opt else {
-        log::warn!("File not picked");
-        return (Err(std::io::ErrorKind::NotFound.into()), PathBuf::default());
+#[derive(Debug, Clone, Snafu)]
+pub enum Error {
+    #[snafu(display("File dialog was closed by user"))]
+    DialogClosed,
+    Read {
+        #[snafu(source(from(std::io::Error, Arc::new)))]
+        source: Arc<std::io::Error>,
+        path: PathBuf,
+    },
+    Write {
+        #[snafu(source(from(std::io::Error, Arc::new)))]
+        source: Arc<std::io::Error>,
+        path: PathBuf,
+    },
+}
+
+pub async fn open_file() -> Result<(PathBuf, String), Error> {
+    let handle = AsyncFileDialog::new()
+        .set_title("my title")
+        .pick_file()
+        .await;
+
+    let Some(file) = handle else {
+        return Err(Error::DialogClosed);
     };
 
-    log::info!("File path: {:?}", path);
-    (read_file(&path), path)
+    let path = file.path();
+    let contents = fs::read_to_string(path).await.context(ReadSnafu { path });
+
+    Ok((path.to_path_buf(), contents.unwrap()))
 }
 
-/// Displays the user's os native file dialog to pick a folder to open.
-pub(crate) fn pick_folder_dialog() {
-    let path_opt = FileDialog::new().pick_folder();
-
-    let Some(path) = path_opt else { return };
-
-    println!("{:?}", path);
-
-    todo!(); //update gui
-}
-
-/// Opens the file dialog if the path given is blank,
-/// Otherwise it simpley saves the file.
-pub(crate) fn save_file_dialog(file_tab: &FileTab) -> Result<()> {
-    match &file_tab.path {
-        Some(path) => save_file(path, &file_tab.content.text()),
-        None => save_dialog(file_tab),
-    }
-}
-
-/// Opens the file picker to choose file name and location,
-/// if a location is picked the file is saved.
-pub(crate) fn save_file_as_dialog(file_tab: &FileTab) -> Result<()> {
-    save_dialog(file_tab)
-}
-
-fn save_dialog(file_tab: &FileTab) -> Result<()> {
-    let path_opt = FileDialog::new().save_file();
-
-    let Some(path) = path_opt else {
-        log::warn!("File not saved");
-        return Err(std::io::ErrorKind::Interrupted.into());
+pub async fn save_file(path: Option<PathBuf>, contents: String) -> Result<(), Error> {
+    let path = match path {
+        Some(path) => path,
+        None => {
+            let Some(handle) = AsyncFileDialog::new().save_file().await else {
+                return Err(Error::DialogClosed);
+            };
+            handle.path().to_path_buf()
+        }
     };
 
-    log::info!("File path: {:?}", path);
-    save_file(&path, &file_tab.content.text())
+    fs::write(&path, contents)
+        .await
+        .context(WriteSnafu { path })
+}
+
+pub async fn save_file_with_dialog(contents: String) -> Result<(), Error> {
+    let Some(handle) = AsyncFileDialog::new().save_file().await else {
+        return Err(Error::DialogClosed);
+    };
+    let path = handle.path().to_path_buf();
+
+    fs::write(&path, contents)
+        .await
+        .context(WriteSnafu { path })
 }

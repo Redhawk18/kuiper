@@ -17,7 +17,7 @@ pub(crate) fn menu_bar() -> Row<'static, Message> {
     let open_file = button("Open File").on_press(Message::OpenFile).width(150);
 
     let open_folder = button("Open Folder")
-        .on_press(Message::OpenFolder)
+        // .on_press(Message::OpenFolder)
         .width(150);
 
     let save = button("Save").on_press(Message::Save).width(150);

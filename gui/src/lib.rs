@@ -1,7 +1,11 @@
+// my comment from the editor
+
 mod file_dialog;
 mod style;
 mod tab;
 mod widgets;
+use std::path::PathBuf;
+
 use tab::{FileTab, Tab};
 use widgets::{menu_bar, pane_grid};
 
@@ -44,9 +48,11 @@ pub(crate) enum Message {
     //menu bar
     NewFile,
     OpenFile,
-    OpenFolder,
+    OpenedFile(Result<(PathBuf, String), file_dialog::Error>),
     Save,
+    Saved(Result<(), file_dialog::Error>),
     SaveAs,
+    SavedAs(Result<(), file_dialog::Error>),
     Quit,
 
     //tabs
@@ -143,18 +149,19 @@ impl Application for Blaze {
             Message::NewFile => self.insert_tab(Tab::File(FileTab::default())),
 
             Message::OpenFile => {
-                let (file_contents, path) = file_dialog::pick_file_dialog();
-                let Ok(text) = file_contents else {
+                return Command::perform(file_dialog::open_file(), Message::OpenedFile)
+            }
+
+            Message::OpenedFile(result) => {
+                let Ok(file) = result else {
                     return Command::none();
                 };
 
                 self.insert_tab(Tab::File(FileTab {
-                    path: Some(path),
-                    content: Content::with_text(&text),
+                    path: Some(file.0),
+                    content: Content::with_text(&file.1),
                 }))
             }
-
-            Message::OpenFolder => file_dialog::pick_folder_dialog(),
 
             Message::Save => {
                 let Some(tab) = self.get_tab() else {
@@ -164,29 +171,33 @@ impl Application for Blaze {
 
                 match tab {
                     Tab::File(file_tab) => {
-                        if let Err(e) = file_dialog::save_file_dialog(file_tab) {
-                            log::warn!("Saving error: {e}");
-                            return Command::none();
-                        }
+                        return Command::perform(
+                            file_dialog::save_file(file_tab.path.clone(), file_tab.content.text()),
+                            Message::Saved,
+                        );
                     }
                 }
             }
 
+            Message::Saved(_) => {}
+
             Message::SaveAs => {
                 let Some(tab) = self.get_tab() else {
-                    log::warn!("TODO ERROR MESSAGE Message::SaveAs");
+                    log::warn!("TODO ERROR MESSAGE Message::Save");
                     return Command::none();
                 };
 
                 match tab {
                     Tab::File(file_tab) => {
-                        if let Err(e) = file_dialog::save_file_as_dialog(file_tab) {
-                            log::warn!("Saving error: {e}");
-                            return Command::none();
-                        }
+                        return Command::perform(
+                            file_dialog::save_file_with_dialog(file_tab.content.text()),
+                            Message::SavedAs,
+                        )
                     }
                 }
             }
+
+            Message::SavedAs(_) => {}
 
             Message::Quit => return iced::window::close(iced::window::Id::MAIN),
 

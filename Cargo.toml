@@ -9,12 +9,11 @@ license.workspace = true
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-blaze_core.workspace = true
 blaze_gui.workspace = true
 pretty_env_logger.workspace = true
 
 [workspace]
-members = [ "core", "gui" ]
+members = [ "gui" ]
 
 [workspace.package]
 version = "0.1.0"
@@ -23,16 +22,17 @@ authors = ["Redhawk18"]
 license = "MIT"
 
 [workspace.dependencies]
-blaze_core = { path = "core" }
 blaze_gui = { path = "gui" }
 
 dark-light = "1.0"
-iced = "0.12"
-iced_aw = { version = "0.7", features = ["icons", "tab_bar"], default-features = false }
+iced = { version = "0.12", features = ["tokio"] }
+iced_aw = { version = "0.8", features = ["icons", "menu","tab_bar"], default-features = false }
 log = "0.4"
 pretty_env_logger = "0.5"
-rfd = "0.13"
+rfd = { version = "0.13", features = ["xdg-portal", "tokio"], default-features = false}
 slotmap = "1.0"
+snafu = "0.8"
+tokio = { version = "1", features = ["fs"] }
 
 [patch.crates-io]
-iced_aw = { git = 'https://github.com/iced-rs/iced_aw.git', rev = 'ed59455' }
+# iced_aw = { git = 'https://github.com/iced-rs/iced_aw.git', rev = 'ed59455' }
