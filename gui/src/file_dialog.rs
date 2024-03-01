@@ -1,11 +1,6 @@
-
-
 use rfd::AsyncFileDialog;
 use snafu::{ResultExt, Snafu};
-use std::{
-    path::{PathBuf},
-    sync::Arc,
-};
+use std::{path::PathBuf, sync::Arc};
 use tokio::fs;
 
 #[derive(Debug, Clone, Snafu)]

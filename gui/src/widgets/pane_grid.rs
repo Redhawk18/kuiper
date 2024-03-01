@@ -1,7 +1,7 @@
 use crate::{
     style::{pane_active, pane_inactive, title_bar_active, title_bar_inactive},
     widgets::tab_bar,
-    Message, Panes, Tab,
+    Buffer, Message, Panes,
 };
 
 use iced::{
@@ -17,7 +17,7 @@ use slotmap::{DefaultKey, SlotMap};
 
 pub(crate) fn pane_grid<'a>(
     panes: &'a Panes,
-    map: &'a SlotMap<DefaultKey, Tab>,
+    map: &'a SlotMap<DefaultKey, Buffer>,
 ) -> PaneGrid<'a, Message, Theme, Renderer> {
     PaneGrid::new(&panes.data, |pane, state, _is_maximized| {
         let active = panes.active != pane;

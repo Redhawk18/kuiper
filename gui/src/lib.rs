@@ -1,12 +1,10 @@
-// my comment from the editor
-
+mod buffer;
 mod file_dialog;
 mod style;
-mod tab;
 mod widgets;
 use std::path::PathBuf;
 
-use tab::{FileTab, Tab};
+use buffer::{Buffer, FileBuffer};
 use widgets::{menu_bar, pane_grid};
 
 use iced::{
@@ -25,7 +23,7 @@ pub fn start_gui() -> iced::Result {
 }
 
 pub(crate) struct Blaze {
-    data: SlotMap<DefaultKey, Tab>,
+    data: SlotMap<DefaultKey, Buffer>,
     panes: Panes,
 }
 
@@ -81,7 +79,7 @@ impl Blaze {
         self.panes.data.get_mut(self.panes.active).unwrap()
     }
 
-    pub(crate) fn get_tab(&self) -> Option<&Tab> {
+    pub(crate) fn get_tab(&self) -> Option<&Buffer> {
         let panestate = self.get_panestate();
         match panestate.data.get(panestate.active_tab_index) {
             Some(key) => Some(self.data.get(*key).unwrap()),
@@ -89,7 +87,7 @@ impl Blaze {
         }
     }
 
-    pub(crate) fn get_mut_tab(&mut self) -> Option<&mut Tab> {
+    pub(crate) fn get_mut_tab(&mut self) -> Option<&mut Buffer> {
         let panestate = self.get_panestate();
         match panestate.get_active_key() {
             Some(key) => Some(self.data.get_mut(*key).unwrap()),
@@ -97,7 +95,7 @@ impl Blaze {
         }
     }
 
-    pub(crate) fn insert_tab(&mut self, tab: Tab) {
+    pub(crate) fn insert_tab(&mut self, tab: Buffer) {
         let key = self.data.insert(tab);
         self.get_mut_panestate().data.push(key);
     }
@@ -108,7 +106,7 @@ impl PaneState {
         self.data.get(self.active_tab_index)
     }
 
-    pub fn get_data<'a>(&'a self, map: &'a SlotMap<DefaultKey, Tab>) -> Vec<&Tab> {
+    pub fn get_data<'a>(&'a self, map: &'a SlotMap<DefaultKey, Buffer>) -> Vec<&Buffer> {
         self.data.iter().map(|key| map.get(*key).unwrap()).collect()
     }
 
@@ -146,7 +144,7 @@ impl Application for Blaze {
         match message {
             Message::FontLoaded(_) => {}
 
-            Message::NewFile => self.insert_tab(Tab::File(FileTab::default())),
+            Message::NewFile => self.insert_tab(Buffer::File(FileBuffer::default())),
 
             Message::OpenFile => {
                 return Command::perform(file_dialog::open_file(), Message::OpenedFile)
@@ -157,7 +155,7 @@ impl Application for Blaze {
                     return Command::none();
                 };
 
-                self.insert_tab(Tab::File(FileTab {
+                self.insert_tab(Buffer::File(FileBuffer {
                     path: Some(file.0),
                     content: Content::with_text(&file.1),
                 }))
@@ -170,9 +168,12 @@ impl Application for Blaze {
                 };
 
                 match tab {
-                    Tab::File(file_tab) => {
+                    Buffer::File(file_buffer) => {
                         return Command::perform(
-                            file_dialog::save_file(file_tab.path.clone(), file_tab.content.text()),
+                            file_dialog::save_file(
+                                file_buffer.path.clone(),
+                                file_buffer.content.text(),
+                            ),
                             Message::Saved,
                         );
                     }
@@ -188,9 +189,9 @@ impl Application for Blaze {
                 };
 
                 match tab {
-                    Tab::File(file_tab) => {
+                    Buffer::File(file_buffer) => {
                         return Command::perform(
-                            file_dialog::save_file_with_dialog(file_tab.content.text()),
+                            file_dialog::save_file_with_dialog(file_buffer.content.text()),
                             Message::SavedAs,
                         )
                     }
@@ -245,7 +246,7 @@ impl Application for Blaze {
             Message::TextEditorUpdate(action) => {
                 let tab = self.get_mut_tab().unwrap();
                 match tab {
-                    Tab::File(filetab) => filetab.content.perform(action),
+                    Buffer::File(file_buffer) => file_buffer.content.perform(action),
                 }
             } //             Message::TextInputUpdate(text) => {
               //                 let tab = self.get_mut_tab().unwrap();
