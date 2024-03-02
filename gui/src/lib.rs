@@ -191,7 +191,10 @@ impl Application for Blaze {
                 match tab {
                     Buffer::File(file_buffer) => {
                         return Command::perform(
-                            file_dialog::save_file_with_dialog(file_buffer.content.text()),
+                            file_dialog::save_file_with_dialog(
+                                file_buffer.path.clone(),
+                                file_buffer.content.text(),
+                            ),
                             Message::SavedAs,
                         )
                     }

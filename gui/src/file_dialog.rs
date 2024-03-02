@@ -51,8 +51,25 @@ pub async fn save_file(path: Option<PathBuf>, contents: String) -> Result<(), Er
         .context(WriteSnafu { path })
 }
 
-pub async fn save_file_with_dialog(contents: String) -> Result<(), Error> {
-    let Some(handle) = AsyncFileDialog::new().save_file().await else {
+pub async fn save_file_with_dialog(path: Option<PathBuf>, contents: String) -> Result<(), Error> {
+    let handle = match path {
+        Some(path) => {
+            AsyncFileDialog::new()
+                .add_filter("Text Filies | *.txt", &["txt"])
+                .set_file_name(path.to_string_lossy())
+                .set_title("Save As")
+                .save_file()
+                .await
+        }
+        None => {
+            AsyncFileDialog::new()
+                .set_title("Save As")
+                .save_file()
+                .await
+        }
+    };
+
+    let Some(handle) = handle else {
         return Err(Error::DialogClosed);
     };
     let path = handle.path().to_path_buf();
