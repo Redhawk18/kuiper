@@ -19,6 +19,7 @@ pub enum Error {
     },
 }
 
+/// opens a file dialog from [AsyncFileDialog] and reads the contents and returns it.
 pub async fn open_file() -> Result<(PathBuf, String), Error> {
     let handle = AsyncFileDialog::new()
         .set_title("my title")
@@ -35,6 +36,7 @@ pub async fn open_file() -> Result<(PathBuf, String), Error> {
     Ok((path.to_path_buf(), contents.unwrap()))
 }
 
+/// Opens a file dialog if path is [None] from [AsyncFileDialog] and save the content of the file chosen to the filesystem.
 pub async fn save_file(path: Option<PathBuf>, contents: String) -> Result<(), Error> {
     let path = match path {
         Some(path) => path,
@@ -51,6 +53,7 @@ pub async fn save_file(path: Option<PathBuf>, contents: String) -> Result<(), Er
         .context(WriteSnafu { path })
 }
 
+/// Opens a file dialog from [AsyncFileDialog] and save the content of the file chosen to the filesystem
 pub async fn save_file_with_dialog(path: Option<PathBuf>, contents: String) -> Result<(), Error> {
     let handle = match path {
         Some(path) => {

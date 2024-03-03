@@ -2,7 +2,6 @@ mod buffer;
 mod file_dialog;
 mod style;
 mod widgets;
-use std::path::PathBuf;
 
 use buffer::{Buffer, FileBuffer};
 use widgets::{menu_bar, pane_grid};
@@ -17,6 +16,7 @@ use iced::{
     Application, Command, Element, Settings, Subscription, Theme,
 };
 use slotmap::{DefaultKey, SlotMap};
+use std::path::PathBuf;
 
 pub fn start_gui() -> iced::Result {
     Blaze::run(Settings::default())
@@ -27,11 +27,14 @@ pub(crate) struct Blaze {
     panes: Panes,
 }
 
+/// The active panes/windows in the application.
 pub(crate) struct Panes {
     active: Pane,
+    /// wraps [iced]'s [State] in the [PaneState].
     data: State<PaneState>,
 }
 
+/// The global data store to hold all [Buffer]'s for the application.
 #[derive(Default)]
 pub(crate) struct PaneState {
     active_tab_index: usize,
@@ -66,8 +69,6 @@ pub(crate) enum Message {
 
     //text editor
     TextEditorUpdate(Action),
-    //text input
-    // TextInputUpdate(String),
 }
 
 impl Blaze {
@@ -79,7 +80,7 @@ impl Blaze {
         self.panes.data.get_mut(self.panes.active).unwrap()
     }
 
-    pub(crate) fn get_tab(&self) -> Option<&Buffer> {
+    pub(crate) fn get_buffer(&self) -> Option<&Buffer> {
         let panestate = self.get_panestate();
         match panestate.data.get(panestate.active_tab_index) {
             Some(key) => Some(self.data.get(*key).unwrap()),
@@ -87,7 +88,7 @@ impl Blaze {
         }
     }
 
-    pub(crate) fn get_mut_tab(&mut self) -> Option<&mut Buffer> {
+    pub(crate) fn get_mut_buffer(&mut self) -> Option<&mut Buffer> {
         let panestate = self.get_panestate();
         match panestate.get_active_key() {
             Some(key) => Some(self.data.get_mut(*key).unwrap()),
@@ -95,8 +96,8 @@ impl Blaze {
         }
     }
 
-    pub(crate) fn insert_tab(&mut self, tab: Buffer) {
-        let key = self.data.insert(tab);
+    pub(crate) fn insert_buffer(&mut self, buffer: Buffer) {
+        let key = self.data.insert(buffer);
         self.get_mut_panestate().data.push(key);
     }
 }
@@ -144,7 +145,7 @@ impl Application for Blaze {
         match message {
             Message::FontLoaded(_) => {}
 
-            Message::NewFile => self.insert_tab(Buffer::File(FileBuffer::default())),
+            Message::NewFile => self.insert_buffer(Buffer::File(FileBuffer::default())),
 
             Message::OpenFile => {
                 return Command::perform(file_dialog::open_file(), Message::OpenedFile)
@@ -155,19 +156,19 @@ impl Application for Blaze {
                     return Command::none();
                 };
 
-                self.insert_tab(Buffer::File(FileBuffer {
+                self.insert_buffer(Buffer::File(FileBuffer {
                     path: Some(file.0),
                     content: Content::with_text(&file.1),
                 }))
             }
 
             Message::Save => {
-                let Some(tab) = self.get_tab() else {
+                let Some(buffer) = self.get_buffer() else {
                     log::warn!("TODO ERROR MESSAGE Message::Save");
                     return Command::none();
                 };
 
-                match tab {
+                match buffer {
                     Buffer::File(file_buffer) => {
                         return Command::perform(
                             file_dialog::save_file(
@@ -183,12 +184,12 @@ impl Application for Blaze {
             Message::Saved(_) => {}
 
             Message::SaveAs => {
-                let Some(tab) = self.get_tab() else {
+                let Some(buffer) = self.get_buffer() else {
                     log::warn!("TODO ERROR MESSAGE Message::Save");
                     return Command::none();
                 };
 
-                match tab {
+                match buffer {
                     Buffer::File(file_buffer) => {
                         return Command::perform(
                             file_dialog::save_file_with_dialog(
@@ -232,11 +233,12 @@ impl Application for Blaze {
             Message::PaneClicked(pane) => self.panes.active = pane,
 
             Message::PaneSplit(axis, pane) => {
-                if let Some((pane, _)) = self.panes.data.split(
-                    axis,
-                    pane,
-                    PaneState::with_key(self.get_panestate().get_active_key().unwrap()),
-                ) {
+                let panestate = match self.get_panestate().get_active_key() {
+                    Some(key) => PaneState::with_key(key),
+                    None => PaneState::default(),
+                };
+
+                if let Some((pane, _)) = self.panes.data.split(axis, pane, panestate) {
                     self.panes.active = pane;
                 }
             }
@@ -247,17 +249,11 @@ impl Application for Blaze {
                 }
             }
             Message::TextEditorUpdate(action) => {
-                let tab = self.get_mut_tab().unwrap();
-                match tab {
+                let buffer = self.get_mut_buffer().unwrap();
+                match buffer {
                     Buffer::File(file_buffer) => file_buffer.content.perform(action),
                 }
-            } //             Message::TextInputUpdate(text) => {
-              //                 let tab = self.get_mut_tab().unwrap();
-
-              //                 match tab {
-              //                     Tab::File(file_tab) => file_tab.text = text,
-              //                 };
-              //             }
+            }
         }
 
         Command::none()
