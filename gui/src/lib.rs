@@ -132,7 +132,8 @@ impl Application for Blaze {
                 panes: Panes::default(),
             },
             Command::batch(vec![
-                font::load(iced_aw::BOOTSTRAP_FONT_BYTES).map(Message::FontLoaded)
+                font::load(iced_aw::BOOTSTRAP_FONT_BYTES).map(Message::FontLoaded),
+                font::load(iced_aw::NERD_FONT_BYTES).map(Message::FontLoaded),
             ]),
         )
     }

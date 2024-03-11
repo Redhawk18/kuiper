@@ -8,11 +8,11 @@ use iced::{
     widget::{
         button,
         pane_grid::{Axis, Content, Pane, PaneGrid, TitleBar},
-        row, text,
+        row,
     },
     Alignment, Renderer, Theme,
 };
-use iced_aw::graphics::icons::{icon_to_char, BootstrapIcon};
+use iced_aw::core::icons::nerd::{icon_to_text, Nerd};
 use slotmap::{DefaultKey, SlotMap};
 
 pub(crate) fn pane_grid<'a>(
@@ -36,18 +36,11 @@ pub(crate) fn pane_grid<'a>(
 fn title_bar(active: bool, pane: Pane) -> TitleBar<'static, Message, Theme, Renderer> {
     TitleBar::new(
         row!(
-            button(
-                text(icon_to_char(BootstrapIcon::ChevronDoubleRight).to_string())
-                    .font(iced_aw::BOOTSTRAP_FONT)
-            )
-            .on_press(Message::PaneSplit(Axis::Vertical, pane)),
-            button(
-                text(icon_to_char(BootstrapIcon::ChevronDoubleDown).to_string())
-                    .font(iced_aw::BOOTSTRAP_FONT)
-            )
-            .on_press(Message::PaneSplit(Axis::Horizontal, pane)),
-            button(text(icon_to_char(BootstrapIcon::X).to_string()).font(iced_aw::BOOTSTRAP_FONT))
-                .on_press(Message::PaneClosed(pane)),
+            button(icon_to_text(Nerd::SplitHorizontal))
+                .on_press(Message::PaneSplit(Axis::Vertical, pane)),
+            button(icon_to_text(Nerd::SplitVertical))
+                .on_press(Message::PaneSplit(Axis::Horizontal, pane)),
+            button(icon_to_text(Nerd::X)).on_press(Message::PaneClosed(pane)),
         )
         .align_items(Alignment::Center),
     )

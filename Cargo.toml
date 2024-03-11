@@ -35,4 +35,4 @@ snafu = "0.8"
 tokio = { version = "1", features = ["fs"] }
 
 [patch.crates-io]
-# iced_aw = { git = 'https://github.com/iced-rs/iced_aw.git', rev = 'ed59455' }
+iced_aw = { git = 'https://github.com/iced-rs/iced_aw.git', rev = '99c12f1' }
