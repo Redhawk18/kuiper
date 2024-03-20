@@ -217,8 +217,15 @@ impl Application for Blaze {
                     pane_state.active_tab_index = 0;
                 }
 
+                // current we arent removing the data from the program, just removing it from being visable. This is a memory leak
                 pane_state.data.remove(id);
-                // current we arent removing the data from the program, just removing it from being visable
+
+                // set the new active tab index
+                if pane_state.data.is_empty() {
+                    pane_state.active_tab_index = 0;
+                } else {
+                    pane_state.active_tab_index = pane_state.data.len() - 1;
+                }
             }
 
             Message::PaneDragged(DragEvent::Dropped { pane, target }) => {

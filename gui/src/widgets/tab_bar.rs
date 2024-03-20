@@ -50,7 +50,7 @@ fn head(active: usize, data: &[&Buffer]) -> TabBar<Message, usize, Theme, Render
 }
 
 fn body<'a>(active: usize, data: &[&'a Buffer]) -> Element<'a, Message> {
-    let active_tab = data.get(active).unwrap(); //wrong
+    let active_tab = data.get(active).expect("There is no active tab");
 
     match active_tab {
         Buffer::File(file_buffer) => text_editor(&file_buffer.content)
