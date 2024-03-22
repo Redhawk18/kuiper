@@ -2,17 +2,18 @@
 
 To add some order to this project these objectives need to be completed.
 
-[ x ] basic gui features (open file, save, quit)
+[x] basic gui features (open file, save, quit)
 
-[ x ] gui theme
+[x] gui theme
 
-[ x ] pane grid
+[x] pane grid
 
-### Program: file type recognition
-* [ ] implement icons for file types
+[x] file type recognition
 
-### Program: sidebar for plugins
-* should icons be svgs or unicode?
+[x] code icons 
 
 ### Explore: system shell in gui
-A shell widget within iced seems the most simple out of the first few widgets and it is very helpful to users.
+A shell widget within iced seems the most simple out of the first few widgets and it is very helpful to users. Revisiting this idea, `iced_term` is what should be used.
+
+### Program: custom text editor widget
+We require highlighting and tooltips when the LSP gives us warnings or errors. Also look into inline hints with in the text editor.

@@ -9,5 +9,7 @@ pub enum Buffer {
 #[derive(Debug, Default)]
 pub struct FileBuffer {
     pub path: Option<PathBuf>,
-    pub content: Content,
+    pub content: Content, // This causes a bug because [`Content`] can create exact replicas of a text
+                          // editor so scrolling and cusor locations are the same on each. Currently the only way I see
+                          // this changing is making a custom text editor widget.
 }
