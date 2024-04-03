@@ -1,7 +1,7 @@
-use crate::{Buffer, Message};
+use crate::{widgets::TextEditor, Buffer, Message};
 
 use iced::{
-    widget::{column, text_editor, Column},
+    widget::{column, Column},
     Element, Length, Renderer, Theme,
 };
 use iced_aw::{
@@ -53,7 +53,7 @@ fn body<'a>(active: usize, data: &[&'a Buffer]) -> Element<'a, Message> {
     let active_tab = data.get(active).expect("There is no active tab");
 
     match active_tab {
-        Buffer::File(file_buffer) => text_editor(&file_buffer.content)
+        Buffer::File(file_buffer) => TextEditor::new(&file_buffer.content)
             .height(Length::Fill)
             .on_action(Message::TextEditorUpdate)
             .into(),

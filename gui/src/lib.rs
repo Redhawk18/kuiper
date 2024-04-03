@@ -4,14 +4,14 @@ mod style;
 mod widgets;
 
 use buffer::{Buffer, FileBuffer};
-use widgets::{menu_bar, pane_grid};
+use widgets::{menu_bar, pane_grid, Content};
 
 use iced::{
     executor, font,
     widget::{
         column,
         pane_grid::{Axis, DragEvent, Pane, ResizeEvent, State},
-        text_editor::{Action, Content},
+        text_editor::Action,
     },
     Application, Command, Element, Settings, Subscription, Theme,
 };
@@ -51,8 +51,10 @@ pub(crate) enum Message {
     OpenFile,
     OpenedFile(Result<(PathBuf, String), file_dialog::Error>),
     Save,
+    #[allow(dead_code)]
     Saved(Result<(), file_dialog::Error>),
     SaveAs,
+    #[allow(dead_code)]
     SavedAs(Result<(), file_dialog::Error>),
     Quit,
 

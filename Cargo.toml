@@ -25,7 +25,7 @@ license = "MIT"
 blaze_gui = { path = "gui" }
 
 dark-light = "1.0"
-iced = { version = "0.12", features = ["tokio"] }
+iced = { version = "0.12", features = ["advanced", "tokio"] }
 iced_aw = { version = "0.8", features = ["icons", "menu","tab_bar"], default-features = false }
 log = "0.4"
 pattern_code = "0.1"
