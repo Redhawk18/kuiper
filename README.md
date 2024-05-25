@@ -1,9 +1,9 @@
 <div align="center">
 
-# Blaze
+# Kuiper 
 
-[![Builds](https://img.shields.io/github/actions/workflow/status/Redhawk18/code-editor/build.yml)](https://github.com/Redhawk18/code-editor/actions/workflows/build.yml)
-[![License](https://img.shields.io/github/license/Redhawk18/code-editor)](https://github.com/Redhawk18/code-editor/blob/main/LICENSE)
+[![Builds](https://img.shields.io/github/actions/workflow/status/Redhawk18/kuiper/build.yml)](https://github.com/Redhawk18/kuiper/actions/workflows/build.yml)
+[![License](https://img.shields.io/github/license/Redhawk18/kuiper)](https://github.com/Redhawk18/kuiper/blob/main/LICENSE)
 
 A blazing fast [Integrated Development Environment](https://en.wikipedia.org/wiki/Integrated_development_environment), meant to give power back to developers.
 
@@ -21,13 +21,13 @@ Currently to install
 1. Clone the repository
 
 ```
-git clone git@github.com:Redhawk18/blaze.git
+git clone git@github.com:Redhawk18/kuiper.git
 ```
 
 2. Compile and install the program
 
 ```
-cargo install --path blaze
+cargo install --path kuiper
 ```
 
 3. Add given path to your `$PATH`
@@ -40,20 +40,20 @@ If youre operating system needs additional packages please create a pull request
   <summary>OpenSuse</summary>
 
   ```
-  sudo zypper install atkmm-devel gdk-pixbuf-devel gdk-pixbuf-xlib-devel glib2-devel gtk3-devel harfbuzz-devel pkg-config rustup
+  sudo zypper install atkmm-devel pkg-config rustup
   ```
 </details>
 
 1. Clone the repository
 
 ```
-git clone git@github.com:Redhawk18/blaze.git
+git clone git@github.com:Redhawk18/kuiper.git
 ```
 
 2. Go into the repository
 
 ```
-cd blaze
+cd kuiper
 ```
 
 3. Compiling

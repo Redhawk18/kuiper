@@ -1,4 +1,4 @@
-use blaze_gui::start_gui;
+use kuiper_gui::start_gui;
 
 fn main() {
     pretty_env_logger::init();

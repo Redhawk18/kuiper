@@ -19,10 +19,10 @@ use slotmap::{DefaultKey, SlotMap};
 use std::path::PathBuf;
 
 pub fn start_gui() -> iced::Result {
-    Blaze::run(Settings::default())
+    Kuiper::run(Settings::default())
 }
 
-pub(crate) struct Blaze {
+pub(crate) struct Kuiper {
     data: SlotMap<DefaultKey, Buffer>,
     panes: Panes,
 }
@@ -73,7 +73,7 @@ pub(crate) enum Message {
     TextEditorUpdate(Action),
 }
 
-impl Blaze {
+impl Kuiper {
     pub(crate) fn get_panestate(&self) -> &PaneState {
         self.panes.data.get(self.panes.active).unwrap()
     }
@@ -121,7 +121,7 @@ impl PaneState {
     }
 }
 
-impl Application for Blaze {
+impl Application for Kuiper {
     type Executor = executor::Default;
     type Message = Message;
     type Theme = Theme;
@@ -129,7 +129,7 @@ impl Application for Blaze {
 
     fn new(_flags: Self::Flags) -> (Self, Command<Self::Message>) {
         (
-            Blaze {
+            Kuiper {
                 data: SlotMap::default(),
                 panes: Panes::default(),
             },
@@ -141,7 +141,7 @@ impl Application for Blaze {
     }
 
     fn title(&self) -> String {
-        String::from("Blaze")
+        String::from("Kuiper")
     }
 
     fn update(&mut self, message: Message) -> Command<Message> {

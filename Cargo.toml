@@ -1,5 +1,5 @@
 [package]
-name = "blaze"
+name = "kuiper"
 description = "A blazing fast Integrated Development Environment, meant to give power back to developers."
 version.workspace = true
 edition.workspace = true
@@ -9,31 +9,37 @@ license.workspace = true
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-blaze_gui.workspace = true
+kuiper_gui.workspace = true
+kuiper_lsp.workspace = true
 pretty_env_logger.workspace = true
 
 [workspace]
-members = [ "gui" ]
+members = [ "gui" , "lsp"]
 
 [workspace.package]
 version = "0.1.0"
 edition = "2021"
 authors = ["Redhawk18"]
-license = "MIT"
+license = "MPL-2.0"
 
 [workspace.dependencies]
-blaze_gui = { path = "gui" }
+kuiper_gui = { path = "gui" }
+kuiper_lsp = { path = "lsp" }
 
+async-lsp = { version = "0.2", features = ["tokio"] }
 dark-light = "1.0"
 iced = { version = "0.12", features = ["advanced", "tokio"] }
 iced_aw = { version = "0.8", features = ["icons", "menu","tab_bar"], default-features = false }
+jsonrpc = "0.17.0"
 log = "0.4"
+lsp-types = "*"
 pattern_code = "0.1"
 pretty_env_logger = "0.5"
 rfd = { version = "0.13", features = ["xdg-portal", "tokio"], default-features = false}
 slotmap = "1.0"
 snafu = "0.8"
 tokio = { version = "1", features = ["fs"] }
+
 
 [patch.crates-io]
 iced_aw = { git = 'https://github.com/iced-rs/iced_aw.git', rev = '99c12f1' }
