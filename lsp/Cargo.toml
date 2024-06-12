@@ -14,3 +14,5 @@ log.workspace = true
 lsp-types.workspace = true
 snafu.workspace = true
 tokio.workspace = true
+tokio-util.workspace = true
+tower.workspace = true

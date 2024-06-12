@@ -24,6 +24,7 @@
             dotenv.disableHint = true;
 
             languages.rust.enable = true;
+            packages = with pkgs; [ rust-analyzer ];
 
             env = {
               LD_LIBRARY_PATH = lib.makeLibraryPath (with pkgs; [
@@ -37,6 +38,7 @@
                 xorg.libX11
               ]);
             };
+            RUST_LOG = "info";
           };
         };
     };

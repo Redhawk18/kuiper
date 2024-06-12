@@ -1,2 +1,5 @@
 mod client;
-mod subscription;
+// mod subscription;
+//
+
+pub use client::start_lsp;

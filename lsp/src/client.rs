@@ -1,17 +1,19 @@
 use async_lsp::{
     concurrency::ConcurrencyLayer, panic::CatchUnwindLayer, router::Router, tracing::TracingLayer,
-    LanguageClient, ResponseError,
+    LanguageClient, LanguageServer, ResponseError,
 };
 use log::{info, trace, Level};
 use lsp_types::{
     notification::{Progress, PublishDiagnostics, ShowMessage},
-    ClientCapabilities, HoverContents, HoverParams, InitializeParams, MarkupContent,
-    NumberOrString, Position, ProgressParamsValue, TextDocumentIdentifier,
-    TextDocumentPositionParams, Url, WindowClientCapabilities, WorkDoneProgress,
-    WorkDoneProgressParams,
+    ClientCapabilities, DidOpenTextDocumentParams, HoverContents, HoverParams, InitializeParams,
+    InitializedParams, MarkupContent, NumberOrString, Position, ProgressParamsValue,
+    TextDocumentIdentifier, TextDocumentItem, TextDocumentPositionParams, Url,
+    WindowClientCapabilities, WorkDoneProgress, WorkDoneProgressParams,
 };
 use std::{ops::ControlFlow, path::Path, process::Stdio};
-use tokio::sync::oneshot;
+use tokio::{sync::oneshot, process::Command, };
+use tokio_util::compat::{ TokioAsyncWriteCompatExt, TokioAsyncReadCompatExt};
+use tower::builder::ServiceBuilder;
 
 const TEST_ROOT: &str = ".";
 
@@ -67,13 +69,13 @@ pub async fn start_lsp() {
             .service(router)
     });
 
-    tracing_subscriber::fmt()
-        .with_max_level(Level::Info)
-        .with_ansi(false)
-        .with_writer(std::io::stdout)
-        .init();
+    // tracing_subscriber::fmt()
+    //     .with_max_level(Level::Info)
+    //     .with_ansi(false)
+    //     .with_writer(std::io::stdout)
+    //     .init();
 
-    let child = async_process::Command::new("rust-analyzer")
+    let child = Command::new("rust-analyzer")
         .current_dir(&root_dir)
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
@@ -81,8 +83,8 @@ pub async fn start_lsp() {
         .kill_on_drop(true)
         .spawn()
         .expect("Failed run rust-analyzer");
-    let stdout = child.stdout.unwrap();
-    let stdin = child.stdin.unwrap();
+    let stdout = child.stdout.unwrap().compat();
+    let stdin = child.stdin.unwrap().compat_write();
 
     let mainloop_fut = tokio::spawn(async move {
         mainloop.run_buffered(stdout, stdin).await.unwrap();
@@ -108,7 +110,8 @@ pub async fn start_lsp() {
     server.initialized(InitializedParams {}).unwrap();
 
     // Synchronize documents.
-    let file_uri = Url::from_file_path(root_dir.join("src/lib.rs")).unwrap();
+    // let file_uri = Url::from_file_path(root_dir.join("src/lib.rs")).unwrap();
+    let file_uri = Url::from_file_path(root_dir.join("src/main.rs")).unwrap();
     let text = "fn func() { let var = 1; }";
     server
         .did_open(DidOpenTextDocumentParams {
