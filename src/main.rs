@@ -1,4 +1,4 @@
-use kuiper_gui::start_gui;
+// use kuiper_gui::start_gui;
 use kuiper_lsp::start_lsp;
 use tokio;
 

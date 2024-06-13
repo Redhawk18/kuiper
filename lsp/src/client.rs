@@ -112,14 +112,16 @@ pub async fn start_lsp() {
     // Synchronize documents.
     // let file_uri = Url::from_file_path(root_dir.join("src/lib.rs")).unwrap();
     let file_uri = Url::from_file_path(root_dir.join("src/main.rs")).unwrap();
-    let text = "fn func() { let var = 1; }";
+    println!("{file_uri}");
+    // let text = "fn func() { let var = 1; }";
+    let text = tokio::fs::read_to_string(file_uri.path()).await.unwrap();
     server
         .did_open(DidOpenTextDocumentParams {
             text_document: TextDocumentItem {
                 uri: file_uri.clone(),
                 language_id: "rust".into(),
                 version: 0,
-                text: text.into(),
+                text: text.clone(),
             },
         })
         .unwrap();
@@ -128,7 +130,7 @@ pub async fn start_lsp() {
     indexed_rx.await.unwrap();
 
     // Query.
-    let var_pos = text.find("var").unwrap();
+    let var_pos = text.find("main()").unwrap();
     let hover = server
         .hover(HoverParams {
             text_document_position_params: TextDocumentPositionParams {
@@ -140,15 +142,15 @@ pub async fn start_lsp() {
         .await
         .unwrap()
         .unwrap();
-    info!("Hover result: {hover:?}");
-    assert!(
-        matches!(
-            hover.contents,
-            HoverContents::Markup(MarkupContent { value, .. })
-            if value.contains("let var: i32")
-        ),
-        "should show the type of `var`",
-    );
+    info!("Hover result: {hover:#?}");
+    // assert!(
+    //     matches!(
+    //         hover.contents,
+    //         HoverContents::Markup(MarkupContent { value, .. })
+    //         if value.contains("let var: i32")
+    //     ),
+    //     "should show the type of `var`",
+    // );
 
     // Shutdown.
     server.shutdown(()).await.unwrap();
