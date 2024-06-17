@@ -9,7 +9,7 @@ license.workspace = true
 
 [dependencies]
 async-lsp.workspace = true
-iced.workspace = true
+iced_runtime.workspace = true
 log.workspace = true
 lsp-types.workspace = true
 snafu.workspace = true

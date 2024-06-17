@@ -37,8 +37,8 @@
                 xorg.libXi
                 xorg.libX11
               ]);
+              RUST_LOG = "info";
             };
-            RUST_LOG = "info";
           };
         };
     };

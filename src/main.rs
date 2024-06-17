@@ -1,11 +1,7 @@
-// use kuiper_gui::start_gui;
-use kuiper_lsp::start_lsp;
-use tokio;
+use kuiper_gui::start_gui;
 
-#[tokio::main]
-async fn main() {
+fn main() {
     pretty_env_logger::init();
 
-    // let _ = start_gui();
-    start_lsp().await;
+    let _ = start_gui();
 }
