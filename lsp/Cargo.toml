@@ -11,7 +11,6 @@ license.workspace = true
 async-lsp.workspace = true
 iced_runtime.workspace = true
 log.workspace = true
-lsp-types.workspace = true
 snafu.workspace = true
 tokio.workspace = true
 tokio-util.workspace = true

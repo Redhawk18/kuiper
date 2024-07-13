@@ -1,5 +1,4 @@
-mod client;
-// mod subscription;
-//
+pub mod client;
+pub mod commands;
 
-pub use client::start_lsp;
+pub use async_lsp::Error;

@@ -1,19 +1,25 @@
 mod buffer;
 mod file_dialog;
+mod messages;
 mod style;
 mod widgets;
 
 use buffer::{Buffer, FileBuffer};
+pub use messages::{Button, LanguageServer, Message, PaneGrid, Tab, TextEditor, Widgets};
 use widgets::{menu_bar, pane_grid, Content};
+
+use kuiper_lsp::{
+    client::LSPClient,
+    commands::{initialize, synchronize},
+};
 
 use iced::{
     executor, font,
     widget::{
         column,
-        pane_grid::{Axis, DragEvent, Pane, ResizeEvent, State},
-        text_editor::Action,
+        pane_grid::{DragEvent, Pane, ResizeEvent, State},
     },
-    Application, Command, Element, Settings, Subscription, Theme,
+    Application, Command, Element, Settings, Theme,
 };
 use slotmap::{DefaultKey, SlotMap};
 use std::path::PathBuf;
@@ -22,13 +28,15 @@ pub fn start_gui() -> iced::Result {
     Kuiper::run(Settings::default())
 }
 
-pub(crate) struct Kuiper {
+pub struct Kuiper {
     data: SlotMap<DefaultKey, Buffer>,
+    lsp_client: Option<LSPClient>,
     panes: Panes,
+    workspace_folder: Option<PathBuf>,
 }
 
 /// The active panes/windows in the application.
-pub(crate) struct Panes {
+pub struct Panes {
     active: Pane,
     /// wraps [iced]'s [State] in the [PaneState].
     data: State<PaneState>,
@@ -36,41 +44,9 @@ pub(crate) struct Panes {
 
 /// The global data store to hold all [Buffer]'s for the application.
 #[derive(Default)]
-pub(crate) struct PaneState {
+pub struct PaneState {
     active_tab_index: usize,
     data: Vec<DefaultKey>,
-}
-
-#[derive(Debug, Clone)]
-pub(crate) enum Message {
-    //application
-    FontLoaded(Result<(), font::Error>),
-
-    //menu bar
-    NewFile,
-    OpenFile,
-    OpenedFile(Result<(PathBuf, String), file_dialog::Error>),
-    Save,
-    #[allow(dead_code)]
-    Saved(Result<(), file_dialog::Error>),
-    SaveAs,
-    #[allow(dead_code)]
-    SavedAs(Result<(), file_dialog::Error>),
-    Quit,
-
-    //tabs
-    TabSelected(usize),
-    TabClosed(usize),
-
-    //panegrid
-    PaneClicked(Pane),
-    PaneClosed(Pane),
-    PaneDragged(DragEvent),
-    PaneResized(ResizeEvent),
-    PaneSplit(Axis, Pane),
-
-    //text editor
-    TextEditorUpdate(Action),
 }
 
 impl Kuiper {
@@ -131,7 +107,9 @@ impl Application for Kuiper {
         (
             Kuiper {
                 data: SlotMap::default(),
+                lsp_client: None,
                 panes: Panes::default(),
+                workspace_folder: None,
             },
             Command::batch(vec![
                 font::load(iced_aw::BOOTSTRAP_FONT_BYTES).map(Message::FontLoaded),
@@ -147,123 +125,152 @@ impl Application for Kuiper {
     fn update(&mut self, message: Message) -> Command<Message> {
         match message {
             Message::FontLoaded(_) => {}
+            Message::LanguageServer(lsp) => match lsp {
+                LanguageServer::Initalize(result) => {
+                    let Ok(server) = result else {
+                        log::error!("Error initializing language server");
+                        return Command::none();
+                    };
 
-            Message::NewFile => self.insert_buffer(Buffer::File(FileBuffer::default())),
-
-            Message::OpenFile => {
-                return Command::perform(file_dialog::open_file(), Message::OpenedFile)
-            }
-
-            Message::OpenedFile(result) => {
-                let Ok(file) = result else {
-                    return Command::none();
-                };
-
-                self.insert_buffer(Buffer::File(FileBuffer {
-                    path: Some(file.0),
-                    content: Content::with_text(&file.1),
-                }))
-            }
-
-            Message::Save => {
-                let Some(buffer) = self.get_buffer() else {
-                    log::warn!("TODO ERROR MESSAGE Message::Save");
-                    return Command::none();
-                };
-
-                match buffer {
-                    Buffer::File(file_buffer) => {
-                        return Command::perform(
-                            file_dialog::save_file(
-                                file_buffer.path.clone(),
-                                file_buffer.content.text(),
-                            ),
-                            Message::Saved,
-                        );
+                    self.lsp_client = Some(LSPClient::new(server));
+                }
+                LanguageServer::Shutdown() => todo!(),
+                LanguageServer::Syncronize(server) => log::warn!("{:#?}", server),
+            },
+            Message::Widgets(widget) => match widget {
+                Widgets::Button(button) => match button {
+                    Button::NewFile => self.insert_buffer(Buffer::File(FileBuffer::default())),
+                    Button::OpenFile => {
+                        return Command::perform(file_dialog::open_file(), |x| {
+                            Message::Widgets(Widgets::Button(Button::OpenedFile(x)))
+                        });
                     }
-                }
-            }
+                    Button::OpenedFile(result) => {
+                        let Ok(file) = result else {
+                            return Command::none();
+                        };
 
-            Message::Saved(_) => {}
+                        self.insert_buffer(Buffer::File(FileBuffer {
+                            path: Some(file.0),
+                            content: Content::with_text(&file.1),
+                        }));
 
-            Message::SaveAs => {
-                let Some(buffer) = self.get_buffer() else {
-                    log::warn!("TODO ERROR MESSAGE Message::Save");
-                    return Command::none();
-                };
-
-                match buffer {
-                    Buffer::File(file_buffer) => {
-                        return Command::perform(
-                            file_dialog::save_file_with_dialog(
-                                file_buffer.path.clone(),
-                                file_buffer.content.text(),
-                            ),
-                            Message::SavedAs,
-                        )
+                        return Command::perform(initialize(), |x| {
+                            Message::LanguageServer(LanguageServer::Initalize(x))
+                        });
                     }
-                }
-            }
+                    Button::OpenFolder => {
+                        return Command::perform(file_dialog::open_folder(), |x| {
+                            Message::Widgets(Widgets::Button(Button::OpenedFolder(x)))
+                        })
+                    }
+                    Button::OpenedFolder(result) => {
+                        let Ok(folder) = result else {
+                            return Command::none();
+                        };
 
-            Message::SavedAs(_) => {}
+                        self.workspace_folder = Some(folder);
+                    }
+                    Button::Save => {
+                        let Some(buffer) = self.get_buffer() else {
+                            log::warn!("No file open to save");
+                            return Command::none();
+                        };
 
-            Message::Quit => return iced::window::close(iced::window::Id::MAIN),
+                        match buffer {
+                            Buffer::File(file_buffer) => {
+                                return Command::perform(
+                                    file_dialog::save_file(
+                                        file_buffer.path.clone(),
+                                        file_buffer.content.text(),
+                                    ),
+                                    |x| Message::Widgets(Widgets::Button(Button::Saved(x))),
+                                );
+                            }
+                        }
+                    }
+                    Button::Saved(_) => {}
+                    Button::SaveAs => {
+                        let Some(buffer) = self.get_buffer() else {
+                            log::warn!("No file open to save");
+                            return Command::none();
+                        };
 
-            Message::TabSelected(id) => {
-                self.get_mut_panestate().active_tab_index = id;
-            }
+                        match buffer {
+                            Buffer::File(file_buffer) => {
+                                return Command::perform(
+                                    file_dialog::save_file_with_dialog(
+                                        file_buffer.path.clone(),
+                                        file_buffer.content.text(),
+                                    ),
+                                    |x| Message::Widgets(Widgets::Button(Button::SavedAs(x))),
+                                )
+                            }
+                        }
+                    }
+                    Button::SavedAs(_) => {}
+                    Button::Quit => return iced::window::close(iced::window::Id::MAIN),
+                },
+                Widgets::PaneGrid(pane_grid) => match pane_grid {
+                    PaneGrid::PaneClicked(pane) => self.panes.active = pane,
+                    PaneGrid::PaneClosed(pane) => {
+                        if let Some((_, sibling)) = self.panes.data.close(pane) {
+                            self.panes.active = sibling;
+                        }
+                    }
+                    PaneGrid::PaneDragged(DragEvent::Dropped { pane, target }) => {
+                        self.panes.data.drop(pane, target);
+                    }
+                    PaneGrid::PaneDragged(_) => {}
+                    PaneGrid::PaneResized(ResizeEvent { split, ratio }) => {
+                        self.panes.data.resize(split, ratio);
+                    }
+                    PaneGrid::PaneSplit(axis, pane) => {
+                        let panestate = match self.get_panestate().get_active_key() {
+                            Some(key) => PaneState::with_key(key),
+                            None => PaneState::default(),
+                        };
 
-            Message::TabClosed(id) => {
-                let pane_state = self.get_mut_panestate();
-                if id == pane_state.active_tab_index {
-                    pane_state.active_tab_index = 0;
-                }
+                        if let Some((pane, _)) = self.panes.data.split(axis, pane, panestate) {
+                            self.panes.active = pane;
+                        }
+                    }
+                },
+                Widgets::Tab(tab) => match tab {
+                    Tab::TabSelected(id) => self.get_mut_panestate().active_tab_index = id,
+                    Tab::TabClosed(id) => {
+                        let pane_state = self.get_mut_panestate();
+                        if id == pane_state.active_tab_index {
+                            pane_state.active_tab_index = 0;
+                        }
 
-                // current we arent removing the data from the program, just removing it from being visable. This is a memory leak
-                pane_state.data.remove(id);
+                        // current we arent removing the data from the program, just removing it from being visable. This is a memory leak
+                        pane_state.data.remove(id);
 
-                // set the new active tab index
-                if pane_state.data.is_empty() {
-                    pane_state.active_tab_index = 0;
-                } else {
-                    pane_state.active_tab_index = pane_state.data.len() - 1;
-                }
-            }
-
-            Message::PaneDragged(DragEvent::Dropped { pane, target }) => {
-                self.panes.data.drop(pane, target);
-            }
-
-            Message::PaneDragged(_) => {}
-
-            Message::PaneResized(ResizeEvent { split, ratio }) => {
-                self.panes.data.resize(split, ratio);
-            }
-
-            Message::PaneClicked(pane) => self.panes.active = pane,
-
-            Message::PaneSplit(axis, pane) => {
-                let panestate = match self.get_panestate().get_active_key() {
-                    Some(key) => PaneState::with_key(key),
-                    None => PaneState::default(),
-                };
-
-                if let Some((pane, _)) = self.panes.data.split(axis, pane, panestate) {
-                    self.panes.active = pane;
-                }
-            }
-
-            Message::PaneClosed(pane) => {
-                if let Some((_, sibling)) = self.panes.data.close(pane) {
-                    self.panes.active = sibling;
-                }
-            }
-            Message::TextEditorUpdate(action) => {
-                let buffer = self.get_mut_buffer().unwrap();
-                match buffer {
-                    Buffer::File(file_buffer) => file_buffer.content.perform(action),
-                }
-            }
+                        // set the new active tab index
+                        if pane_state.data.is_empty() {
+                            pane_state.active_tab_index = 0;
+                        } else {
+                            pane_state.active_tab_index = pane_state.data.len() - 1;
+                        }
+                    }
+                },
+                Widgets::TextEditor(text_editor) => match text_editor {
+                    TextEditor::TextEditorUpdate(action) => {
+                        let buffer = self.get_mut_buffer().unwrap();
+                        match buffer {
+                            Buffer::File(buffer) => {
+                                buffer.content.perform(action);
+                                let path = buffer.path.clone().unwrap();
+                                return Command::perform(
+                                    synchronize(path, self.lsp_client.clone().unwrap().socket),
+                                    |x| Message::LanguageServer(LanguageServer::Syncronize(x)),
+                                );
+                            }
+                        }
+                    }
+                },
+            },
         }
 
         Command::none()
@@ -276,11 +283,7 @@ impl Application for Kuiper {
     }
 
     fn theme(&self) -> Theme {
-        iced::Theme::GruvboxDark
-    }
-
-    fn subscription(&self) -> Subscription<Message> {
-        Subscription::none()
+        Theme::GruvboxDark
     }
 }
 

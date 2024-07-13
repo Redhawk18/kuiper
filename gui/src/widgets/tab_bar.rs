@@ -1,4 +1,4 @@
-use crate::{widgets::TextEditor, Buffer, Message};
+use crate::{widgets::TextEditor, Buffer, Message, Tab, Widgets};
 
 use iced::{
     widget::{column, Column},
@@ -22,7 +22,8 @@ pub(crate) fn tab_bar<'a>(
 }
 
 fn head(active: usize, data: &[&Buffer]) -> TabBar<Message, usize, Theme, Renderer> {
-    let mut tab_bar = TabBar::new(Message::TabSelected).on_close(Message::TabClosed);
+    let mut tab_bar = TabBar::new(|x| Message::Widgets(Widgets::Tab(Tab::TabSelected(x))))
+        .on_close(|x| Message::Widgets(Widgets::Tab(Tab::TabClosed(x))));
 
     for (i, tab) in data.iter().enumerate() {
         match tab {
@@ -55,7 +56,9 @@ fn body<'a>(active: usize, data: &[&'a Buffer]) -> Element<'a, Message> {
     match active_tab {
         Buffer::File(file_buffer) => TextEditor::new(&file_buffer.content)
             .height(Length::Fill)
-            .on_action(Message::TextEditorUpdate)
+            .on_action(|x| {
+                Message::Widgets(Widgets::TextEditor(crate::TextEditor::TextEditorUpdate(x)))
+            })
             .into(),
     }
 }

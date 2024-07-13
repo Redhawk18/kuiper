@@ -10,8 +10,11 @@ license.workspace = true
 
 [dependencies]
 kuiper_gui.workspace = true
-kuiper_lsp.workspace = true
+tokio.workspace = true
 pretty_env_logger.workspace = true
+
+[dev.dependencies]
+console-subscriber = "0.3.0"
 
 [workspace]
 members = [ "gui" , "lsp"]
@@ -33,13 +36,12 @@ iced_aw = { version = "0.8", features = ["icons", "menu","tab_bar"], default-fea
 iced_runtime = "0.12"
 jsonrpc = "0.17.0"
 log = "0.4"
-lsp-types = "0.95.1"
 pattern_code = "0.1"
 pretty_env_logger = "0.5"
 rfd = { version = "0.13", features = ["xdg-portal", "tokio"], default-features = false}
 slotmap = "1.0"
 snafu = "0.8"
-tokio = { version = "1", features = ["fs"] }
+tokio = { version = "1", features = ["fs", "tracing"] }
 tokio-util = { version = "0.7", features = ["compat"] }
 tower = "0.4"
 

@@ -19,10 +19,10 @@ pub enum Error {
     },
 }
 
-/// opens a file dialog from [AsyncFileDialog] and reads the contents and returns it.
+/// Opens a file dialog from [AsyncFileDialog] and reads the contents and returns it.
 pub async fn open_file() -> Result<(PathBuf, String), Error> {
     let handle = AsyncFileDialog::new()
-        .set_title("my title")
+        .set_title("Open File")
         .pick_file()
         .await;
 
@@ -34,6 +34,20 @@ pub async fn open_file() -> Result<(PathBuf, String), Error> {
     let contents = fs::read_to_string(path).await.context(ReadSnafu { path });
 
     Ok((path.to_path_buf(), contents.unwrap()))
+}
+
+/// Opens a file dialog from [AsyncFileDialog] and returns the path.
+pub async fn open_folder() -> Result<PathBuf, Error> {
+    let handle = AsyncFileDialog::new()
+        .set_title("Open Folder")
+        .pick_folder()
+        .await;
+
+    let Some(folder) = handle else {
+        return Err(Error::DialogClosed);
+    };
+
+    Ok(folder.path().to_path_buf())
 }
 
 /// Opens a file dialog if path is [None] from [AsyncFileDialog] and save the content of the file chosen to the filesystem.
