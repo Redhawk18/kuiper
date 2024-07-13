@@ -1,7 +1,7 @@
 use crate::{
     style::{pane_active, pane_inactive, title_bar_active, title_bar_inactive},
     widgets::tab_bar,
-    Buffer, Message, Panes,
+    Buffer, Message, Panes, Widgets,
 };
 
 use iced::{
@@ -10,7 +10,7 @@ use iced::{
         pane_grid::{Axis, Content, Pane, PaneGrid, TitleBar},
         row,
     },
-    Alignment, Renderer, Theme,
+    Alignment, Element, Renderer, Theme,
 };
 use iced_aw::core::icons::nerd::{icon_to_text, Nerd};
 use slotmap::{DefaultKey, SlotMap};
@@ -27,22 +27,27 @@ pub(crate) fn pane_grid<'a>(
             .style(if active { pane_active } else { pane_inactive })
             .title_bar(title_bar(active, pane))
     })
-    .on_click(Message::PaneClicked)
-    .on_drag(Message::PaneDragged)
-    .on_resize(10, Message::PaneResized)
+    .on_click(|x| Message::Widgets(Widgets::PaneGrid(crate::PaneGrid::PaneClicked(x))))
+    .on_drag(|x| Message::Widgets(Widgets::PaneGrid(crate::PaneGrid::PaneDragged(x))))
+    .on_resize(10, |x| {
+        Message::Widgets(Widgets::PaneGrid(crate::PaneGrid::PaneResized(x)))
+    })
     .spacing(15)
 }
 
 fn title_bar(active: bool, pane: Pane) -> TitleBar<'static, Message, Theme, Renderer> {
     TitleBar::new(
-        row!(
-            button(icon_to_text(Nerd::SplitHorizontal))
-                .on_press(Message::PaneSplit(Axis::Vertical, pane)),
-            button(icon_to_text(Nerd::SplitVertical))
-                .on_press(Message::PaneSplit(Axis::Horizontal, pane)),
-            button(icon_to_text(Nerd::X)).on_press(Message::PaneClosed(pane)),
+        Element::from(
+            row!(
+                button(icon_to_text(Nerd::SplitHorizontal))
+                    .on_press(crate::PaneGrid::PaneSplit(Axis::Horizontal, pane)),
+                button(icon_to_text(Nerd::SplitVertical))
+                    .on_press(crate::PaneGrid::PaneSplit(Axis::Vertical, pane)),
+                button(icon_to_text(Nerd::X)).on_press(crate::PaneGrid::PaneClosed(pane)),
+            )
+            .align_items(Alignment::Center),
         )
-        .align_items(Alignment::Center),
+        .map(|x| Message::Widgets(Widgets::PaneGrid(x))),
     )
     .style(if active {
         title_bar_active

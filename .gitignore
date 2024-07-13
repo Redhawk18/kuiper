@@ -21,3 +21,8 @@ Cargo.lock
 # editors
 .idea
 .vscode
+
+# nix
+.devenv
+.direnv
+
