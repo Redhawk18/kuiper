@@ -1,7 +1,7 @@
-use crate::{widgets::TextEditor, Buffer, Message, Tab, Widgets};
+use crate::{Buffer, Message, Tab, Widgets};
 
 use iced::{
-    widget::{column, Column},
+    widget::{column, Column, TextEditor},
     Element, Length, Renderer, Theme,
 };
 use iced_aw::{
@@ -10,18 +10,17 @@ use iced_aw::{
 };
 use std::path::PathBuf;
 
-pub(crate) fn tab_bar<'a>(
-    active: usize,
-    data: &[&'a Buffer],
-) -> Column<'a, Message, Theme, Renderer> {
+pub fn tab_bar<'a>(active: usize, data: &[&'a Buffer]) -> Column<'a, Message, Theme, Renderer> {
     if data.is_empty() {
         column!()
     } else {
-        column!(head(active, data), body(active, data)).padding(1)
+        let head = head(active, data);
+        let body = body(active, data);
+        column!(head, body).padding(1)
     }
 }
 
-fn head(active: usize, data: &[&Buffer]) -> TabBar<Message, usize, Theme, Renderer> {
+fn head<'a>(active: usize, data: &[&Buffer]) -> TabBar<'a, Message, usize, Theme, Renderer> {
     let mut tab_bar = TabBar::new(|x| Message::Widgets(Widgets::Tab(Tab::TabSelected(x))))
         .on_close(|x| Message::Widgets(Widgets::Tab(Tab::TabClosed(x))));
 

@@ -9,7 +9,6 @@ license.workspace = true
 
 [dependencies]
 async-lsp.workspace = true
-iced_runtime.workspace = true
 log.workspace = true
 snafu.workspace = true
 tokio.workspace = true

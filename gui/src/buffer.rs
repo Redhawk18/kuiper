@@ -1,5 +1,4 @@
-use crate::widgets::Content;
-
+use iced::widget::text_editor::Content;
 use std::path::PathBuf;
 
 #[derive(Debug)]

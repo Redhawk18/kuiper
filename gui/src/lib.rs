@@ -6,7 +6,7 @@ mod widgets;
 
 use buffer::{Buffer, FileBuffer};
 pub use messages::{Button, LanguageServer, Message, PaneGrid, Tab, TextEditor, Widgets};
-use widgets::{menu_bar, pane_grid, Content};
+use widgets::{menu_bar, pane_grid};
 
 use kuiper_lsp::{
     client::LSPClient,
@@ -14,18 +14,21 @@ use kuiper_lsp::{
 };
 
 use iced::{
-    executor, font,
+    application, font,
     widget::{
         column,
         pane_grid::{DragEvent, Pane, ResizeEvent, State},
+        text_editor::Content,
     },
-    Application, Command, Element, Settings, Theme,
+    Element, Task, Theme,
 };
 use slotmap::{DefaultKey, SlotMap};
 use std::path::PathBuf;
 
 pub fn start_gui() -> iced::Result {
-    Kuiper::run(Settings::default())
+    application(Kuiper::title, Kuiper::update, Kuiper::view)
+        .theme(Kuiper::theme)
+        .run_with(Kuiper::new)
 }
 
 pub struct Kuiper {
@@ -50,60 +53,7 @@ pub struct PaneState {
 }
 
 impl Kuiper {
-    pub(crate) fn get_panestate(&self) -> &PaneState {
-        self.panes.data.get(self.panes.active).unwrap()
-    }
-
-    pub(crate) fn get_mut_panestate(&mut self) -> &mut PaneState {
-        self.panes.data.get_mut(self.panes.active).unwrap()
-    }
-
-    pub(crate) fn get_buffer(&self) -> Option<&Buffer> {
-        let panestate = self.get_panestate();
-        match panestate.data.get(panestate.active_tab_index) {
-            Some(key) => Some(self.data.get(*key).unwrap()),
-            None => None,
-        }
-    }
-
-    pub(crate) fn get_mut_buffer(&mut self) -> Option<&mut Buffer> {
-        let panestate = self.get_panestate();
-        match panestate.get_active_key() {
-            Some(key) => Some(self.data.get_mut(*key).unwrap()),
-            None => None,
-        }
-    }
-
-    pub(crate) fn insert_buffer(&mut self, buffer: Buffer) {
-        let key = self.data.insert(buffer);
-        self.get_mut_panestate().data.push(key);
-    }
-}
-
-impl PaneState {
-    pub fn get_active_key(&self) -> Option<&DefaultKey> {
-        self.data.get(self.active_tab_index)
-    }
-
-    pub fn get_data<'a>(&'a self, map: &'a SlotMap<DefaultKey, Buffer>) -> Vec<&Buffer> {
-        self.data.iter().map(|key| map.get(*key).unwrap()).collect()
-    }
-
-    pub fn with_key(key: &DefaultKey) -> Self {
-        PaneState {
-            data: vec![*key],
-            ..Default::default()
-        }
-    }
-}
-
-impl Application for Kuiper {
-    type Executor = executor::Default;
-    type Message = Message;
-    type Theme = Theme;
-    type Flags = ();
-
-    fn new(_flags: Self::Flags) -> (Self, Command<Self::Message>) {
+    fn new() -> (Self, Task<Message>) {
         (
             Kuiper {
                 data: SlotMap::default(),
@@ -111,7 +61,7 @@ impl Application for Kuiper {
                 panes: Panes::default(),
                 workspace_folder: None,
             },
-            Command::batch(vec![
+            Task::batch(vec![
                 font::load(iced_aw::BOOTSTRAP_FONT_BYTES).map(Message::FontLoaded),
                 font::load(iced_aw::NERD_FONT_BYTES).map(Message::FontLoaded),
             ]),
@@ -122,14 +72,14 @@ impl Application for Kuiper {
         String::from("Kuiper")
     }
 
-    fn update(&mut self, message: Message) -> Command<Message> {
+    fn update(&mut self, message: Message) -> Task<Message> {
         match message {
             Message::FontLoaded(_) => {}
             Message::LanguageServer(lsp) => match lsp {
                 LanguageServer::Initalize(result) => {
                     let Ok(server) = result else {
                         log::error!("Error initializing language server");
-                        return Command::none();
+                        return Task::none();
                     };
 
                     self.lsp_client = Some(LSPClient::new(server));
@@ -141,13 +91,13 @@ impl Application for Kuiper {
                 Widgets::Button(button) => match button {
                     Button::NewFile => self.insert_buffer(Buffer::File(FileBuffer::default())),
                     Button::OpenFile => {
-                        return Command::perform(file_dialog::open_file(), |x| {
+                        return Task::perform(file_dialog::open_file(), |x| {
                             Message::Widgets(Widgets::Button(Button::OpenedFile(x)))
                         });
                     }
                     Button::OpenedFile(result) => {
                         let Ok(file) = result else {
-                            return Command::none();
+                            return Task::none();
                         };
 
                         self.insert_buffer(Buffer::File(FileBuffer {
@@ -155,18 +105,18 @@ impl Application for Kuiper {
                             content: Content::with_text(&file.1),
                         }));
 
-                        return Command::perform(initialize(), |x| {
+                        return Task::perform(initialize(), |x| {
                             Message::LanguageServer(LanguageServer::Initalize(x))
                         });
                     }
                     Button::OpenFolder => {
-                        return Command::perform(file_dialog::open_folder(), |x| {
+                        return Task::perform(file_dialog::open_folder(), |x| {
                             Message::Widgets(Widgets::Button(Button::OpenedFolder(x)))
                         })
                     }
                     Button::OpenedFolder(result) => {
                         let Ok(folder) = result else {
-                            return Command::none();
+                            return Task::none();
                         };
 
                         self.workspace_folder = Some(folder);
@@ -174,12 +124,12 @@ impl Application for Kuiper {
                     Button::Save => {
                         let Some(buffer) = self.get_buffer() else {
                             log::warn!("No file open to save");
-                            return Command::none();
+                            return Task::none();
                         };
 
                         match buffer {
                             Buffer::File(file_buffer) => {
-                                return Command::perform(
+                                return Task::perform(
                                     file_dialog::save_file(
                                         file_buffer.path.clone(),
                                         file_buffer.content.text(),
@@ -193,12 +143,12 @@ impl Application for Kuiper {
                     Button::SaveAs => {
                         let Some(buffer) = self.get_buffer() else {
                             log::warn!("No file open to save");
-                            return Command::none();
+                            return Task::none();
                         };
 
                         match buffer {
                             Buffer::File(file_buffer) => {
-                                return Command::perform(
+                                return Task::perform(
                                     file_dialog::save_file_with_dialog(
                                         file_buffer.path.clone(),
                                         file_buffer.content.text(),
@@ -209,7 +159,8 @@ impl Application for Kuiper {
                         }
                     }
                     Button::SavedAs(_) => {}
-                    Button::Quit => return iced::window::close(iced::window::Id::MAIN),
+                    // Button::Quit => return iced::window::close(0),
+                    Button::Quit => todo!(),
                 },
                 Widgets::PaneGrid(pane_grid) => match pane_grid {
                     PaneGrid::PaneClicked(pane) => self.panes.active = pane,
@@ -262,7 +213,7 @@ impl Application for Kuiper {
                             Buffer::File(buffer) => {
                                 buffer.content.perform(action);
                                 let path = buffer.path.clone().unwrap();
-                                return Command::perform(
+                                return Task::perform(
                                     synchronize(path, self.lsp_client.clone().unwrap().socket),
                                     |x| Message::LanguageServer(LanguageServer::Syncronize(x)),
                                 );
@@ -273,7 +224,7 @@ impl Application for Kuiper {
             },
         }
 
-        Command::none()
+        Task::none()
     }
 
     fn view(&self) -> Element<Message> {
@@ -284,6 +235,52 @@ impl Application for Kuiper {
 
     fn theme(&self) -> Theme {
         Theme::GruvboxDark
+    }
+
+    pub(crate) fn get_buffer(&self) -> Option<&Buffer> {
+        let panestate = self.get_panestate();
+        match panestate.data.get(panestate.active_tab_index) {
+            Some(key) => Some(self.data.get(*key).unwrap()),
+            None => None,
+        }
+    }
+
+    pub(crate) fn get_mut_buffer(&mut self) -> Option<&mut Buffer> {
+        let panestate = self.get_panestate();
+        match panestate.get_active_key() {
+            Some(key) => Some(self.data.get_mut(*key).unwrap()),
+            None => None,
+        }
+    }
+
+    pub(crate) fn get_panestate(&self) -> &PaneState {
+        self.panes.data.get(self.panes.active).unwrap()
+    }
+
+    pub(crate) fn get_mut_panestate(&mut self) -> &mut PaneState {
+        self.panes.data.get_mut(self.panes.active).unwrap()
+    }
+
+    pub(crate) fn insert_buffer(&mut self, buffer: Buffer) {
+        let key = self.data.insert(buffer);
+        self.get_mut_panestate().data.push(key);
+    }
+}
+
+impl PaneState {
+    pub fn get_active_key(&self) -> Option<&DefaultKey> {
+        self.data.get(self.active_tab_index)
+    }
+
+    pub fn get_data<'a>(&self, map: &'a SlotMap<DefaultKey, Buffer>) -> Vec<&'a Buffer> {
+        self.data.iter().map(|key| map.get(*key).unwrap()).collect()
+    }
+
+    pub fn with_key(key: &DefaultKey) -> Self {
+        PaneState {
+            data: vec![*key],
+            ..Default::default()
+        }
     }
 }
 

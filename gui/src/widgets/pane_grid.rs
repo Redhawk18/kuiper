@@ -15,15 +15,18 @@ use iced::{
 use iced_aw::core::icons::nerd::{icon_to_text, Nerd};
 use slotmap::{DefaultKey, SlotMap};
 
-pub(crate) fn pane_grid<'a>(
+pub fn pane_grid<'a>(
     panes: &'a Panes,
     map: &'a SlotMap<DefaultKey, Buffer>,
 ) -> PaneGrid<'a, Message, Theme, Renderer> {
-    PaneGrid::new(&panes.data, |pane, state, _is_maximized| {
-        let active = panes.active != pane;
+    let active = panes.active;
+
+    PaneGrid::new(&panes.data, move |pane, state, _is_maximized| {
+        let active = active != pane;
 
         // currently this is fine **if** we want all gui elements to be tabs
-        Content::new(tab_bar(state.active_tab_index, &state.get_data(map)))
+        let buffers = state.get_data(&map);
+        Content::new(tab_bar(state.active_tab_index, &buffers))
             .style(if active { pane_active } else { pane_inactive })
             .title_bar(title_bar(active, pane))
     })
@@ -35,7 +38,7 @@ pub(crate) fn pane_grid<'a>(
     .spacing(15)
 }
 
-fn title_bar(active: bool, pane: Pane) -> TitleBar<'static, Message, Theme, Renderer> {
+fn title_bar<'a>(active: bool, pane: Pane) -> TitleBar<'a, Message, Theme, Renderer> {
     TitleBar::new(
         Element::from(
             row!(
@@ -45,7 +48,7 @@ fn title_bar(active: bool, pane: Pane) -> TitleBar<'static, Message, Theme, Rend
                     .on_press(crate::PaneGrid::PaneSplit(Axis::Vertical, pane)),
                 button(icon_to_text(Nerd::X)).on_press(crate::PaneGrid::PaneClosed(pane)),
             )
-            .align_items(Alignment::Center),
+            .align_y(Alignment::Center),
         )
         .map(|x| Message::Widgets(Widgets::PaneGrid(x))),
     )

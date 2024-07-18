@@ -4,10 +4,10 @@ use iced::{Border, Theme};
 const WIDTH: f32 = 2.0;
 const RADIUS: f32 = 4.0;
 
-pub fn pane_active(theme: &Theme) -> container::Appearance {
+pub fn pane_active(theme: &Theme) -> container::Style {
     let palette = theme.extended_palette();
 
-    container::Appearance {
+    container::Style {
         background: Some(palette.background.base.color.into()),
         border: Border {
             color: palette.background.strong.color,
@@ -18,10 +18,10 @@ pub fn pane_active(theme: &Theme) -> container::Appearance {
     }
 }
 
-pub fn pane_inactive(theme: &Theme) -> container::Appearance {
+pub fn pane_inactive(theme: &Theme) -> container::Style {
     let palette = theme.extended_palette();
 
-    container::Appearance {
+    container::Style {
         background: Some(palette.background.base.color.into()),
         border: Border {
             color: palette.background.strong.color,
@@ -32,20 +32,20 @@ pub fn pane_inactive(theme: &Theme) -> container::Appearance {
     }
 }
 
-pub fn title_bar_active(theme: &Theme) -> container::Appearance {
+pub fn title_bar_active(theme: &Theme) -> container::Style {
     let palette = theme.extended_palette();
 
-    container::Appearance {
+    container::Style {
         text_color: Some(palette.background.strong.text),
         background: Some(palette.background.strong.color.into()),
         ..Default::default()
     }
 }
 
-pub fn title_bar_inactive(theme: &Theme) -> container::Appearance {
+pub fn title_bar_inactive(theme: &Theme) -> container::Style {
     let palette = theme.extended_palette();
 
-    container::Appearance {
+    container::Style {
         text_color: Some(palette.primary.strong.text),
         background: Some(palette.primary.strong.color.into()),
         ..Default::default()

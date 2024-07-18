@@ -29,7 +29,7 @@ impl LanguageClient for ClientState {
     type NotifyResult = ControlFlow<async_lsp::Result<()>>;
 }
 
-pub async fn initialize() -> Result<ServerSocket, async_lsp::Error> {
+pub async fn initialize() -> Result<ServerSocket, crate::Error> {
     let root_dir = Path::new(TEST_ROOT)
         .canonicalize()
         .expect("test root should be valid");
