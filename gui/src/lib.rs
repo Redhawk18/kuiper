@@ -159,7 +159,6 @@ impl Kuiper {
                         }
                     }
                     Button::SavedAs(_) => {}
-                    // Button::Quit => return iced::window::close(0),
                     Button::Quit => todo!(),
                 },
                 Widgets::PaneGrid(pane_grid) => match pane_grid {
@@ -212,11 +211,28 @@ impl Kuiper {
                         match buffer {
                             Buffer::File(buffer) => {
                                 buffer.content.perform(action);
-                                let path = buffer.path.clone().unwrap();
-                                return Task::perform(
-                                    synchronize(path, self.lsp_client.clone().unwrap().socket),
-                                    |x| Message::LanguageServer(LanguageServer::Syncronize(x)),
-                                );
+
+                                let path: PathBuf;
+                                match &buffer.path {
+                                    Some(pathbuf) => path = pathbuf.to_path_buf(),
+                                    None => {
+                                        return Task::none();
+                                    }
+                                }
+
+                                match &self.lsp_client {
+                                    Some(client) => {
+                                        return Task::perform(
+                                            synchronize(path, client.clone().socket),
+                                            |x| {
+                                                Message::LanguageServer(LanguageServer::Syncronize(
+                                                    x,
+                                                ))
+                                            },
+                                        );
+                                    }
+                                    None => {}
+                                }
                             }
                         }
                     }
