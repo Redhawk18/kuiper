@@ -5,16 +5,17 @@ mod style;
 mod widgets;
 
 use buffer::{Buffer, FileBuffer};
+use log::info;
 pub use messages::{Button, LanguageServer, Message, PaneGrid, Tab, TextEditor, Widgets};
 use widgets::{menu_bar, pane_grid};
 
 use kuiper_lsp::{
     client::LSPClient,
-    commands::{initialize, synchronize},
+    commands::{initialize, shutdown, synchronize},
 };
 
 use iced::{
-    application, font,
+    application, exit, font,
     widget::{
         column,
         pane_grid::{DragEvent, Pane, ResizeEvent, State},
@@ -159,7 +160,19 @@ impl Kuiper {
                         }
                     }
                     Button::SavedAs(_) => {}
-                    Button::Quit => todo!(),
+                    Button::Quit => {
+                        let mut tasks: Vec<Task<Message>> = Vec::new();
+
+                        if let Some(client) = &self.lsp_client {
+                            let task = Task::perform(shutdown(client.clone().socket), |_| {
+                                Message::LanguageServer(LanguageServer::Shutdown())
+                            });
+                            info!("Shutting down lsp");
+                            tasks.push(task);
+                        }
+
+                        return Task::batch(tasks).chain(exit());
+                    }
                 },
                 Widgets::PaneGrid(pane_grid) => match pane_grid {
                     PaneGrid::PaneClicked(pane) => self.panes.active = pane,

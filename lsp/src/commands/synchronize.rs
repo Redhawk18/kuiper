@@ -11,7 +11,6 @@ pub async fn synchronize(
     path: PathBuf,
     mut server: ServerSocket,
 ) -> Result<ServerSocket, crate::Error> {
-    //TODO add
     let text = tokio::fs::read_to_string(path.clone()).await.unwrap();
     let uri = Url::from_file_path(path).unwrap();
 
