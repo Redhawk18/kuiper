@@ -11,7 +11,7 @@ use widgets::{menu_bar, pane_grid};
 
 use kuiper_lsp::{
     client::LSPClient,
-    commands::{initialize, shutdown, synchronize},
+    commands::{did_open::did_open, initialize, shutdown},
 };
 
 use iced::{
@@ -86,7 +86,11 @@ impl Kuiper {
                     self.lsp_client = Some(LSPClient::new(server));
                 }
                 LanguageServer::Shutdown() => todo!(),
-                LanguageServer::Syncronize(server) => log::warn!("{:#?}", server),
+                LanguageServer::Syncronize(sync) => match sync {
+                    messages::Syncronize::DidClose => todo!(),
+                    messages::Syncronize::DidChange => todo!(),
+                    messages::Syncronize::DidOpen => did_open(path, server),
+                },
             },
             Message::Widgets(widget) => match widget {
                 Widgets::Button(button) => match button {

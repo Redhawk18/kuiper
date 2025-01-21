@@ -22,7 +22,14 @@ pub enum Message {
 pub enum LanguageServer {
     Initalize(Result<ServerSocket, kuiper_lsp::Error>),
     Shutdown(),
-    Syncronize(Result<ServerSocket, kuiper_lsp::Error>),
+    Syncronize(Syncronize),
+}
+
+#[derive(Debug)]
+pub enum Syncronize {
+    DidClose,
+    DidChange,
+    DidOpen(PathBuf, ServerSocket),
 }
 
 #[derive(Debug)]

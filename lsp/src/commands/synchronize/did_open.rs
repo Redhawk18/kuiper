@@ -7,7 +7,7 @@ use async_lsp::{
 use snafu::ResultExt;
 use std::path::PathBuf;
 
-pub async fn synchronize(
+pub async fn did_open(
     path: PathBuf,
     mut server: ServerSocket,
 ) -> Result<ServerSocket, crate::Error> {
