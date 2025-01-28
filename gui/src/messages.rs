@@ -1,5 +1,4 @@
 use crate::file_dialog;
-use kuiper_lsp::client::ServerSocket;
 
 use iced::{
     font,
@@ -8,6 +7,7 @@ use iced::{
         text_editor::Action,
     },
 };
+use kuiper_lsp::client::LSPClient;
 use std::path::PathBuf;
 
 #[derive(Debug)]
@@ -20,7 +20,7 @@ pub enum Message {
 
 #[derive(Debug)]
 pub enum LanguageServer {
-    Initalize(Result<ServerSocket, kuiper_lsp::Error>),
+    Initalize(Result<LSPClient, kuiper_lsp::Error>),
     Shutdown(),
     Syncronize(Syncronize),
 }
@@ -29,7 +29,7 @@ pub enum LanguageServer {
 pub enum Syncronize {
     DidClose,
     DidChange,
-    DidOpen(PathBuf, ServerSocket),
+    DidOpen(),
 }
 
 #[derive(Debug)]

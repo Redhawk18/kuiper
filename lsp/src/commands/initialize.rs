@@ -10,11 +10,13 @@ use async_lsp::{
     tracing::TracingLayer,
     LanguageClient, LanguageServer, ResponseError, ServerSocket,
 };
-use log::{info, trace};
-use std::{ops::ControlFlow, path::Path, process::Stdio};
+use std::{borrow::Borrow, ops::ControlFlow, path::Path, process::Stdio};
 use tokio::{process::Command, sync::oneshot, task::spawn};
 use tokio_util::compat::{TokioAsyncReadCompatExt, TokioAsyncWriteCompatExt};
 use tower::builder::ServiceBuilder;
+use tracing::{debug, info, trace};
+
+use crate::client::LSPClient;
 
 const TEST_ROOT: &str = ".";
 
@@ -29,7 +31,7 @@ impl LanguageClient for ClientState {
     type NotifyResult = ControlFlow<async_lsp::Result<()>>;
 }
 
-pub async fn initialize() -> Result<ServerSocket, crate::Error> {
+pub async fn initialize() -> Result<LSPClient, crate::Error> {
     let root_dir = Path::new(TEST_ROOT)
         .canonicalize()
         .expect("test root should be valid");
@@ -58,7 +60,7 @@ pub async fn initialize() -> Result<ServerSocket, crate::Error> {
             })
             .notification::<PublishDiagnostics>(|_, _| ControlFlow::Continue(()))
             .notification::<ShowMessage>(|_, params| {
-                trace!("Message {:?}: {}", params.typ, params.message);
+                debug!("Message {:?}: {}", params.typ, params.message);
                 ControlFlow::Continue(())
             })
             .event(|_, _: Stop| ControlFlow::Break(Ok(())));
@@ -70,7 +72,7 @@ pub async fn initialize() -> Result<ServerSocket, crate::Error> {
             .service(router)
     });
 
-    let child = Command::new("rust-analyzer")
+    let mut child = Command::new("rust-analyzer")
         .current_dir(&root_dir)
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
@@ -78,8 +80,8 @@ pub async fn initialize() -> Result<ServerSocket, crate::Error> {
         // .kill_on_drop(true)
         .spawn()
         .expect("Failed run rust-analyzer");
-    let stdout = child.stdout.unwrap().compat();
-    let stdin = child.stdin.unwrap().compat_write();
+    let stdout = child.stdout.take().unwrap().compat();
+    let stdin = child.stdin.take().unwrap().compat_write();
 
     let _mainloop_fut = spawn(async move { mainloop.run_buffered(stdout, stdin).await });
 
@@ -131,5 +133,6 @@ pub async fn initialize() -> Result<ServerSocket, crate::Error> {
 
     // Ok((mainloop_fut, child, server))
 
-    Ok(server)
+    let client = LSPClient::new(child, server);
+    Ok(client)
 }

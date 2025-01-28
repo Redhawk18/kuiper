@@ -1,5 +1,5 @@
 pub mod client;
-pub mod commands;
+// pub mod commands;
 
 use snafu::Snafu;
 use std::sync::Arc;

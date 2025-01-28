@@ -11,9 +11,10 @@
       systems = nixpkgs.lib.systems.flakeExposed;
 
       perSystem =
-        { lib
-        , pkgs
-        , ...
+        {
+          lib,
+          pkgs,
+          ...
         }:
         {
           # Per-system attributes can be defined here. The self' and inputs'
@@ -27,16 +28,19 @@
             # packages = with pkgs; [ rust-analyzer ];
 
             env = {
-              LD_LIBRARY_PATH = lib.makeLibraryPath (with pkgs; [
-                libGL
-                libxkbcommon
-                vulkan-loader
-                wayland
-                xorg.libXcursor
-                xorg.libXrandr
-                xorg.libXi
-                xorg.libX11
-              ]);
+              LD_LIBRARY_PATH = lib.makeLibraryPath (
+                with pkgs;
+                [
+                  libGL
+                  libxkbcommon
+                  vulkan-loader
+                  wayland
+                  xorg.libXcursor
+                  xorg.libXrandr
+                  xorg.libXi
+                  xorg.libX11
+                ]
+              );
               RUST_LOG = "info";
             };
           };

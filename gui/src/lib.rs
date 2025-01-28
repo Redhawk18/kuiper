@@ -5,14 +5,10 @@ mod style;
 mod widgets;
 
 use buffer::{Buffer, FileBuffer};
-use log::info;
+use kuiper_lsp::client::LSPClient;
+use messages::Syncronize;
 pub use messages::{Button, LanguageServer, Message, PaneGrid, Tab, TextEditor, Widgets};
 use widgets::{menu_bar, pane_grid};
-
-use kuiper_lsp::{
-    client::LSPClient,
-    commands::{did_open::did_open, initialize, shutdown},
-};
 
 use iced::{
     application, exit, font,
@@ -25,6 +21,7 @@ use iced::{
 };
 use slotmap::{DefaultKey, SlotMap};
 use std::path::PathBuf;
+use tracing::{error, info, warn};
 
 pub fn start_gui() -> iced::Result {
     application(Kuiper::title, Kuiper::update, Kuiper::view)
@@ -79,17 +76,24 @@ impl Kuiper {
             Message::LanguageServer(lsp) => match lsp {
                 LanguageServer::Initalize(result) => {
                     let Ok(server) = result else {
-                        log::error!("Error initializing language server");
+                        error!("Error initializing language server");
                         return Task::none();
                     };
 
-                    self.lsp_client = Some(LSPClient::new(server));
+                    // self.lsp_client = Some(LSPClient::new(server));
                 }
                 LanguageServer::Shutdown() => todo!(),
                 LanguageServer::Syncronize(sync) => match sync {
                     messages::Syncronize::DidClose => todo!(),
                     messages::Syncronize::DidChange => todo!(),
-                    messages::Syncronize::DidOpen => did_open(path, server),
+                    messages::Syncronize::DidOpen() => {
+                        // TODO too many moves and clones, may jesus help.
+                        // return Task::perform(did_open(path.clone(), server.clone()), move |_| {
+                        //     Message::LanguageServer(LanguageServer::Syncronize(
+                        //         Syncronize::DidOpen(path.clone(), server.clone()),
+                        //     ))
+                        // });
+                    }
                 },
             },
             Message::Widgets(widget) => match widget {
@@ -110,9 +114,9 @@ impl Kuiper {
                             content: Content::with_text(&file.1),
                         }));
 
-                        return Task::perform(initialize(), |x| {
-                            Message::LanguageServer(LanguageServer::Initalize(x))
-                        });
+                        //                         return Task::perform(initialize(), |x| {
+                        //                             Message::LanguageServer(LanguageServer::Initalize(x))
+                        //                         });
                     }
                     Button::OpenFolder => {
                         return Task::perform(file_dialog::open_folder(), |x| {
@@ -128,7 +132,7 @@ impl Kuiper {
                     }
                     Button::Save => {
                         let Some(buffer) = self.get_buffer() else {
-                            log::warn!("No file open to save");
+                            warn!("No file open to save");
                             return Task::none();
                         };
 
@@ -147,7 +151,7 @@ impl Kuiper {
                     Button::Saved(_) => {}
                     Button::SaveAs => {
                         let Some(buffer) = self.get_buffer() else {
-                            log::warn!("No file open to save");
+                            warn!("No file open to save");
                             return Task::none();
                         };
 
@@ -168,11 +172,12 @@ impl Kuiper {
                         let mut tasks: Vec<Task<Message>> = Vec::new();
 
                         if let Some(client) = &self.lsp_client {
-                            let task = Task::perform(shutdown(client.clone().socket), |_| {
-                                Message::LanguageServer(LanguageServer::Shutdown())
-                            });
+                            // let task =
+                            //     Task::perform(shutdown(client.clone().socket.clone()), |_| {
+                            //         Message::LanguageServer(LanguageServer::Shutdown())
+                            //     });
                             info!("Shutting down lsp");
-                            tasks.push(task);
+                            // tasks.push(task);
                         }
 
                         return Task::batch(tasks).chain(exit());
@@ -239,14 +244,14 @@ impl Kuiper {
 
                                 match &self.lsp_client {
                                     Some(client) => {
-                                        return Task::perform(
-                                            synchronize(path, client.clone().socket),
-                                            |x| {
-                                                Message::LanguageServer(LanguageServer::Syncronize(
-                                                    x,
-                                                ))
-                                            },
-                                        );
+                                        // return Task::perform(
+                                        // synchronize(path, client.clone().socket),
+                                        // |x| {
+                                        // Message::LanguageServer(LanguageServer::Syncronize(
+                                        // x,
+                                        // ))
+                                        // },
+                                        // );
                                     }
                                     None => {}
                                 }
