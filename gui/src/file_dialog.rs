@@ -3,6 +3,9 @@ use snafu::{ResultExt, Snafu};
 use std::{path::PathBuf, sync::Arc};
 use tokio::fs;
 
+pub type File = (Option<PathBuf>, String);
+pub type Folder = PathBuf;
+
 #[derive(Debug, Clone, Snafu)]
 pub enum Error {
     #[snafu(display("File dialog was closed by user"))]
@@ -20,7 +23,7 @@ pub enum Error {
 }
 
 /// Opens a file dialog from [AsyncFileDialog] and reads the contents and returns it.
-pub async fn open_file() -> Result<(PathBuf, String), Error> {
+pub async fn open_file() -> Result<File, Error> {
     let handle = AsyncFileDialog::new()
         .set_title("Open File")
         .pick_file()
@@ -33,11 +36,11 @@ pub async fn open_file() -> Result<(PathBuf, String), Error> {
     let path = file.path();
     let contents = fs::read_to_string(path).await.context(ReadSnafu { path });
 
-    Ok((path.to_path_buf(), contents.unwrap()))
+    Ok((Some(path.to_path_buf()), contents.unwrap()))
 }
 
 /// Opens a file dialog from [AsyncFileDialog] and returns the path.
-pub async fn open_folder() -> Result<PathBuf, Error> {
+pub async fn open_folder() -> Result<Folder, Error> {
     let handle = AsyncFileDialog::new()
         .set_title("Open Folder")
         .pick_folder()
@@ -51,8 +54,8 @@ pub async fn open_folder() -> Result<PathBuf, Error> {
 }
 
 /// Opens a file dialog if path is [None] from [AsyncFileDialog] and save the content of the file chosen to the filesystem.
-pub async fn save_file(path: Option<PathBuf>, contents: String) -> Result<(), Error> {
-    let path = match path {
+pub async fn save_file(file: File) -> Result<(), Error> {
+    let path = match file.0 {
         Some(path) => path,
         None => {
             let Some(handle) = AsyncFileDialog::new().save_file().await else {
@@ -62,14 +65,12 @@ pub async fn save_file(path: Option<PathBuf>, contents: String) -> Result<(), Er
         }
     };
 
-    fs::write(&path, contents)
-        .await
-        .context(WriteSnafu { path })
+    fs::write(&path, file.1).await.context(WriteSnafu { path })
 }
 
 /// Opens a file dialog from [AsyncFileDialog] and save the content of the file chosen to the filesystem
-pub async fn save_file_with_dialog(path: Option<PathBuf>, contents: String) -> Result<(), Error> {
-    let handle = match path {
+pub async fn save_file_as(file: File) -> Result<(), Error> {
+    let handle = match file.0 {
         Some(path) => {
             AsyncFileDialog::new()
                 .add_filter("Text Filies | *.txt", &["txt"])
@@ -91,7 +92,5 @@ pub async fn save_file_with_dialog(path: Option<PathBuf>, contents: String) -> R
     };
     let path = handle.path().to_path_buf();
 
-    fs::write(&path, contents)
-        .await
-        .context(WriteSnafu { path })
+    fs::write(&path, file.1).await.context(WriteSnafu { path })
 }

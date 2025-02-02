@@ -1,70 +1,11 @@
-use crate::{Buffer, Message, Tab, Widgets};
-
-use iced::{
-    widget::{column, Column, TextEditor},
-    Element, Length, Renderer, Theme,
-};
-use iced_aw::{
-    core::icons::nerd::{icon_to_char, Nerd},
-    TabBar, TabLabel,
-};
+use iced_aw::core::icons::nerd::Nerd;
 use std::path::PathBuf;
 
-pub fn tab_bar<'a>(active: usize, data: &[&'a Buffer]) -> Column<'a, Message, Theme, Renderer> {
-    if data.is_empty() {
-        column!()
-    } else {
-        let head = head(active, data);
-        let body = body(active, data);
-        column!(head, body).padding(1)
-    }
-}
+pub use iced_aw::core::icons::nerd::icon_to_char;
 
-fn head<'a>(active: usize, data: &[&Buffer]) -> TabBar<'a, Message, usize, Theme, Renderer> {
-    let mut tab_bar = TabBar::new(|x| Message::Widgets(Widgets::Tab(Tab::TabSelected(x))))
-        .on_close(|x| Message::Widgets(Widgets::Tab(Tab::TabClosed(x))));
-
-    for (i, tab) in data.iter().enumerate() {
-        match tab {
-            Buffer::File(file_buffer) => {
-                let file_name = if let Some(path) = &file_buffer.path {
-                    path.file_name()
-                        .expect("path is some, filename should not be none")
-                        .to_string_lossy()
-                        .to_string()
-                } else {
-                    "New Tab".to_string()
-                };
-                let file_icon = if let Some(path) = &file_buffer.path {
-                    path_to_char(path)
-                } else {
-                    icon_to_char(Nerd::File)
-                };
-
-                tab_bar = tab_bar.push(i, TabLabel::IconText(file_icon, file_name));
-            }
-        }
-    }
-
-    tab_bar.set_active_tab(&active).tab_width(Length::Shrink)
-}
-
-fn body<'a>(active: usize, data: &[&'a Buffer]) -> Element<'a, Message> {
-    let active_tab = data.get(active).expect("There is no active tab");
-
-    match active_tab {
-        Buffer::File(file_buffer) => TextEditor::new(&file_buffer.content)
-            .height(Length::Fill)
-            .on_action(|x| {
-                Message::Widgets(Widgets::TextEditor(crate::TextEditor::TextEditorUpdate(x)))
-            })
-            .into(),
-    }
-}
-
-/// Maps the file name to [`pattern_code::Langauges`]'s and matchs and returns the icon's char
+/// Maps the file name to [`pattern_code::Languages`]'s and matches and returns the icon's char
 /// value
-fn path_to_char(path: &PathBuf) -> char {
+pub fn path_to_char(path: &PathBuf) -> char {
     icon_to_char(match pattern_code::path_to_language(path) {
         pattern_code::Language::Assembly => Nerd::FileBinary,
         pattern_code::Language::Bash => Nerd::Bash,
@@ -124,4 +65,8 @@ fn path_to_char(path: &PathBuf) -> char {
         pattern_code::Language::Zsh => Nerd::TerminalBash,
         pattern_code::Language::Unknown => Nerd::File,
     })
+}
+
+pub fn file() -> char {
+    icon_to_char(Nerd::File)
 }
