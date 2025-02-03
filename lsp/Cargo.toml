@@ -9,6 +9,8 @@ license.workspace = true
 
 [dependencies]
 async-lsp.workspace = true
+futures.workspace = true
+iced_runtime.workspace = true
 snafu.workspace = true
 tokio.workspace = true
 tokio-util.workspace = true

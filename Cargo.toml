@@ -10,7 +10,6 @@ license.workspace = true
 
 [dependencies]
 kuiper_gui.workspace = true
-pretty_env_logger = "0.5.0"
 
 tracing-subscriber.workspace = true 
 
@@ -31,8 +30,10 @@ kuiper_gui = { path = "gui" }
 kuiper_lsp = { path = "lsp" }
 
 async-lsp = { version = "0.2" }
+futures = "0.3"
 iced = { version = "0.13.1", features = ["advanced", "tokio"] }
 iced_aw = { version = "0.10", features = ["icons", "tab_bar"], default-features = false }
+iced_runtime = "0.13.2"
 pattern_code = "0.1"
 rfd = { version = "0.15", features = ["xdg-portal", "tokio"], default-features = false}
 slotmap = "1.0"

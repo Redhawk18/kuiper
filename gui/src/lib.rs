@@ -1,6 +1,7 @@
-use iced::{application, exit, font, widget::column, Element, Task, Theme};
+use iced::{application, exit, font, widget::column, Element, Subscription, Task, Theme};
 use slotmap::{DefaultKey, SlotMap};
 use std::path::PathBuf;
+use tracing::warn;
 
 mod buffer;
 mod file_dialog;
@@ -14,6 +15,7 @@ use buffer::Buffer;
 
 pub fn start_gui() -> iced::Result {
     application(Kuiper::title, Kuiper::update, Kuiper::view)
+        .subscription(Kuiper::subscription)
         .theme(Kuiper::theme)
         .run_with(Kuiper::new)
 }
@@ -24,7 +26,7 @@ pub type Map = SlotMap<Key, Buffer>;
 #[derive(Default)]
 pub struct Kuiper {
     data: Map,
-    lsp_client: Option<kuiper_lsp::client::LSPClient>,
+    lsp_client: Option<kuiper_lsp::Connection>,
     panes: panes::Panes,
     workspace_folder: Option<PathBuf>,
 }
@@ -33,7 +35,7 @@ pub struct Kuiper {
 pub enum Message {
     FontLoaded(Result<(), font::Error>),
 
-    LanguageServer(lsp::Message),
+    LanguageServer(kuiper_lsp::Message),
     Toolbar(toolbar::Message),
     Panes(panes::Message),
 }
@@ -57,6 +59,10 @@ impl Kuiper {
         Theme::GruvboxDark
     }
 
+    fn subscription(&self) -> Subscription<Message> {
+        Subscription::run(kuiper_lsp::client).map(Message::LanguageServer)
+    }
+
     fn update(&mut self, message: Message) -> Task<Message> {
         match message {
             Message::FontLoaded(_) => Task::none(),
@@ -64,10 +70,21 @@ impl Kuiper {
                 if let Some(action) = toolbar::update(message) {
                     match action {
                         toolbar::Action::InsertFileBuffer(buffer) => {
+                            let path = buffer.path.clone().unwrap();
                             let key = self.data.insert(buffer.into());
                             self.panes
                                 .active_pane_mut()
                                 .map(|pane| pane.insert_buffer(key));
+
+                            // Blindly tell lsp every file is opened we want to send to it
+                            // if let Some(client) = &mut self.lsp_client {
+                            //     return Task::perform(
+                            //         client.did_open(path),
+                            //         lsp::Syncronize::DidOpen,
+                            //     )
+                            //     .map(lsp::Message::Syncronize)
+                            //     .map(Message::LanguageServer);
+                            // }
                         }
                         toolbar::Action::SetWorkspacePath(path) => {
                             self.workspace_folder = Some(path);
@@ -114,7 +131,7 @@ impl Kuiper {
                                 //     Task::perform(shutdown(client.clone().socket.clone()), |_| {
                                 //         Message::LanguageServer(LanguageServer::Shutdown())
                                 //     });
-                                tracing::info!("Shutting down lsp");
+                                // tracing::info!("Shutting down lsp");
                                 // tasks.push(task);
                             }
 
