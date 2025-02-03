@@ -6,9 +6,9 @@ mod buffer;
 mod file_dialog;
 pub mod icon;
 mod lsp;
-mod menu_bar;
-mod pane_grid;
+mod panes;
 mod style;
+mod toolbar;
 
 use buffer::Buffer;
 
@@ -25,16 +25,17 @@ pub type Map = SlotMap<Key, Buffer>;
 pub struct Kuiper {
     data: Map,
     lsp_client: Option<kuiper_lsp::client::LSPClient>,
-    panes: pane_grid::Panes,
+    panes: panes::Panes,
     workspace_folder: Option<PathBuf>,
 }
 
 #[derive(Debug)]
 pub enum Message {
     FontLoaded(Result<(), font::Error>),
+
     LanguageServer(lsp::Message),
-    Menu(menu_bar::Message),
-    Panes(pane_grid::Message),
+    Toolbar(toolbar::Message),
+    Panes(panes::Message),
 }
 
 impl Kuiper {
@@ -59,19 +60,19 @@ impl Kuiper {
     fn update(&mut self, message: Message) -> Task<Message> {
         match message {
             Message::FontLoaded(_) => Task::none(),
-            Message::Menu(message) => {
-                if let Some(action) = menu_bar::update(message) {
+            Message::Toolbar(message) => {
+                if let Some(action) = toolbar::update(message) {
                     match action {
-                        menu_bar::Action::InsertFileBuffer(buffer) => {
+                        toolbar::Action::InsertFileBuffer(buffer) => {
                             let key = self.data.insert(buffer.into());
                             self.panes
                                 .active_pane_mut()
                                 .map(|pane| pane.insert_buffer(key));
                         }
-                        menu_bar::Action::SetWorkspacePath(path) => {
+                        toolbar::Action::SetWorkspacePath(path) => {
                             self.workspace_folder = Some(path);
                         }
-                        menu_bar::Action::SaveBuffer => {
+                        toolbar::Action::SaveBuffer => {
                             if let Some(buffer) = self
                                 .panes
                                 .active_buffer_key()
@@ -81,14 +82,14 @@ impl Kuiper {
                                     Buffer::File(file_buffer) => {
                                         return Task::perform(
                                             file_dialog::save_file(file_buffer.to_file()),
-                                            menu_bar::Message::FileSaved,
+                                            toolbar::Message::FileSaved,
                                         )
-                                        .map(Message::Menu);
+                                        .map(Message::Toolbar);
                                     }
                                 }
                             }
                         }
-                        menu_bar::Action::SaveBufferAs => {
+                        toolbar::Action::SaveBufferAs => {
                             if let Some(buffer) = self
                                 .panes
                                 .active_buffer_key()
@@ -98,14 +99,14 @@ impl Kuiper {
                                     Buffer::File(file_buffer) => {
                                         return Task::perform(
                                             file_dialog::save_file_as(file_buffer.to_file()),
-                                            menu_bar::Message::FileSavedAs,
+                                            toolbar::Message::FileSavedAs,
                                         )
-                                        .map(Message::Menu);
+                                        .map(Message::Toolbar);
                                     }
                                 }
                             }
                         }
-                        menu_bar::Action::Quit => {
+                        toolbar::Action::Quit => {
                             let tasks = Vec::new();
 
                             if let Some(_) = &self.lsp_client {
@@ -119,7 +120,7 @@ impl Kuiper {
 
                             return Task::batch(tasks).chain(exit());
                         }
-                        menu_bar::Action::Run(task) => return task.map(Message::Menu),
+                        toolbar::Action::Run(task) => return task.map(Message::Toolbar),
                     }
                 }
 
@@ -137,9 +138,10 @@ impl Kuiper {
 
     fn view(&self) -> Element<Message> {
         column!(
-            menu_bar::view().map(Message::Menu),
+            toolbar::view().map(Message::Toolbar),
             self.panes.view(&self.data).map(Message::Panes)
         )
+        .spacing(2)
         .padding(8)
         .into()
     }
