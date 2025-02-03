@@ -48,7 +48,9 @@ pub(crate) fn view() -> Element<'static, Message> {
 
     let quit = button("Quit").on_press(Message::Quit).width(150);
 
-    row![new_file, open_file, open_folder, save, save_as, quit].into()
+    row![new_file, open_file, open_folder, save, save_as, quit]
+        .spacing(2)
+        .into()
 }
 
 pub fn update(message: Message) -> Option<Action> {

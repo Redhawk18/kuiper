@@ -6,7 +6,7 @@ use iced::{
 use iced_aw::core::icons::nerd::{icon_to_text, Nerd};
 use kuiper_lsp::client::LSPClient;
 
-mod tab_bar;
+mod tabs;
 
 use crate::{
     buffer::Buffer,
@@ -22,7 +22,7 @@ pub enum Message {
     PaneResized(ResizeEvent),
     PaneSplit(Axis, Pane),
 
-    TabBar(Pane, tab_bar::Message),
+    Tabs(Pane, tabs::Message),
     Editor(Pane, text_editor::Action),
 }
 
@@ -91,17 +91,17 @@ impl Panes {
         client: &'a mut Option<LSPClient>,
     ) -> Task<Message> {
         match message {
-            Message::TabBar(pane_id, message) => match message {
+            Message::Tabs(pane_id, message) => match message {
                 // Here we could also use something like `tab_bar::update(/* ...
                 // */) -> Option<Action>` and match on the result to handle any
                 // actions, but since the tab bar is so simple it's shorter and
                 // easier to just handle "actions" here directly.
-                tab_bar::Message::Selected(buffer_id) => {
+                tabs::Message::Selected(buffer_id) => {
                     self.panes.get_mut(pane_id).map(|pane| {
                         pane.active_buffer = buffer_id;
                     });
                 }
-                tab_bar::Message::Closed(buffer_id) => {
+                tabs::Message::Closed(buffer_id) => {
                     self.panes.get_mut(pane_id).map(|pane| {
                         pane.active_buffer = pane.active_buffer.saturating_sub(1);
                         pane.open_buffers.remove(buffer_id);
@@ -201,7 +201,7 @@ fn body<'a>(
 
     match active_buffer {
         Some(Buffer::File(file_buffer)) => column![
-            tab_bar::view(*active, visible_buffers()).map(move |msg| Message::TabBar(pane, msg)),
+            tabs::view(*active, visible_buffers()).map(move |msg| Message::Tabs(pane, msg)),
             text_editor(&file_buffer.content)
                 .height(Fill)
                 .on_action(move |action| Message::Editor(pane, action))
