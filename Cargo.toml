@@ -30,7 +30,7 @@ license = "MPL-2.0"
 kuiper_gui = { path = "gui" }
 kuiper_lsp = { path = "lsp" }
 
-async-lsp = { version = "0.2", features = ["tracing"] }
+async-lsp = { version = "0.2" }
 iced = { version = "0.13.1", features = ["advanced", "tokio"] }
 iced_aw = { version = "0.10", features = ["icons", "tab_bar"], default-features = false }
 pattern_code = "0.1"
@@ -41,7 +41,7 @@ tokio = { version = "1", features = ["fs", "process", "tracing"] }
 tokio-util = { version = "0.7", features = ["compat"] }
 tower = "0.4"
 tracing = "0.1"
-tracing-subscriber = "0.3"
+tracing-subscriber =  { version = "0.3", features = ["env-filter"] }
 
 [patch.crates-io]
 # iced = { git = 'https://github.com/iced-rs/iced.git' }

@@ -77,7 +77,7 @@ pub async fn initialize() -> Result<LSPClient, crate::Error> {
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .stderr(Stdio::inherit())
-        // .kill_on_drop(true)
+        .kill_on_drop(true)
         .spawn()
         .expect("Failed run rust-analyzer");
     let stdout = child.stdout.take().unwrap().compat();

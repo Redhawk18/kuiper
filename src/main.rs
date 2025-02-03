@@ -1,8 +1,9 @@
 use kuiper_gui::start_gui;
+use tracing_subscriber::{fmt, EnvFilter};
 
 fn main() {
-    tracing_subscriber::fmt::init();
-    // pretty_env_logger::init();
+    let filter = EnvFilter::from_default_env().add_directive("async_lsp=trace".parse().unwrap());
+    fmt().with_env_filter(filter).init();
 
     let _ = start_gui();
 }

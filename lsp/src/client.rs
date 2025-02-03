@@ -9,7 +9,7 @@ use async_lsp::{
     panic::CatchUnwindLayer,
     router::Router,
     tracing::TracingLayer,
-    LanguageClient, LanguageServer, ResponseError, ServerSocket,
+    LanguageServer, ServerSocket,
 };
 use snafu::ResultExt;
 use std::{
@@ -19,8 +19,9 @@ use std::{
 };
 use tokio::{
     process::{Child, Command},
+    spawn,
     sync::oneshot,
-    task::{spawn, JoinHandle},
+    task::JoinHandle,
 };
 use tokio_util::compat::{TokioAsyncReadCompatExt, TokioAsyncWriteCompatExt};
 use tower::builder::ServiceBuilder;
@@ -39,7 +40,8 @@ struct ClientState {
 #[derive(Debug)]
 pub struct LSPClient {
     mainloop: JoinHandle<Result<(), async_lsp::Error>>,
-    process: Child,
+    /// We want to hold onto the child process to properly kill on drop.
+    _process: Child,
     socket: ServerSocket,
 }
 
@@ -90,13 +92,13 @@ impl LSPClient {
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
             .stderr(Stdio::inherit())
-            // .kill_on_drop(true)
+            .kill_on_drop(true)
             .spawn()
             .expect("Failed run rust-analyzer");
         let stdout = child.stdout.take().unwrap().compat();
         let stdin = child.stdin.take().unwrap().compat_write();
 
-        let _mainloop_fut = spawn(async move { mainloop.run_buffered(stdout, stdin).await });
+        let mainloop_future = spawn(async move { mainloop.run_buffered(stdout, stdin).await });
 
         // Initialize.
         let root_uri = Url::from_file_path(&root_dir).unwrap();
@@ -117,53 +119,27 @@ impl LSPClient {
         info!("Initialized: {init_ret:?}");
         server.initialized(InitializedParams {}).unwrap();
 
-        // Synchronize documents.
-        // these need to be in a command that runs consisntly
-        // let file_uri = Url::from_file_path(root_dir.join("src/main.rs")).unwrap();
-        // let text = tokio::fs::read_to_string(file_uri.path()).await.unwrap();
-        // server
-        //     .did_open(DidOpenTextDocumentParams {
-        //         text_document: TextDocumentItem {
-        //             uri: file_uri.clone(),
-        //             language_id: "rust".into(),
-        //             version: 0,
-        //             text: text.clone(),
-        //         },
-        //     })
-        //     .unwrap();
-
         // Wait until indexed.
         indexed_rx.await.unwrap();
 
-        //        // Shutdown.
-        //        // server.shutdown(()).await.unwrap();
-        //        // server.exit(()).unwrap();
-
-        //        // server.emit(Stop).unwrap();
-        //        // mainloop_fut.await.unwrap();
-        //        //
-        //        //
-
-        // Ok((mainloop_fut, child, server))
-
         Ok(LSPClient {
-            mainloop: _mainloop_fut,
-            process: child,
+            mainloop: mainloop_future,
+            _process: child,
             socket: server,
         })
     }
 
+    /// Shutdowns server, this method is not run on process termination.
+    /// Only on user requested process termination.
     pub async fn shutdown(&mut self) -> Result<(), crate::Error> {
         info!("Language Server Protocol Client shutting down.");
 
-        self.socket.shutdown(()).await.context(LspSnafu);
-        self.socket.exit(()).context(LspSnafu);
-        self.socket.emit(Stop).context(LspSnafu);
-        // TODO
-        // self.mainloop.await.unwrap();
+        self.socket.shutdown(()).await.context(LspSnafu)?;
+        self.socket.exit(()).context(LspSnafu)?;
+        self.socket.emit(Stop).context(LspSnafu)?;
+        (&mut self.mainloop).await.unwrap().context(LspSnafu)?;
 
-        debug!("Language Server Protocol Client shutdown complete.");
-
+        trace!("Language Server Protocol Client shutdown complete.");
         Ok(())
     }
 
