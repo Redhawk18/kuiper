@@ -13,7 +13,7 @@ pub enum Message {
 pub enum Syncronize {
     DidClose,
     DidChange,
-    DidOpen(),
+    DidOpen(Result<(), kuiper_lsp::Error>),
 }
 
 pub fn update(lsp_client: &mut Option<LSPClient>, message: Message) -> Task<Message> {
@@ -29,8 +29,9 @@ pub fn update(lsp_client: &mut Option<LSPClient>, message: Message) -> Task<Mess
         },
         Message::Shutdown => {
             if let Some(client) = lsp_client {
+                // TODO it doesn't currently work lmao
+                // this is a future, but we're in a non-async block
                 client.shutdown();
-                todo!("Implement LSP shutdown");
             }
         }
         Message::Syncronize(sync) => {
@@ -42,7 +43,7 @@ pub fn update(lsp_client: &mut Option<LSPClient>, message: Message) -> Task<Mess
                     Syncronize::DidChange => {
                         eprintln!("DidChange not implemented");
                     }
-                    Syncronize::DidOpen() => {
+                    Syncronize::DidOpen(_) => {
                         eprintln!("DidOpen not implemented");
                     }
                 }

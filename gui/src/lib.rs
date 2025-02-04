@@ -1,4 +1,5 @@
-use iced::{application, exit, font, widget::column, Element, Task, Theme};
+use iced::{application, exit, font, futures::FutureExt, widget::column, Element, Task, Theme};
+use kuiper_lsp::client::LSPClient;
 use slotmap::{DefaultKey, SlotMap};
 use std::path::PathBuf;
 
@@ -45,6 +46,9 @@ impl Kuiper {
             Task::batch(vec![
                 font::load(iced_aw::BOOTSTRAP_FONT_BYTES).map(Message::FontLoaded),
                 font::load(iced_aw::NERD_FONT_BYTES).map(Message::FontLoaded),
+                // TODO lazy load lsp start up
+                Task::perform(LSPClient::initialize(), lsp::Message::Initalize)
+                    .map(Message::LanguageServer),
             ]),
         )
     }
@@ -64,10 +68,21 @@ impl Kuiper {
                 if let Some(action) = toolbar::update(message) {
                     match action {
                         toolbar::Action::InsertFileBuffer(buffer) => {
+                            let path = buffer.path.clone().unwrap();
                             let key = self.data.insert(buffer.into());
                             self.panes
                                 .active_pane_mut()
                                 .map(|pane| pane.insert_buffer(key));
+
+                            // Blindly tell lsp every file is opened we want to send to it
+                            // if let Some(client) = &mut self.lsp_client {
+                            //     return Task::perform(
+                            //         client.did_open(path),
+                            //         lsp::Syncronize::DidOpen,
+                            //     )
+                            //     .map(lsp::Message::Syncronize)
+                            //     .map(Message::LanguageServer);
+                            // }
                         }
                         toolbar::Action::SetWorkspacePath(path) => {
                             self.workspace_folder = Some(path);
@@ -114,7 +129,7 @@ impl Kuiper {
                                 //     Task::perform(shutdown(client.clone().socket.clone()), |_| {
                                 //         Message::LanguageServer(LanguageServer::Shutdown())
                                 //     });
-                                tracing::info!("Shutting down lsp");
+                                // tracing::info!("Shutting down lsp");
                                 // tasks.push(task);
                             }
 

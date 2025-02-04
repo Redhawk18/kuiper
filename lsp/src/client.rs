@@ -150,34 +150,23 @@ impl LSPClient {
     pub async fn did_change() -> Result<ServerSocket, crate::Error> {
         todo!()
     }
-    pub async fn did_open(
-        path: PathBuf,
-        mut server: ServerSocket,
-    ) -> Result<ServerSocket, crate::Error> {
+    pub async fn did_open(&mut self, path: PathBuf) -> Result<(), crate::Error> {
         let text = tokio::fs::read_to_string(path.clone()).await.unwrap();
         // TODO We already have the text else where in the program,
         // so we shouldn't need to re-read it.
         let uri = Url::from_file_path(path).unwrap();
 
-        match server.did_open(DidOpenTextDocumentParams {
-            text_document: TextDocumentItem {
-                uri,
-                language_id: "rust".into(),
-                version: 0,
-                text,
-            },
-        }) {
-            Ok(_) => Ok(server.clone()),
-            Err(e) => Err(e).context(LspSnafu),
-        }
+        self.socket
+            .did_open(DidOpenTextDocumentParams {
+                text_document: TextDocumentItem {
+                    uri,
+                    language_id: "rust".into(),
+                    version: 0,
+                    text,
+                },
+            })
+            .context(LspSnafu)?;
+
+        Ok(())
     }
 }
-
-// impl Drop for LSPClient {
-//     fn drop(&mut self) {
-//         error!("we are dropping");
-//         Runtime::new()
-//             .expect("Create tokio runtime")
-//             .block_on(shutdown(self.socket.clone()));
-//     }
-// }
