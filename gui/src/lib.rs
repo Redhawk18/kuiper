@@ -1,7 +1,7 @@
-use iced::{application, exit, font, futures::FutureExt, widget::column, Element, Task, Theme};
-use kuiper_lsp::client::LSPClient;
+use iced::{application, exit, font, widget::column, Element, Subscription, Task, Theme};
 use slotmap::{DefaultKey, SlotMap};
 use std::path::PathBuf;
+use tracing::warn;
 
 mod buffer;
 mod file_dialog;
@@ -15,6 +15,7 @@ use buffer::Buffer;
 
 pub fn start_gui() -> iced::Result {
     application(Kuiper::title, Kuiper::update, Kuiper::view)
+        .subscription(Kuiper::subscription)
         .theme(Kuiper::theme)
         .run_with(Kuiper::new)
 }
@@ -25,7 +26,7 @@ pub type Map = SlotMap<Key, Buffer>;
 #[derive(Default)]
 pub struct Kuiper {
     data: Map,
-    lsp_client: Option<kuiper_lsp::client::LSPClient>,
+    lsp_client: Option<kuiper_lsp::Connection>,
     panes: panes::Panes,
     workspace_folder: Option<PathBuf>,
 }
@@ -34,7 +35,7 @@ pub struct Kuiper {
 pub enum Message {
     FontLoaded(Result<(), font::Error>),
 
-    LanguageServer(lsp::Message),
+    LanguageServer(kuiper_lsp::Message),
     Toolbar(toolbar::Message),
     Panes(panes::Message),
 }
@@ -46,9 +47,6 @@ impl Kuiper {
             Task::batch(vec![
                 font::load(iced_aw::BOOTSTRAP_FONT_BYTES).map(Message::FontLoaded),
                 font::load(iced_aw::NERD_FONT_BYTES).map(Message::FontLoaded),
-                // TODO lazy load lsp start up
-                Task::perform(LSPClient::initialize(), lsp::Message::Initalize)
-                    .map(Message::LanguageServer),
             ]),
         )
     }
@@ -59,6 +57,10 @@ impl Kuiper {
 
     fn theme(&self) -> Theme {
         Theme::GruvboxDark
+    }
+
+    fn subscription(&self) -> Subscription<Message> {
+        Subscription::run(kuiper_lsp::client).map(Message::LanguageServer)
     }
 
     fn update(&mut self, message: Message) -> Task<Message> {

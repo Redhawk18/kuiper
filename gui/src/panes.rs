@@ -88,7 +88,7 @@ impl Panes {
         &'a mut self,
         message: Message,
         data: &'a mut Map,
-        client: &'a mut Option<LSPClient>,
+        connection: &'a mut Option<kuiper_lsp::Connection>,
     ) -> Task<Message> {
         match message {
             Message::Tabs(pane_id, message) => match message {
@@ -142,7 +142,7 @@ impl Panes {
                         Buffer::File(file_buffer) => {
                             file_buffer.content.perform(action);
                             tracing::warn!("LSP client update not implemented");
-                            if let Some(_client) = client {
+                            if let Some(_client) = connection {
                                 if let Some(_path) = &file_buffer.path {
                                     // return Task::perform(
                                     // synchronize(path, client.clone().socket),

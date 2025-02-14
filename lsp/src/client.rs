@@ -21,7 +21,6 @@ use tokio::{
     process::{Child, Command},
     spawn,
     sync::oneshot,
-    task::JoinHandle,
 };
 use tokio_util::compat::{TokioAsyncReadCompatExt, TokioAsyncWriteCompatExt};
 use tower::builder::ServiceBuilder;
@@ -39,7 +38,6 @@ struct ClientState {
 
 #[derive(Debug)]
 pub struct LSPClient {
-    mainloop: JoinHandle<Result<(), async_lsp::Error>>,
     /// We want to hold onto the child process to properly kill on drop.
     _process: Child,
     socket: ServerSocket,
@@ -98,7 +96,7 @@ impl LSPClient {
         let stdout = child.stdout.take().unwrap().compat();
         let stdin = child.stdin.take().unwrap().compat_write();
 
-        let mainloop_future = spawn(async move { mainloop.run_buffered(stdout, stdin).await });
+        let _mainloop_future = spawn(async move { mainloop.run_buffered(stdout, stdin).await });
 
         // Initialize.
         let root_uri = Url::from_file_path(&root_dir).unwrap();
@@ -122,8 +120,7 @@ impl LSPClient {
         // Wait until indexed.
         indexed_rx.await.unwrap();
 
-        Ok(LSPClient {
-            mainloop: mainloop_future,
+        Ok(Self {
             _process: child,
             socket: server,
         })
@@ -133,12 +130,9 @@ impl LSPClient {
     /// Only on user requested process termination.
     pub async fn shutdown(&mut self) -> Result<(), crate::Error> {
         info!("Language Server Protocol Client shutting down.");
-
         self.socket.shutdown(()).await.context(LspSnafu)?;
         self.socket.exit(()).context(LspSnafu)?;
         self.socket.emit(Stop).context(LspSnafu)?;
-        (&mut self.mainloop).await.unwrap().context(LspSnafu)?;
-
         trace!("Language Server Protocol Client shutdown complete.");
         Ok(())
     }
