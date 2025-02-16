@@ -70,7 +70,7 @@ pub fn update(message: Message) -> Option<Action> {
         Message::FileOpened(result) => result
             .ok()
             .map(|file| Action::InsertFileBuffer(file.into())),
-        Message::FolderOpened(result) => result.ok().map(|folder| Action::SetWorkspacePath(folder)),
+        Message::FolderOpened(result) => result.ok().map(Action::SetWorkspacePath),
         Message::FileSaved(_) => {
             tracing::info!("File saved");
             None

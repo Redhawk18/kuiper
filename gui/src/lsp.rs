@@ -1,7 +1,9 @@
 use iced::Task;
-use tracing::debug;
+use tracing::{debug, error};
 
 use kuiper_lsp::Message;
+
+// this file should just be deleted tbh
 
 pub fn update(
     lsp_connection: &mut Option<kuiper_lsp::Connection>,
@@ -14,7 +16,11 @@ pub fn update(
         }
         Message::Shutdown => todo!(),
         Message::Synchronize(synchronize) => match synchronize {
-            kuiper_lsp::Synchronize::DidOpen => todo!(),
+            kuiper_lsp::Synchronize::DidOpen(_path) => {
+                error!("gui/lsp.rs");
+            }
+            kuiper_lsp::Synchronize::DidChange => todo!(),
+            kuiper_lsp::Synchronize::DidClose => todo!(),
         },
     };
     Task::none()

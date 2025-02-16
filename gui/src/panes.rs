@@ -4,7 +4,6 @@ use iced::{
     Alignment, Element, Fill, Renderer, Task, Theme,
 };
 use iced_aw::core::icons::nerd::{icon_to_text, Nerd};
-use kuiper_lsp::client::LSPClient;
 
 mod tabs;
 
@@ -97,15 +96,15 @@ impl Panes {
                 // actions, but since the tab bar is so simple it's shorter and
                 // easier to just handle "actions" here directly.
                 tabs::Message::Selected(buffer_id) => {
-                    self.panes.get_mut(pane_id).map(|pane| {
+                    if let Some(pane) = self.panes.get_mut(pane_id) {
                         pane.active_buffer = buffer_id;
-                    });
+                    }
                 }
                 tabs::Message::Closed(buffer_id) => {
-                    self.panes.get_mut(pane_id).map(|pane| {
+                    if let Some(pane) = self.panes.get_mut(pane_id) {
                         pane.active_buffer = pane.active_buffer.saturating_sub(1);
                         pane.open_buffers.remove(buffer_id);
-                    });
+                    }
                 }
             },
             Message::PaneClicked(pane_id) => self.active_pane = pane_id,
@@ -135,8 +134,7 @@ impl Panes {
                 if let Some(buffer) = self
                     .panes
                     .get(pane_id)
-                    .map(|pane| data.get_mut(pane.open_buffers[pane.active_buffer]))
-                    .flatten()
+                    .and_then(|pane| data.get_mut(pane.open_buffers[pane.active_buffer]))
                 {
                     match buffer {
                         Buffer::File(file_buffer) => {
@@ -180,13 +178,12 @@ fn title_bar<'a>(active: bool, pane: Pane) -> TitleBar<'a, Message, Theme, Rende
     } else {
         title_bar_inactive
     })
-    .into()
 }
 
 fn body<'a>(
     pane: Pane,
     active: &'a usize,
-    visible: &'a Vec<Key>,
+    visible: &'a [Key],
     data: &'a Map,
 ) -> Element<'a, Message, Theme, Renderer> {
     // create a reusable iterator for visible buffers

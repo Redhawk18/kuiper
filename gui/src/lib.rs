@@ -1,7 +1,6 @@
-use iced::{application, exit, font, widget::column, Element, Subscription, Task, Theme};
+use iced::{application, font, widget::column, Element, Subscription, Task, Theme};
 use slotmap::{DefaultKey, SlotMap};
 use std::path::PathBuf;
-use tracing::warn;
 
 mod buffer;
 mod file_dialog;
@@ -72,19 +71,16 @@ impl Kuiper {
                         toolbar::Action::InsertFileBuffer(buffer) => {
                             let path = buffer.path.clone().unwrap();
                             let key = self.data.insert(buffer.into());
-                            self.panes
-                                .active_pane_mut()
-                                .map(|pane| pane.insert_buffer(key));
+                            if let Some(pane) = self.panes.active_pane_mut() {
+                                pane.insert_buffer(key)
+                            }
 
                             // Blindly tell lsp every file is opened we want to send to it
-                            // if let Some(client) = &mut self.lsp_client {
-                            //     return Task::perform(
-                            //         client.did_open(path),
-                            //         lsp::Syncronize::DidOpen,
-                            //     )
-                            //     .map(lsp::Message::Syncronize)
-                            //     .map(Message::LanguageServer);
-                            // }
+                            if let Some(client) = &mut self.lsp_client {
+                                client.send(kuiper_lsp::Message::Synchronize(
+                                    kuiper_lsp::Synchronize::DidOpen(path),
+                                ))
+                            }
                         }
                         toolbar::Action::SetWorkspacePath(path) => {
                             self.workspace_folder = Some(path);
@@ -124,18 +120,11 @@ impl Kuiper {
                             }
                         }
                         toolbar::Action::Quit => {
-                            let tasks = Vec::new();
-
-                            if let Some(_) = &self.lsp_client {
-                                // let task =
-                                //     Task::perform(shutdown(client.clone().socket.clone()), |_| {
-                                //         Message::LanguageServer(LanguageServer::Shutdown())
-                                //     });
-                                // tracing::info!("Shutting down lsp");
-                                // tasks.push(task);
+                            if let Some(connection) = &mut self.lsp_client {
+                                connection.send(kuiper_lsp::Message::Shutdown)
                             }
 
-                            return Task::batch(tasks).chain(exit());
+                            return iced::exit();
                         }
                         toolbar::Action::Run(task) => return task.map(Message::Toolbar),
                     }

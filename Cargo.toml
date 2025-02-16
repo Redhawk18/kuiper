@@ -38,7 +38,7 @@ pattern_code = "0.1"
 rfd = { version = "0.15", features = ["xdg-portal", "tokio"], default-features = false}
 slotmap = "1.0"
 snafu = "0.8"
-tokio = { version = "1", features = ["fs", "process", "tracing"] }
+tokio = { version = "1", features = ["fs", "process", "time", "tracing", "rt"] }
 tokio-util = { version = "0.7", features = ["compat"] }
 tower = "0.4"
 tracing = "0.1"

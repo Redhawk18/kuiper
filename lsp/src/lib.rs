@@ -7,9 +7,8 @@ use futures::{
 };
 use iced_runtime::futures::stream::channel;
 use snafu::Snafu;
-use std::{sync::Arc, time::Duration};
-use tokio::time::sleep;
-use tracing::{info, warn};
+use std::{path::PathBuf, sync::Arc};
+use tracing::{error, warn};
 
 const CHANNEL_SIZE: usize = 1024;
 
@@ -40,7 +39,9 @@ pub enum Message {
 
 #[derive(Debug, Clone)]
 pub enum Synchronize {
-    DidOpen,
+    DidChange,
+    DidClose,
+    DidOpen(PathBuf),
 }
 
 impl Connection {
@@ -61,12 +62,19 @@ pub fn client() -> impl Stream<Item = Message> {
                     if let Some(message) = receiver.next().await {
                         match message {
                             Message::Initialized(sender) => {
-                                info!("we are init");
+                                error!("we are init");
                             }
                             Message::Shutdown => {
                                 let _ = client.shutdown().await;
                             }
-                            Message::Synchronize(_) => todo!(),
+                            Message::Synchronize(synchronize) => match synchronize {
+                                Synchronize::DidChange => todo!(),
+                                Synchronize::DidClose => todo!(),
+                                Synchronize::DidOpen(path) => {
+                                    error!("lsp/src/lib.rs 75");
+                                    let _ = client.did_open(path).await;
+                                }
+                            },
                         }
                     }
                 }
@@ -78,8 +86,7 @@ pub fn client() -> impl Stream<Item = Message> {
                     }
                     Err(e) => {
                         warn!("{e}");
-                        let _ = output.send(Message::Shutdown);
-                        sleep(Duration::from_secs(1)).await;
+                        let _ = output.send(Message::Shutdown).await;
                     }
                 },
             }

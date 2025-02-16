@@ -1,11 +1,11 @@
 use iced_aw::core::icons::nerd::Nerd;
-use std::path::PathBuf;
+use std::path::Path;
 
 pub use iced_aw::core::icons::nerd::icon_to_char;
 
 /// Maps the file name to [`pattern_code::Languages`]'s and matches and returns the icon's char
 /// value
-pub fn path_to_char(path: &PathBuf) -> char {
+pub fn path_to_char(path: &Path) -> char {
     icon_to_char(match pattern_code::path_to_language(path) {
         pattern_code::Language::Assembly => Nerd::FileBinary,
         pattern_code::Language::Bash => Nerd::Bash,
