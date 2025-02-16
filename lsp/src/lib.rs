@@ -8,9 +8,13 @@ use futures::{
 use iced_runtime::futures::stream::channel;
 use snafu::Snafu;
 use std::{path::PathBuf, sync::Arc};
-use tracing::{error, warn};
+use tracing::warn;
 
 const CHANNEL_SIZE: usize = 1024;
+
+/// The sender to commincate fast and thread safe with the [`client::LanguageServerProtocolClient`].
+#[derive(Debug, Clone)]
+pub struct Connection(mpsc::Sender<Message>);
 
 #[derive(Debug, Clone, Snafu)]
 pub enum Error {
@@ -20,16 +24,7 @@ pub enum Error {
     },
 }
 
-#[derive(Debug, Default)]
-pub enum State {
-    Connected(client::LSPClient, Receiver<Message>),
-    #[default]
-    Disconnected,
-}
-
-#[derive(Debug, Clone)]
-pub struct Connection(mpsc::Sender<Message>);
-
+/// One message for each action the [`client::LanguageServerProtocolClient`] can take according to the [specification](https://microsoft.github.io/language-server-protocol/).
 #[derive(Debug, Clone)]
 pub enum Message {
     Initialized(Connection),
@@ -37,6 +32,7 @@ pub enum Message {
     Synchronize(Synchronize),
 }
 
+/// Nested all messages that are about file synchronization.
 #[derive(Debug, Clone)]
 pub enum Synchronize {
     DidChange,
@@ -44,14 +40,26 @@ pub enum Synchronize {
     DidOpen(PathBuf),
 }
 
+/// How the internals of the stream are handled. This enum never leaves the stream and never is
+/// touched by the gui. It is self managed state by the [`client`] stream.
+#[derive(Debug, Default)]
+enum State {
+    Connected(client::LanguageServerProtocolClient, Receiver<Message>),
+    #[default]
+    Disconnected,
+}
+
 impl Connection {
     pub fn send(&mut self, message: Message) {
         self.0
             .try_send(message)
-            .expect("Send message to echo server");
+            .expect("Send message to language server protocol server.");
     }
 }
 
+/// Starts the [`client::LanguageServerProtocolClient`] [`Stream`] which is likely to last the entire program lifetime. The
+/// reason for this is these server processes are often very expensive to start, and the gain from
+/// reclaiming the resources will likely not matter much to the end user.
 pub fn client() -> impl Stream<Item = Message> {
     channel(CHANNEL_SIZE, |mut output| async move {
         let mut state = State::default();
@@ -61,9 +69,7 @@ pub fn client() -> impl Stream<Item = Message> {
                 State::Connected(ref mut client, ref mut receiver) => {
                     if let Some(message) = receiver.next().await {
                         match message {
-                            Message::Initialized(sender) => {
-                                error!("we are init");
-                            }
+                            Message::Initialized(_sender) => {}
                             Message::Shutdown => {
                                 let _ = client.shutdown().await;
                             }
@@ -71,24 +77,25 @@ pub fn client() -> impl Stream<Item = Message> {
                                 Synchronize::DidChange => todo!(),
                                 Synchronize::DidClose => todo!(),
                                 Synchronize::DidOpen(path) => {
-                                    error!("lsp/src/lib.rs 75");
                                     let _ = client.did_open(path).await;
                                 }
                             },
                         }
                     }
                 }
-                State::Disconnected => match client::LSPClient::initialize().await {
-                    Ok(client) => {
-                        let (sender, reciever) = mpsc::channel(CHANNEL_SIZE);
-                        let _ = output.send(Message::Initialized(Connection(sender))).await;
-                        state = State::Connected(client, reciever);
+                State::Disconnected => {
+                    match client::LanguageServerProtocolClient::initialize().await {
+                        Ok(client) => {
+                            let (sender, reciever) = mpsc::channel(CHANNEL_SIZE);
+                            let _ = output.send(Message::Initialized(Connection(sender))).await;
+                            state = State::Connected(client, reciever);
+                        }
+                        Err(e) => {
+                            warn!("{e}");
+                            let _ = output.send(Message::Shutdown).await;
+                        }
                     }
-                    Err(e) => {
-                        warn!("{e}");
-                        let _ = output.send(Message::Shutdown).await;
-                    }
-                },
+                }
             }
         }
     })

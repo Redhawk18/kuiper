@@ -37,13 +37,13 @@ struct ClientState {
 }
 
 #[derive(Debug)]
-pub struct LSPClient {
+pub struct LanguageServerProtocolClient {
     /// We want to hold onto the child process to properly kill on drop.
     _process: Child,
     socket: ServerSocket,
 }
 
-impl LSPClient {
+impl LanguageServerProtocolClient {
     pub async fn initialize() -> Result<Self, crate::Error> {
         let root_dir = Path::new(TEST_ROOT)
             .canonicalize()
