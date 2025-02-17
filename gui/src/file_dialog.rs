@@ -3,8 +3,7 @@ use snafu::{ResultExt, Snafu};
 use std::{path::PathBuf, sync::Arc};
 use tokio::fs;
 
-pub type File = (Option<PathBuf>, String);
-pub type Folder = PathBuf;
+use crate::buffer::{File, Folder};
 
 #[derive(Debug, Clone, Snafu)]
 pub enum Error {
@@ -34,9 +33,9 @@ pub async fn open_file() -> Result<File, Error> {
     };
 
     let path = file.path();
-    let contents = fs::read_to_string(path).await.context(ReadSnafu { path });
+    let contents = fs::read_to_string(path).await.context(ReadSnafu { path })?;
 
-    Ok((Some(path.to_path_buf()), contents.unwrap()))
+    Ok((contents, Some(path.to_path_buf())))
 }
 
 /// Opens a file dialog from [AsyncFileDialog] and returns the path.
@@ -55,7 +54,7 @@ pub async fn open_folder() -> Result<Folder, Error> {
 
 /// Opens a file dialog if path is [None] from [AsyncFileDialog] and save the content of the file chosen to the filesystem.
 pub async fn save_file(file: File) -> Result<(), Error> {
-    let path = match file.0 {
+    let path = match file.1 {
         Some(path) => path,
         None => {
             let Some(handle) = AsyncFileDialog::new().save_file().await else {
@@ -65,12 +64,12 @@ pub async fn save_file(file: File) -> Result<(), Error> {
         }
     };
 
-    fs::write(&path, file.1).await.context(WriteSnafu { path })
+    fs::write(&path, file.0).await.context(WriteSnafu { path })
 }
 
 /// Opens a file dialog from [AsyncFileDialog] and save the content of the file chosen to the filesystem
 pub async fn save_file_as(file: File) -> Result<(), Error> {
-    let handle = match file.0 {
+    let handle = match file.1 {
         Some(path) => {
             AsyncFileDialog::new()
                 .add_filter("Text Filies | *.txt", &["txt"])
@@ -92,5 +91,5 @@ pub async fn save_file_as(file: File) -> Result<(), Error> {
     };
     let path = handle.path().to_path_buf();
 
-    fs::write(&path, file.1).await.context(WriteSnafu { path })
+    fs::write(&path, file.0).await.context(WriteSnafu { path })
 }

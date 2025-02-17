@@ -144,10 +144,7 @@ impl LanguageServerProtocolClient {
     pub async fn did_change() -> Result<ServerSocket, crate::Error> {
         todo!()
     }
-    pub async fn did_open(&mut self, path: PathBuf) -> Result<(), crate::Error> {
-        let text = tokio::fs::read_to_string(path.clone()).await.unwrap();
-        // TODO We already have the text else where in the program,
-        // so we shouldn't need to re-read it.
+    pub async fn did_open(&mut self, text: String, path: PathBuf) -> Result<(), crate::Error> {
         let uri = Url::from_file_path(path).unwrap();
 
         self.socket
