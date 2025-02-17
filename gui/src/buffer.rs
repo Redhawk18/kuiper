@@ -1,7 +1,8 @@
 use iced::widget::text_editor;
 use std::path::PathBuf;
 
-use crate::file_dialog::File;
+pub type File = (String, Option<PathBuf>);
+pub type Folder = PathBuf;
 
 #[derive(Debug)]
 pub enum Buffer {
@@ -28,12 +29,12 @@ impl FileBuffer {
     }
 
     pub fn to_file(&self) -> File {
-        (self.path.clone(), self.content.text().to_string())
+        (self.content.text(), self.path.clone())
     }
 }
 
 impl From<File> for FileBuffer {
-    fn from((path, content): File) -> Self {
+    fn from((content, path): File) -> Self {
         Self {
             content: text_editor::Content::with_text(&content),
             path,

@@ -3,8 +3,8 @@ use iced::{
     Element, Task,
 };
 
-use crate::buffer::FileBuffer;
-use crate::file_dialog::{self, Error, File, Folder};
+use crate::buffer::{File, FileBuffer, Folder};
+use crate::file_dialog::{self, Error};
 
 #[derive(Debug, Clone)]
 pub enum Message {

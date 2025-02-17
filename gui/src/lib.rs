@@ -69,7 +69,7 @@ impl Kuiper {
                 if let Some(action) = toolbar::update(message) {
                     match action {
                         toolbar::Action::InsertFileBuffer(buffer) => {
-                            let path = buffer.path.clone().unwrap();
+                            let (text, path) = buffer.to_file();
                             let key = self.data.insert(buffer.into());
                             if let Some(pane) = self.panes.active_pane_mut() {
                                 pane.insert_buffer(key)
@@ -78,7 +78,7 @@ impl Kuiper {
                             // Blindly tell lsp every file is opened we want to send to it
                             if let Some(client) = &mut self.lsp_client {
                                 client.send(kuiper_lsp::Message::Synchronize(
-                                    kuiper_lsp::Synchronize::DidOpen(path),
+                                    kuiper_lsp::Synchronize::DidOpen(text, path.unwrap()),
                                 ))
                             }
                         }

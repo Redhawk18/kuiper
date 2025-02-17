@@ -10,8 +10,6 @@ use snafu::Snafu;
 use std::{path::PathBuf, sync::Arc};
 use tracing::warn;
 
-const CHANNEL_SIZE: usize = 1024;
-
 /// The sender to commincate fast and thread safe with the [`client::LanguageServerProtocolClient`].
 #[derive(Debug, Clone)]
 pub struct Connection(mpsc::Sender<Message>);
@@ -37,7 +35,7 @@ pub enum Message {
 pub enum Synchronize {
     DidChange,
     DidClose,
-    DidOpen(PathBuf),
+    DidOpen(String, PathBuf),
 }
 
 /// How the internals of the stream are handled. This enum never leaves the stream and never is
@@ -61,6 +59,7 @@ impl Connection {
 /// reason for this is these server processes are often very expensive to start, and the gain from
 /// reclaiming the resources will likely not matter much to the end user.
 pub fn client() -> impl Stream<Item = Message> {
+    const CHANNEL_SIZE: usize = 1024;
     channel(CHANNEL_SIZE, |mut output| async move {
         let mut state = State::default();
 
@@ -76,8 +75,8 @@ pub fn client() -> impl Stream<Item = Message> {
                             Message::Synchronize(synchronize) => match synchronize {
                                 Synchronize::DidChange => todo!(),
                                 Synchronize::DidClose => todo!(),
-                                Synchronize::DidOpen(path) => {
-                                    let _ = client.did_open(path).await;
+                                Synchronize::DidOpen(string, path) => {
+                                    let _ = client.did_open(string, path).await;
                                 }
                             },
                         }
