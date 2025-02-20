@@ -1,10 +1,11 @@
 use async_lsp::{
     concurrency::ConcurrencyLayer,
     lsp_types::{
-        notification::{Progress, PublishDiagnostics, ShowMessage},
-        ClientCapabilities, DidOpenTextDocumentParams, InitializeParams, InitializedParams,
-        NumberOrString, ProgressParamsValue, TextDocumentItem, Url, WindowClientCapabilities,
-        WorkDoneProgress,
+        notification::{DidChangeTextDocument, Progress, PublishDiagnostics, ShowMessage},
+        ClientCapabilities, DidChangeTextDocumentParams, DidOpenTextDocumentParams,
+        InitializeParams, InitializedParams, NumberOrString, ProgressParamsValue,
+        TextDocumentContentChangeEvent, TextDocumentItem, Url, VersionedTextDocumentIdentifier,
+        WindowClientCapabilities, WorkDoneProgress,
     },
     panic::CatchUnwindLayer,
     router::Router,
@@ -30,6 +31,7 @@ use crate::LspSnafu;
 
 struct Stop;
 
+const LANGUAGE: &str = "rust";
 const TEST_ROOT: &str = ".";
 
 struct ClientState {
@@ -137,13 +139,37 @@ impl LanguageServerProtocolClient {
         Ok(())
     }
 
-    pub async fn did_close() -> Result<ServerSocket, crate::Error> {
+    pub async fn did_close() -> Result<(), crate::Error> {
         todo!()
     }
 
-    pub async fn did_change() -> Result<ServerSocket, crate::Error> {
-        todo!()
+    pub async fn did_change(&mut self, changed: String, path: PathBuf) -> Result<(), crate::Error> {
+        let uri = Url::from_file_path(path).unwrap();
+
+        trace!("didchange");
+        self.socket
+            .did_change(DidChangeTextDocumentParams {
+                text_document: VersionedTextDocumentIdentifier {
+                    uri,
+                    // TODO we have to increase the version number before we do this
+                    version: 1,
+                },
+                content_changes: vec![TextDocumentContentChangeEvent {
+                    // OPTIMIZATION we need to send only the sections that have changed.
+                    // range is the starting..ending lines that have changed.
+                    // text is the text from the sections that have changed.
+                    // range_length is deprecated, keep as none.
+                    range: None,
+                    range_length: None,
+                    text: changed,
+                }],
+            })
+            .context(LspSnafu)?;
+        trace!("didchanged");
+
+        Ok(())
     }
+
     pub async fn did_open(&mut self, text: String, path: PathBuf) -> Result<(), crate::Error> {
         let uri = Url::from_file_path(path).unwrap();
 
@@ -151,7 +177,7 @@ impl LanguageServerProtocolClient {
             .did_open(DidOpenTextDocumentParams {
                 text_document: TextDocumentItem {
                     uri,
-                    language_id: "rust".into(),
+                    language_id: LANGUAGE.into(),
                     version: 0,
                     text,
                 },

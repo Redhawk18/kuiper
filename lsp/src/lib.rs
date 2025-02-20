@@ -33,7 +33,7 @@ pub enum Message {
 /// Nested all messages that are about file synchronization.
 #[derive(Debug, Clone)]
 pub enum Synchronize {
-    DidChange,
+    DidChange(String, PathBuf),
     DidClose,
     DidOpen(String, PathBuf),
 }
@@ -73,7 +73,9 @@ pub fn client() -> impl Stream<Item = Message> {
                                 let _ = client.shutdown().await;
                             }
                             Message::Synchronize(synchronize) => match synchronize {
-                                Synchronize::DidChange => todo!(),
+                                Synchronize::DidChange(string, path) => {
+                                    let _ = client.did_change(string, path).await;
+                                }
                                 Synchronize::DidClose => todo!(),
                                 Synchronize::DidOpen(string, path) => {
                                     let _ = client.did_open(string, path).await;

@@ -138,20 +138,25 @@ impl Panes {
                 {
                     match buffer {
                         Buffer::File(file_buffer) => {
-                            file_buffer.content.perform(action);
-                            tracing::warn!("LSP client update not implemented");
-                            if let Some(_client) = connection {
-                                if let Some(_path) = &file_buffer.path {
-                                    // return Task::perform(
-                                    // synchronize(path, client.clone().socket),
-                                    // |x| {
-                                    // Message::LanguageServer(LanguageServer::Syncronize(
-                                    // x,
-                                    // ))
-                                    // },
-                                    // );
+                            match action {
+                                text_editor::Action::Edit(_) => {
+                                    if let Some(conn) = connection {
+                                        conn.send(kuiper_lsp::Message::Synchronize(
+                                            kuiper_lsp::Synchronize::DidChange(
+                                                file_buffer.content.text(),
+                                                // OPTIMIZATION remove clone
+                                                // the cost of this should be pretty high since this will
+                                                // clone every single time the user has any input.
+                                                file_buffer.path.clone().expect(
+                                                    "non-files can't have lsp connections :P",
+                                                ),
+                                            ),
+                                        ))
+                                    }
                                 }
+                                _ => {}
                             }
+                            file_buffer.content.perform(action);
                         }
                     }
                 }
