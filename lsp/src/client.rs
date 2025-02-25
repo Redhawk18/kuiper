@@ -3,9 +3,10 @@ use async_lsp::{
     lsp_types::{
         notification::{DidChangeTextDocument, Progress, PublishDiagnostics, ShowMessage},
         ClientCapabilities, DidChangeTextDocumentParams, DidOpenTextDocumentParams,
-        InitializeParams, InitializedParams, NumberOrString, ProgressParamsValue,
-        TextDocumentContentChangeEvent, TextDocumentItem, Url, VersionedTextDocumentIdentifier,
-        WindowClientCapabilities, WorkDoneProgress,
+        DidSaveTextDocumentParams, InitializeParams, InitializedParams, NumberOrString,
+        ProgressParamsValue, TextDocumentContentChangeEvent, TextDocumentIdentifier,
+        TextDocumentItem, TextDocumentSaveReason, Url, VersionedTextDocumentIdentifier,
+        WillSaveTextDocumentParams, WindowClientCapabilities, WorkDoneProgress,
     },
     panic::CatchUnwindLayer,
     router::Router,
@@ -181,6 +182,32 @@ impl LanguageServerProtocolClient {
                     version: 0,
                     text,
                 },
+            })
+            .context(LspSnafu)?;
+
+        Ok(())
+    }
+
+    pub async fn did_save(&mut self, text: String, path: PathBuf) -> Result<(), crate::Error> {
+        let uri = Url::from_file_path(path).unwrap();
+
+        self.socket
+            .did_save(DidSaveTextDocumentParams {
+                text_document: TextDocumentIdentifier { uri },
+                text: Some(text),
+            })
+            .context(LspSnafu)?;
+
+        Ok(())
+    }
+
+    pub async fn will_save(&mut self, path: PathBuf) -> Result<(), crate::Error> {
+        let uri = Url::from_file_path(path).unwrap();
+
+        self.socket
+            .will_save(WillSaveTextDocumentParams {
+                text_document: TextDocumentIdentifier { uri },
+                reason: TextDocumentSaveReason::MANUAL,
             })
             .context(LspSnafu)?;
 

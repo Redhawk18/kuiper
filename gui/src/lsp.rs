@@ -3,8 +3,14 @@ use tracing::debug;
 
 use kuiper_lsp::Message;
 
-// this file should just be deleted tbh
-// for now I'll keep it, because you never know what you'll need.
+#[macro_export]
+macro_rules! send {
+    ($self:expr, $inner:expr) => {
+        if let Some(client) = &mut $self.lsp_client {
+            client.send($inner.into()); // Convert into `kuiper_lsp::Message`
+        }
+    };
+}
 
 pub fn update(
     lsp_connection: &mut Option<kuiper_lsp::Connection>,

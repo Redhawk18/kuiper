@@ -36,6 +36,8 @@ pub enum Synchronize {
     DidChange(String, PathBuf),
     DidClose,
     DidOpen(String, PathBuf),
+    DidSave(String, PathBuf),
+    WillSave(PathBuf),
 }
 
 /// How the internals of the stream are handled. This enum never leaves the stream and never is
@@ -52,6 +54,12 @@ impl Connection {
         self.0
             .try_send(message)
             .expect("Send message to language server protocol server.");
+    }
+}
+
+impl From<Synchronize> for Message {
+    fn from(value: Synchronize) -> Self {
+        Message::Synchronize(value)
     }
 }
 
@@ -79,6 +87,12 @@ pub fn client() -> impl Stream<Item = Message> {
                                 Synchronize::DidClose => todo!(),
                                 Synchronize::DidOpen(string, path) => {
                                     let _ = client.did_open(string, path).await;
+                                }
+                                Synchronize::DidSave(string, path) => {
+                                    let _ = client.did_save(string, path);
+                                }
+                                Synchronize::WillSave(path) => {
+                                    let _ = client.will_save(path);
                                 }
                             },
                         }

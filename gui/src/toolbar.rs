@@ -71,12 +71,18 @@ pub fn update(message: Message) -> Option<Action> {
             .ok()
             .map(|file| Action::InsertFileBuffer(file.into())),
         Message::FolderOpened(result) => result.ok().map(Action::SetWorkspacePath),
-        Message::FileSaved(_) => {
-            tracing::info!("File saved");
+        Message::FileSaved(r) => {
+            match r {
+                Ok(_) => tracing::info!("File saved"),
+                Err(e) => tracing::error!("{}", e),
+            };
             None
         }
-        Message::FileSavedAs(_) => {
-            tracing::info!("File saved as");
+        Message::FileSavedAs(r) => {
+            match r {
+                Ok(_) => tracing::info!("File saved as"),
+                Err(e) => tracing::error!("{}", e),
+            };
             None
         }
 

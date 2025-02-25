@@ -1,4 +1,5 @@
 use iced::{application, font, widget::column, Element, Subscription, Task, Theme};
+use kuiper_lsp::Synchronize;
 use slotmap::{DefaultKey, SlotMap};
 use std::path::PathBuf;
 
@@ -75,12 +76,7 @@ impl Kuiper {
                                 pane.insert_buffer(key)
                             }
 
-                            // Blindly tell lsp every file is opened we want to send to it
-                            if let Some(client) = &mut self.lsp_client {
-                                client.send(kuiper_lsp::Message::Synchronize(
-                                    kuiper_lsp::Synchronize::DidOpen(text, path.unwrap()),
-                                ))
-                            }
+                            send!(self, kuiper_lsp::Synchronize::DidOpen(text, path.unwrap()));
                         }
                         toolbar::Action::SetWorkspacePath(path) => {
                             self.workspace_folder = Some(path);
@@ -120,9 +116,7 @@ impl Kuiper {
                             }
                         }
                         toolbar::Action::Quit => {
-                            if let Some(connection) = &mut self.lsp_client {
-                                connection.send(kuiper_lsp::Message::Shutdown)
-                            }
+                            send!(self, kuiper_lsp::Message::Shutdown);
 
                             return iced::exit();
                         }
