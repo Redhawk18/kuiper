@@ -31,7 +31,7 @@ kuiper_lsp = { path = "lsp" }
 
 async-lsp = { version = "0.2" }
 futures = "0.3"
-iced = { version = "0.13.1", features = ["advanced", "tokio"] }
+iced = { version = "0.13.1", features = ["advanced","highlighter", "tokio"] }
 iced_aw = { version = "0.10", features = ["icons", "tab_bar"], default-features = false }
 iced_runtime = "0.13.2"
 pattern_code = "0.1"

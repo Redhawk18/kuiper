@@ -1,6 +1,12 @@
+use std::{ffi, path::Path};
+
 use iced::{
-    widget::pane_grid::{Axis, DragEvent, Pane, ResizeEvent, TitleBar},
-    widget::{button, column, pane_grid, row, text_editor},
+    highlighter,
+    widget::{
+        button, column, pane_grid,
+        pane_grid::{Axis, DragEvent, Pane, ResizeEvent, TitleBar},
+        row, text_editor,
+    },
     Alignment, Element, Fill, Renderer, Task, Theme,
 };
 use iced_aw::core::icons::nerd::{icon_to_text, Nerd};
@@ -207,6 +213,8 @@ fn body<'a>(
             text_editor(&file_buffer.content)
                 .height(Fill)
                 .on_action(move |action| Message::Editor(pane, action))
+                // TODO use pattern code library here to match more languages.
+                .highlight("rs", highlighter::Theme::Base16Eighties,)
         ]
         .spacing(1)
         .into(),
