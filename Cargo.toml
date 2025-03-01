@@ -21,7 +21,7 @@ members = [ "gui" , "lsp"]
 
 [workspace.package]
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 authors = ["Redhawk18"]
 license = "MPL-2.0"
 
@@ -31,11 +31,12 @@ kuiper_lsp = { path = "lsp" }
 
 async-lsp = { version = "0.2" }
 futures = "0.3"
-iced = { version = "0.13.1", features = ["advanced","highlighter", "tokio"] }
-iced_aw = { version = "0.10", features = ["icons", "tab_bar"], default-features = false }
-iced_runtime = "0.13.2"
+iced = { version = "0.14.0-dev", features = ["highlighter", "tokio"] }
+iced_aw = { version = "0.12", features = [ "tab_bar"], default-features = false }
+iced_fonts = { version = "0.2", features = ["full"] }
+iced_runtime = "0.14.0-dev"
 pattern_code = "0.1"
-rfd = { version = "0.15", features = ["xdg-portal", "tokio"], default-features = false}
+rfd = { version = "0.15" }
 slotmap = "1.0"
 snafu = "0.8"
 tokio = { version = "1", features = ["fs", "process", "time", "tracing", "rt"] }
@@ -45,5 +46,9 @@ tracing = "0.1"
 tracing-subscriber =  { version = "0.3", features = ["env-filter"] }
 
 [patch.crates-io]
-# iced = { git = 'https://github.com/iced-rs/iced.git' }
-# iced_aw = { git = 'https://github.com/iced-rs/iced_aw.git' }
+iced = { git = 'https://github.com/iced-rs/iced.git' }
+iced_core = { git = 'https://github.com/iced-rs/iced.git' }
+iced_runtime = { git = 'https://github.com/iced-rs/iced.git' }
+iced_widget = { git = 'https://github.com/iced-rs/iced.git' }
+iced_aw = { git = 'https://github.com/redhawk18/iced_aw.git' }
+iced_fonts = { git = 'https://github.com/redhawk18/iced_fonts.git', branch = "next" }

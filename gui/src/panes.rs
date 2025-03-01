@@ -9,7 +9,7 @@ use iced::{
     },
     Alignment, Element, Fill, Renderer, Task, Theme,
 };
-use iced_aw::core::icons::nerd::{icon_to_text, Nerd};
+use iced_fonts::nerd::{to_text, Nerd};
 
 mod tabs;
 
@@ -176,11 +176,11 @@ impl Panes {
 fn title_bar<'a>(active: bool, pane: Pane) -> TitleBar<'a, Message, Theme, Renderer> {
     TitleBar::new(Element::from(
         row!(
-            button(icon_to_text(Nerd::SplitHorizontal))
-                .on_press(Message::PaneSplit(pane_grid::Axis::Vertical, pane)),
-            button(icon_to_text(Nerd::SplitVertical))
-                .on_press(Message::PaneSplit(pane_grid::Axis::Horizontal, pane)),
-            button(icon_to_text(Nerd::X)).on_press(Message::PaneClosed(pane)),
+            // button(to_text(Nerd::SplitHorizontal))
+            //     .on_press(Message::PaneSplit(pane_grid::Axis::Vertical, pane)),
+            // button(to_text(Nerd::SplitVertical))
+            //     .on_press(Message::PaneSplit(pane_grid::Axis::Horizontal, pane)),
+            // button(to_text(Nerd::X)).on_press(Message::PaneClosed(pane)),
         )
         .align_y(Alignment::Center),
     ))

@@ -1,6 +1,8 @@
 {
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    # nixpkgs.url = "github:NixOS/nixpkgs/unstable";
+    # https://nixpk.gs/pr-tracker.html?pr=383902
+    nixpkgs.url = "github:NixOS/nixpkgs/staging";
     devenv.url = "github:cachix/devenv";
   };
 
@@ -25,22 +27,10 @@
             dotenv.disableHint = true;
 
             languages.rust.enable = true;
-            # packages = with pkgs; [ rust-analyzer ];
+            languages.rust.mold.enable = false;
+            # packages = with pkgs; [ ];
 
             env = {
-              LD_LIBRARY_PATH = lib.makeLibraryPath (
-                with pkgs;
-                [
-                  libGL
-                  libxkbcommon
-                  vulkan-loader
-                  wayland
-                  xorg.libXcursor
-                  xorg.libXrandr
-                  xorg.libXi
-                  xorg.libX11
-                ]
-              );
               RUST_LOG = "info";
             };
           };

@@ -1,7 +1,7 @@
-use iced_aw::core::icons::nerd::Nerd;
+use iced_fonts::Nerd;
 use std::path::Path;
 
-pub use iced_aw::core::icons::nerd::icon_to_char;
+use iced_fonts::nerd::icon_to_char;
 
 /// Maps the file name to [`pattern_code::Languages`]'s and matches and returns the icon's char
 /// value

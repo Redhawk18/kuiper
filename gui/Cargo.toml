@@ -12,6 +12,7 @@ kuiper_lsp.workspace = true
 
 iced.workspace = true
 iced_aw.workspace = true
+iced_fonts.workspace = true
 pattern_code.workspace = true
 rfd.workspace = true
 slotmap.workspace = true

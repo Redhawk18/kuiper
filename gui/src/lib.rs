@@ -1,4 +1,4 @@
-use iced::{application, font, widget::column, Element, Subscription, Task, Theme};
+use iced::{Element, Subscription, Task, Theme, application, font, widget::column};
 use kuiper_lsp::Synchronize;
 use slotmap::{DefaultKey, SlotMap};
 use std::path::PathBuf;
@@ -45,8 +45,8 @@ impl Kuiper {
         (
             Kuiper::default(),
             Task::batch(vec![
-                font::load(iced_aw::BOOTSTRAP_FONT_BYTES).map(Message::FontLoaded),
-                font::load(iced_aw::NERD_FONT_BYTES).map(Message::FontLoaded),
+                font::load(iced_fonts::BOOTSTRAP_FONT_BYTES).map(Message::FontLoaded),
+                font::load(iced_fonts::NERD_FONT_BYTES).map(Message::FontLoaded),
             ]),
         )
     }

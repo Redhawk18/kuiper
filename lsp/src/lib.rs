@@ -1,9 +1,9 @@
 pub mod client;
 
 use futures::{
+    SinkExt,
     channel::mpsc::{self, Receiver},
     stream::{Stream, StreamExt},
-    SinkExt,
 };
 use iced_runtime::futures::stream::channel;
 use snafu::Snafu;
@@ -68,7 +68,7 @@ impl From<Synchronize> for Message {
 /// reclaiming the resources will likely not matter much to the end user.
 pub fn client() -> impl Stream<Item = Message> {
     const CHANNEL_SIZE: usize = 1024;
-    channel(CHANNEL_SIZE, |mut output| async move {
+    channel(CHANNEL_SIZE, async |mut output| {
         let mut state = State::default();
 
         loop {
