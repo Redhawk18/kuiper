@@ -31,6 +31,19 @@
             # packages = with pkgs; [ ];
 
             env = {
+              LD_LIBRARY_PATH = lib.makeLibraryPath (
+                with pkgs;
+                [
+                  libGL
+                  libxkbcommon
+                  vulkan-loader
+                  wayland
+                  xorg.libXcursor
+                  xorg.libXrandr
+                  xorg.libXi
+                  xorg.libX11
+                ]
+              );
               RUST_LOG = "info";
             };
           };

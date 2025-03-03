@@ -35,7 +35,7 @@ iced = { version = "0.14.0-dev", features = ["highlighter", "tokio"] }
 iced_aw = { version = "0.12", features = [ "tab_bar"], default-features = false }
 iced_fonts = { version = "0.2", features = ["full"] }
 iced_runtime = "0.14.0-dev"
-pattern_code = "0.1"
+pattern_code = "0.2"
 rfd = { version = "0.15" }
 slotmap = "1.0"
 snafu = "0.8"
@@ -46,9 +46,15 @@ tracing = "0.1"
 tracing-subscriber =  { version = "0.3", features = ["env-filter"] }
 
 [patch.crates-io]
-iced = { git = 'https://github.com/iced-rs/iced.git' }
-iced_core = { git = 'https://github.com/iced-rs/iced.git' }
-iced_runtime = { git = 'https://github.com/iced-rs/iced.git' }
-iced_widget = { git = 'https://github.com/iced-rs/iced.git' }
-iced_aw = { git = 'https://github.com/redhawk18/iced_aw.git' }
-iced_fonts = { git = 'https://github.com/redhawk18/iced_fonts.git', branch = "next" }
+# iced = { git = 'https://github.com/iced-rs/iced.git' }
+iced = { path = "../iced/" }
+# iced_core = { git = 'https://github.com/iced-rs/iced.git' }
+iced_core = { path = "../iced/core" }
+# iced_runtime = { git = 'https://github.com/iced-rs/iced.git' }
+iced_runtime = { path = "../iced/runtime/" }
+# iced_widget = { git = 'https://github.com/iced-rs/iced.git' }
+iced_widget = { path = "../iced/widget/" }
+# iced_aw = { git = 'https://github.com/redhawk18/iced_aw.git' }
+iced_aw = { path = "../iced_aw/" }
+# iced_fonts = { git = 'https://github.com/redhawk18/iced_fonts.git', branch = "next" }
+iced_fonts = { path = "../iced_fonts/" }

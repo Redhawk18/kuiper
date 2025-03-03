@@ -1,22 +1,24 @@
-use std::{ffi, path::Path};
-
 use iced::{
-    highlighter,
+    Alignment, Element, Fill, Renderer, Task, Theme, highlighter,
     widget::{
         button, column, pane_grid,
         pane_grid::{Axis, DragEvent, Pane, ResizeEvent, TitleBar},
         row, text_editor,
     },
-    Alignment, Element, Fill, Renderer, Task, Theme,
 };
-use iced_fonts::nerd::{to_text, Nerd};
+use iced_fonts::nerd::{Nerd, to_text};
+use pattern_code::Language;
+use std::{
+    ffi,
+    path::{Path, PathBuf},
+};
 
 mod tabs;
 
 use crate::{
+    Key, Map,
     buffer::Buffer,
     style::{pane_active, pane_inactive, title_bar_active, title_bar_inactive},
-    Key, Map,
 };
 
 #[derive(Debug, Clone)]
@@ -208,16 +210,19 @@ fn body<'a>(
     let active_buffer = visible.get(*active).and_then(|key| data.get(*key));
 
     match active_buffer {
-        Some(Buffer::File(file_buffer)) => column![
-            tabs::view(*active, visible_buffers()).map(move |msg| Message::Tabs(pane, msg)),
-            text_editor(&file_buffer.content)
-                .height(Fill)
-                .on_action(move |action| Message::Editor(pane, action))
-                // TODO use pattern code library here to match more languages.
-                .highlight("rs", highlighter::Theme::Base16Eighties,)
-        ]
-        .spacing(1)
-        .into(),
+        Some(Buffer::File(file_buffer)) => {
+            let path = file_buffer.path.clone().unwrap_or(PathBuf::new());
+            let language = Language::from(path.as_path());
+            column![
+                tabs::view(*active, visible_buffers()).map(move |msg| Message::Tabs(pane, msg)),
+                text_editor(&file_buffer.content)
+                    .height(Fill)
+                    .on_action(move |action| Message::Editor(pane, action))
+                    .highlight(language.extension_as_str(), highlighter::Theme::GruvboxDark,)
+            ]
+            .spacing(1)
+            .into()
+        }
         None => column![].into(),
     }
 }
