@@ -1,17 +1,13 @@
 use iced::{
     Alignment, Element, Fill, Renderer, Task, Theme, highlighter,
     widget::{
-        button, column, pane_grid,
+        column, pane_grid,
         pane_grid::{Axis, DragEvent, Pane, ResizeEvent, TitleBar},
         row, text_editor,
     },
 };
-use iced_fonts::nerd::{Nerd, to_text};
 use pattern_code::Language;
-use std::{
-    ffi,
-    path::{Path, PathBuf},
-};
+use std::path::PathBuf;
 
 mod tabs;
 
@@ -175,7 +171,7 @@ impl Panes {
     }
 }
 
-fn title_bar<'a>(active: bool, pane: Pane) -> TitleBar<'a, Message, Theme, Renderer> {
+fn title_bar<'a>(active: bool, _pane: Pane) -> TitleBar<'a, Message, Theme, Renderer> {
     TitleBar::new(Element::from(
         row!(
             // button(to_text(Nerd::SplitHorizontal))
@@ -218,7 +214,10 @@ fn body<'a>(
                 text_editor(&file_buffer.content)
                     .height(Fill)
                     .on_action(move |action| Message::Editor(pane, action))
-                    .highlight(language.extension_as_str(), highlighter::Theme::GruvboxDark,)
+                    .highlight(
+                        language.extension_as_str(),
+                        highlighter::Theme::SolarizedDark,
+                    )
             ]
             .spacing(1)
             .into()

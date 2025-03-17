@@ -1,17 +1,17 @@
 use async_lsp::{
+    LanguageServer, ServerSocket,
     concurrency::ConcurrencyLayer,
     lsp_types::{
-        notification::{DidChangeTextDocument, Progress, PublishDiagnostics, ShowMessage},
         ClientCapabilities, DidChangeTextDocumentParams, DidOpenTextDocumentParams,
         DidSaveTextDocumentParams, InitializeParams, InitializedParams, NumberOrString,
         ProgressParamsValue, TextDocumentContentChangeEvent, TextDocumentIdentifier,
         TextDocumentItem, TextDocumentSaveReason, Url, VersionedTextDocumentIdentifier,
         WillSaveTextDocumentParams, WindowClientCapabilities, WorkDoneProgress,
+        notification::{Progress, PublishDiagnostics, ShowMessage},
     },
     panic::CatchUnwindLayer,
     router::Router,
     tracing::TracingLayer,
-    LanguageServer, ServerSocket,
 };
 use snafu::ResultExt;
 use std::{

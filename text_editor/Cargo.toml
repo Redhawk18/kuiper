@@ -1,0 +1,9 @@
+[package]
+name = "kuiper_text_editor"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[dependencies]
+iced.workspace = true

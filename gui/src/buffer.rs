@@ -15,7 +15,7 @@ pub struct FileBuffer {
     pub content: text_editor::Content, // This causes a bug because [`Content`] can create exact replicas of a text
     // editor so scrolling and cursor locations are the same on each. Currently the only way I see
     // this changing is making a custom text editor widget.
-    dirty: bool,
+    _dirty: bool,
     pub path: Option<PathBuf>,
 }
 
