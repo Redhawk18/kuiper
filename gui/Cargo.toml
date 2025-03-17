@@ -9,6 +9,7 @@ license.workspace = true
 
 [dependencies]
 kuiper_lsp.workspace = true
+kuiper_text_editor.workspace = true
 
 iced.workspace = true
 iced_aw.workspace = true

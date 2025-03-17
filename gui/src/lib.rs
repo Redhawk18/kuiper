@@ -1,5 +1,4 @@
 use iced::{Element, Subscription, Task, Theme, application, font, widget::column};
-use kuiper_lsp::Synchronize;
 use slotmap::{DefaultKey, SlotMap};
 use std::path::PathBuf;
 
