@@ -1,11 +1,12 @@
 use iced::{
     Alignment, Element, Fill, Renderer, Task, Theme, highlighter,
     widget::{
-        column, pane_grid,
-        pane_grid::{Axis, DragEvent, Pane, ResizeEvent, TitleBar},
+        button, column,
+        pane_grid::{self, Axis, DragEvent, Pane, ResizeEvent, TitleBar},
         row, text_editor,
     },
 };
+use iced_fonts::{Nerd, nerd::to_text};
 use pattern_code::Language;
 use std::path::PathBuf;
 
@@ -73,7 +74,7 @@ impl Panes {
     pub fn view<'a>(&'a self, map: &'a Map) -> Element<'a, Message, Theme, Renderer> {
         let active = self.active_pane;
 
-        pane_grid(&self.panes, move |pane, state, _is_maximized| {
+        iced::widget::pane_grid(&self.panes, move |pane, state, _is_maximized| {
             let active = active != pane;
 
             pane_grid::Content::new(body(pane, state.active_buffer(), &state.open_buffers, map))
@@ -174,11 +175,11 @@ impl Panes {
 fn title_bar<'a>(active: bool, pane: Pane) -> TitleBar<'a, Message, Theme, Renderer> {
     TitleBar::new(Element::from(
         row!(
-            // button(to_text(Nerd::SplitHorizontal))
-            //     .on_press(Message::PaneSplit(pane_grid::Axis::Vertical, pane)),
-            // button(to_text(Nerd::SplitVertical))
-            //     .on_press(Message::PaneSplit(pane_grid::Axis::Horizontal, pane)),
-            // button(to_text(Nerd::X)).on_press(Message::PaneClosed(pane)),
+            button(to_text(Nerd::SplitHorizontal))
+                .on_press(Message::PaneSplit(pane_grid::Axis::Vertical, pane)),
+            button(to_text(Nerd::SplitVertical))
+                .on_press(Message::PaneSplit(pane_grid::Axis::Horizontal, pane)),
+            button(to_text(Nerd::X)).on_press(Message::PaneClosed(pane)),
         )
         .align_y(Alignment::Center),
     ))

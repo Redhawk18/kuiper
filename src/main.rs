@@ -1,5 +1,5 @@
 use kuiper_gui::start_gui;
-use tracing_subscriber::{fmt, EnvFilter};
+use tracing_subscriber::{EnvFilter, fmt};
 
 fn main() {
     let filter = EnvFilter::from_default_env()

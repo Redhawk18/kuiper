@@ -10,11 +10,10 @@ license.workspace = true
 
 [dependencies]
 kuiper_gui.workspace = true
-
 tracing-subscriber.workspace = true 
 
 [dev-dependencies]
-console-subscriber = "0.4.0"
+console-subscriber = "0.4"
 
 [workspace]
 members = [ "gui" , "lsp", "text_editor"]
@@ -36,17 +35,18 @@ iced = { version = "0.14.0-dev", features = ["advanced", "highlighter", "tokio"]
 iced_aw = { version = "0.12", features = [ "tab_bar"], default-features = false }
 iced_fonts = { version = "0.2", features = ["full"] }
 iced_runtime = "0.14.0-dev"
+ouroboros = "0.18.5"
 pattern_code = "0.2"
 rfd = { version = "0.15" }
 slotmap = "1.0"
 snafu = "0.8"
+syntastica = "0.6.0"
+syntastica-parsers = { version = "0.6.0", features = ["most"] }
 tokio = { version = "1", features = ["fs", "process", "time", "tracing", "rt"] }
 tokio-util = { version = "0.7", features = ["compat"] }
 tower = "0.4"
 tracing = "0.1"
 tracing-subscriber =  { version = "0.3", features = ["env-filter"] }
-tree-house = "0.1.0-beta.1"
-tree-sitter-rust = "0.23.2"
 
 [patch.crates-io]
 iced = { git = 'https://github.com/iced-rs/iced.git', rev = "beddf49c" }
@@ -61,5 +61,5 @@ iced_aw = { git = 'https://github.com/redhawk18/iced_aw.git', branch = "main"}
 # iced_aw = { path = "../iced_aw/" }
 iced_fonts = { git = 'https://github.com/redhawk18/iced_fonts.git', branch = "next" }
 # iced_fonts = { path = "../iced_fonts/" }
-tree-house = { git = "https://github.com/helix-editor/tree-house.git" }
-# tree-house = { path = "../test/tree-house/highlighter/" }
+ # syntastica = { path = "../syntastica/" }
+ # syntastica-parsers = { path = "../syntastica/syntastica-parsers/" }

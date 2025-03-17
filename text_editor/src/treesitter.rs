@@ -1,117 +1,75 @@
 use iced::advanced::text;
-use std::{
-    ops::{Range, RangeBounds},
-    sync::Arc,
-    time::Duration,
-};
-use tree_house::highlighter;
+use ouroboros::self_referencing;
+use std::{ops::Range, sync::Arc};
+use syntastica::Processor;
+use syntastica_parsers::{self, Lang, LanguageSetImpl};
 
-pub struct Loader {}
+const LANGUAGE: Lang = Lang::Rust;
 
-impl Loader {
-    pub fn new() -> Self {
-        Self {}
-    }
+/// VOODOO WARNING, This is not ideal but it compiles this way.
+///
+/// This holds the data for the highlighter used by [`iced`] and by [`syntastica`],
+/// Be careful this is held together with hope and prayers.
+#[self_referencing]
+pub struct Highlighter {
+    current_line: Box<usize>,
+    language_set: Box<LanguageSetImpl>,
+    #[borrows(language_set)]
+    #[covariant]
+    processor: Processor<'this, LanguageSetImpl>,
 }
 
-impl tree_house::LanguageLoader for Loader {
-    fn language_for_marker(
-        &self,
-        _marker: tree_house::InjectionLanguageMarker,
-    ) -> Option<tree_house::Language> {
-        let i = 0;
-        Some(tree_house::Language(i as u32))
-    }
+type Highlight = Option<&'static str>;
 
-    fn get_config(&self, _lang: tree_house::Language) -> Option<&tree_house::LanguageConfig> {
-        None
-        /*
-         * Load the compiled parser with `tree_house::Grammar::new`.
-         * Load query text from `highlights.scm`, `injections.scm` and `locals.scm` queries
-         * with `tree_house::read_query`. And pass everything to `tree_house::LanguageConfig::new`.
-         */
-        // Some(config)
-    }
-}
-
-pub struct Syntax(tree_house::Syntax);
-
-impl Syntax {
-    pub fn new() -> Self {
-        let language = tree_house::Language(0 as u32);
-        let timeout = Duration::from_millis(250);
-        let loader = Loader::new();
-
-        Self(
-            tree_house::Syntax::new(
-                "fn main() { let i = 5; }".into(),
-                language,
-                timeout,
-                &loader,
-            )
-            .unwrap(),
-        )
-    }
-}
-
-pub struct Highlighter<'a> {
-    highlighter: highlighter::Highlighter<'a, 'a, Loader>,
-    syntax: &'a Syntax,
-}
-
-#[derive(Clone)]
+/// The infomation that is passed into the highlighter for updates, or new highlights.
+#[derive(Clone, PartialEq)]
 pub struct Settings<'a> {
-    syntax: &'a Syntax,
     text: &'a str,
-    loader: &'a Loader,
-    range: Range<u32>,
 }
 
-/// We want to compare the content and the range of changes, comparing the syntax tree and the
-/// loader are not needed.
-impl PartialEq for Settings<'_> {
-    fn eq(&self, other: &Self) -> bool {
-        if self.text == other.text && self.range == other.range {
-            true
-        } else {
-            false
+impl text::Highlighter for Highlighter {
+    type Settings = Settings<'static>;
+    type Highlight = Highlight;
+    type Iterator<'b> = Box<dyn Iterator<Item = (Range<usize>, &str)> + 'b>;
+
+    fn new(_settings: &Self::Settings) -> Self {
+        HighlighterBuilder {
+            current_line: Box::new(0),
+            language_set: Box::new(LanguageSetImpl::new()),
+            processor_builder: |set| Processor::new(set),
         }
+        .build()
     }
-}
 
-impl<'a> text::Highlighter for Highlighter<'a>
-where
-    'a: 'static,
-{
-    type Settings = Settings<'a>;
-    type Highlight = highlighter::Highlight;
-    type Iterator<'b> = Box<dyn Iterator<Item = (Range<usize>, highlighter::Highlight)> + 'b>;
+    fn update(&mut self, new_settings: &Self::Settings) {
+        _ = self.with_processor_mut(|p| p.process(new_settings.text, LANGUAGE));
+        self.change_line(0);
+    }
 
-    fn new(settings: &Self::Settings) -> Self {
-        Self {
-            highlighter: highlighter::Highlighter::new(
-                &settings.syntax.0,
-                settings.text.into(),
-                settings.loader,
-                settings.range.clone(),
-            ),
-            syntax: settings.syntax,
+    fn change_line(&mut self, line: usize) {
+        self.with_current_line_mut(|l| **l = line);
+    }
+
+    fn highlight_line(&mut self, line: &'static str) -> Self::Iterator<'_> {
+        // Yeah this can be dangerous. If this never got safer please fix it. Also this makes no
+        // fucking sense, Iced does highlighting line by line, yet Syntastica does it by the whole
+        // file. So this could be a huge bottleneck at most or at least is an annoyance to me.
+        let highlights = self.with_processor_mut(|p| p.process(line, LANGUAGE).unwrap()[0].clone());
+
+        let mut column = 0;
+        let mut iter = Vec::new();
+        for (text, _) in highlights {
+            let start = column;
+            let end = column + text.len();
+            column += text.len();
+
+            iter.push((start..end, text));
         }
-    }
 
-    fn update(&mut self, _new_settings: &Self::Settings) {
-        todo!()
-    }
-
-    fn change_line(&mut self, _line: usize) {
-        todo!()
-    }
-
-    fn highlight_line(&mut self, _line: &str) -> Self::Iterator<'_> {
-        todo!()
+        Box::new(iter.into_iter())
     }
 
     fn current_line(&self) -> usize {
-        todo!()
+        **self.borrow_current_line()
     }
 }

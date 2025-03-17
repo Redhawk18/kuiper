@@ -7,5 +7,6 @@ license.workspace = true
 
 [dependencies]
 iced.workspace = true
-tree-house.workspace = true
-tree-sitter-rust.workspace = true
+ouroboros.workspace = true
+syntastica.workspace = true
+syntastica-parsers.workspace = true

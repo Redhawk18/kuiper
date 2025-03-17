@@ -1,6 +1,6 @@
 use iced::{
-    widget::{button, row},
     Element, Task,
+    widget::{button, row},
 };
 
 use crate::buffer::{File, FileBuffer, Folder};
