@@ -1,0 +1,11 @@
+[package]
+name = "kuiper_text_editor"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[dependencies]
+iced.workspace = true
+tree-house.workspace = true
+tree-sitter-rust.workspace = true

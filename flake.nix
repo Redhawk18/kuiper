@@ -1,8 +1,6 @@
 {
   inputs = {
-    # nixpkgs.url = "github:NixOS/nixpkgs/unstable";
-    # https://nixpk.gs/pr-tracker.html?pr=383902
-    nixpkgs.url = "github:NixOS/nixpkgs/staging";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     devenv.url = "github:cachix/devenv";
   };
 
@@ -27,7 +25,6 @@
             dotenv.disableHint = true;
 
             languages.rust.enable = true;
-            languages.rust.mold.enable = false;
             # packages = with pkgs; [ ];
 
             env = {

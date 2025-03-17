@@ -17,7 +17,7 @@ tracing-subscriber.workspace = true
 console-subscriber = "0.4.0"
 
 [workspace]
-members = [ "gui" , "lsp"]
+members = [ "gui" , "lsp", "text_editor"]
 
 [workspace.package]
 version = "0.1.0"
@@ -28,10 +28,11 @@ license = "MPL-2.0"
 [workspace.dependencies]
 kuiper_gui = { path = "gui" }
 kuiper_lsp = { path = "lsp" }
+kuiper_text_editor = { path = "text_editor" }
 
 async-lsp = { version = "0.2" }
 futures = "0.3"
-iced = { version = "0.14.0-dev", features = ["highlighter", "tokio"] }
+iced = { version = "0.14.0-dev", features = ["advanced", "highlighter", "tokio"] }
 iced_aw = { version = "0.12", features = [ "tab_bar"], default-features = false }
 iced_fonts = { version = "0.2", features = ["full"] }
 iced_runtime = "0.14.0-dev"
@@ -44,17 +45,21 @@ tokio-util = { version = "0.7", features = ["compat"] }
 tower = "0.4"
 tracing = "0.1"
 tracing-subscriber =  { version = "0.3", features = ["env-filter"] }
+tree-house = "0.1.0-beta.1"
+tree-sitter-rust = "0.23.2"
 
 [patch.crates-io]
-# iced = { git = 'https://github.com/iced-rs/iced.git' }
-iced = { path = "../iced/" }
-# iced_core = { git = 'https://github.com/iced-rs/iced.git' }
-iced_core = { path = "../iced/core" }
-# iced_runtime = { git = 'https://github.com/iced-rs/iced.git' }
-iced_runtime = { path = "../iced/runtime/" }
-# iced_widget = { git = 'https://github.com/iced-rs/iced.git' }
-iced_widget = { path = "../iced/widget/" }
-# iced_aw = { git = 'https://github.com/redhawk18/iced_aw.git' }
-iced_aw = { path = "../iced_aw/" }
-# iced_fonts = { git = 'https://github.com/redhawk18/iced_fonts.git', branch = "next" }
-iced_fonts = { path = "../iced_fonts/" }
+iced = { git = 'https://github.com/iced-rs/iced.git', rev = "beddf49c" }
+# iced = { path = "../iced/" }
+iced_core = { git = 'https://github.com/iced-rs/iced.git', rev = "beddf49c"}
+# iced_core = { path = "../iced/core" }
+iced_runtime = { git = 'https://github.com/iced-rs/iced.git', rev = "beddf49c" }
+# iced_runtime = { path = "../iced/runtime/" }
+iced_widget = { git = 'https://github.com/iced-rs/iced.git', rev = "beddf49c"}
+# iced_widget = { path = "../iced/widget/" }
+iced_aw = { git = 'https://github.com/redhawk18/iced_aw.git', branch = "main"}
+# iced_aw = { path = "../iced_aw/" }
+iced_fonts = { git = 'https://github.com/redhawk18/iced_fonts.git', branch = "next" }
+# iced_fonts = { path = "../iced_fonts/" }
+tree-house = { git = "https://github.com/helix-editor/tree-house.git" }
+# tree-house = { path = "../test/tree-house/highlighter/" }
